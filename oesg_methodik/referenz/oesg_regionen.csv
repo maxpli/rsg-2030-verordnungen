@@ -1,0 +1,117 @@
+VZ,VZ_Name,BL_Nr,Bundesland,VR,VR_Name,Bezirk,Bezirk_Name
+1,Ost,1,Burgenland,11,Burgenland-Nord,101,Eisenstadt (Stadt)
+1,Ost,1,Burgenland,11,Burgenland-Nord,102,Rust (Stadt)
+1,Ost,1,Burgenland,11,Burgenland-Nord,103,Eisenstadt-Umgebung
+1,Ost,1,Burgenland,11,Burgenland-Nord,106,Mattersburg
+1,Ost,1,Burgenland,11,Burgenland-Nord,107,Neusiedl am See
+1,Ost,1,Burgenland,11,Burgenland-Nord,108,Oberpullendorf
+2,Süd,1,Burgenland,12,Burgenland-Süd,104,Güssing
+2,Süd,1,Burgenland,12,Burgenland-Süd,105,Jennersdorf
+2,Süd,1,Burgenland,12,Burgenland-Süd,109,Oberwart
+2,Süd,2,Kärnten,21,Kärnten-Ost,201,Klagenfurt Stadt
+2,Süd,2,Kärnten,21,Kärnten-Ost,204,Klagenfurt Land
+2,Süd,2,Kärnten,21,Kärnten-Ost,205,Sankt Veit an der Glan
+2,Süd,2,Kärnten,21,Kärnten-Ost,208,Völkermarkt
+2,Süd,2,Kärnten,21,Kärnten-Ost,209,Wolfsberg
+2,Süd,2,Kärnten,21,Kärnten-Ost,210,Feldkirchen
+2,Süd,2,Kärnten,22,Kärnten-West,202,Villach Stadt
+2,Süd,2,Kärnten,22,Kärnten-West,203,Hermagor
+2,Süd,2,Kärnten,22,Kärnten-West,206,Spittal an der Drau
+2,Süd,2,Kärnten,22,Kärnten-West,207,Villach Land
+1,Ost,3,Niederösterreich,31,NÖ Mitte,301,Krems an der Donau (Stadt)
+1,Ost,3,Niederösterreich,31,NÖ Mitte,302,Sankt Pölten (Stadt)
+1,Ost,3,Niederösterreich,31,NÖ Mitte,313,Krems (Land)
+1,Ost,3,Niederösterreich,31,NÖ Mitte,314,Lilienfeld
+1,Ost,3,Niederösterreich,31,NÖ Mitte,319,Sankt Pölten (Land)
+1,Ost,3,Niederösterreich,31,NÖ Mitte,321,Tulln
+1,Ost,3,Niederösterreich,32,Waldviertel,309,Gmünd
+1,Ost,3,Niederösterreich,32,Waldviertel,311,Horn
+1,Ost,3,Niederösterreich,32,Waldviertel,322,Waidhofen an der Thaya
+1,Ost,3,Niederösterreich,32,Waldviertel,325,Zwettl
+1,Ost,3,Niederösterreich,33,Weinviertel,308,Gänserndorf
+1,Ost,3,Niederösterreich,33,Weinviertel,310,Hollabrunn
+1,Ost,3,Niederösterreich,33,Weinviertel,312,Korneuburg
+1,Ost,3,Niederösterreich,33,Weinviertel,316,Mistelbach
+1,Ost,3,Niederösterreich,34,Thermenregion,304,Wiener Neustadt (Stadt)
+1,Ost,3,Niederösterreich,34,Thermenregion,306,Baden
+1,Ost,3,Niederösterreich,34,Thermenregion,307,Bruck an der Leitha
+1,Ost,3,Niederösterreich,34,Thermenregion,317,Mödling
+1,Ost,3,Niederösterreich,34,Thermenregion,318,Neunkirchen
+1,Ost,3,Niederösterreich,34,Thermenregion,323,Wiener Neustadt (Land)
+1,Ost,3,Niederösterreich,35,Mostviertel,303,Waidhofen an der Ybbs (Stadt)
+1,Ost,3,Niederösterreich,35,Mostviertel,305,Amstetten
+1,Ost,3,Niederösterreich,35,Mostviertel,315,Melk
+1,Ost,3,Niederösterreich,35,Mostviertel,320,Scheibbs
+3,Nord,4,Oberösterreich,41,OÖ Zentralraum Linz,401,Linz (Stadt)
+3,Nord,4,Oberösterreich,41,OÖ Zentralraum Linz,410,Linz-Land
+3,Nord,4,Oberösterreich,42,OÖ Zentralraum Wels,403,Wels (Stadt)
+3,Nord,4,Oberösterreich,42,OÖ Zentralraum Wels,405,Eferding
+3,Nord,4,Oberösterreich,42,OÖ Zentralraum Wels,408,Grieskirchen
+3,Nord,4,Oberösterreich,42,OÖ Zentralraum Wels,418,Wels-Land
+3,Nord,4,Oberösterreich,43,Mühlviertel,406,Freistadt
+3,Nord,4,Oberösterreich,43,Mühlviertel,411,Perg
+3,Nord,4,Oberösterreich,43,Mühlviertel,413,Rohrbach
+3,Nord,4,Oberösterreich,43,Mühlviertel,416,Urfahr-Umgebung
+3,Nord,4,Oberösterreich,44,Pyhrn-Eisenwurzen,402,Steyr (Stadt)
+3,Nord,4,Oberösterreich,44,Pyhrn-Eisenwurzen,409,Kirchdorf an der Krems
+3,Nord,4,Oberösterreich,44,Pyhrn-Eisenwurzen,415,Steyr-Land
+3,Nord,4,Oberösterreich,45,Traunviertel-Salzkammergut,407,Gmunden
+3,Nord,4,Oberösterreich,45,Traunviertel-Salzkammergut,417,Vöcklabruck
+3,Nord,4,Oberösterreich,46,Innviertel,404,Braunau am Inn
+3,Nord,4,Oberösterreich,46,Innviertel,412,Ried im Innkreis
+3,Nord,4,Oberösterreich,46,Innviertel,414,Schärding
+3,Nord,5,Salzburg,51,Salzburg-Nord,501,Salzburg (Stadt)
+3,Nord,5,Salzburg,51,Salzburg-Nord,502,Hallein
+3,Nord,5,Salzburg,51,Salzburg-Nord,503,Salzburg-Umgebung
+3,Nord,5,Salzburg,52,Pinzgau-Pongau-Lungau,504,Sankt Johann im Pongau
+3,Nord,5,Salzburg,52,Pinzgau-Pongau-Lungau,505,Tamsweg
+3,Nord,5,Salzburg,52,Pinzgau-Pongau-Lungau,506,Zell am See
+2,Süd,6,Steiermark,61,Graz,601,Graz (Stadt)
+2,Süd,6,Steiermark,61,Graz,606,Graz-Umgebung
+2,Süd,6,Steiermark,62,Liezen,612,Liezen
+2,Süd,6,Steiermark,63,Östliche Obersteiermark,611,Leoben
+2,Süd,6,Steiermark,63,Östliche Obersteiermark,621,Bruck-Mürzzuschlag
+2,Süd,6,Steiermark,64,Oststeiermark,617,Weiz
+2,Süd,6,Steiermark,64,Oststeiermark,622,Hartberg-Fürstenfeld
+2,Süd,6,Steiermark,64,Oststeiermark,623,Südoststeiermark
+2,Süd,6,Steiermark,65,West-/Südsteiermark,603,Deutschlandsberg
+2,Süd,6,Steiermark,65,West-/Südsteiermark,610,Leibnitz
+2,Süd,6,Steiermark,65,West-/Südsteiermark,616,Voitsberg
+2,Süd,6,Steiermark,66,Westliche Obersteiermark,614,Murau
+2,Süd,6,Steiermark,66,Westliche Obersteiermark,620,Murtal
+4,West,7,Tirol,71,Tirol-Zentralraum,701,Innsbruck-Stadt
+4,West,7,Tirol,71,Tirol-Zentralraum,703,Innsbruck-Land
+4,West,7,Tirol,71,Tirol-Zentralraum,709,Schwaz
+4,West,7,Tirol,72,Tirol-West,702,Imst
+4,West,7,Tirol,72,Tirol-West,706,Landeck
+4,West,7,Tirol,72,Tirol-West,708,Reutte
+4,West,7,Tirol,73,Tirol-Nordost,704,Kitzbühel
+4,West,7,Tirol,73,Tirol-Nordost,705,Kufstein
+4,West,7,Tirol,74,Osttirol,707,Lienz
+4,West,8,Vorarlberg,81,Rheintal-Bregenzerwald,802,Bregenz
+4,West,8,Vorarlberg,81,Rheintal-Bregenzerwald,803,Dornbirn
+4,West,8,Vorarlberg,82,Vorarlberg-Süd,801,Bludenz
+4,West,8,Vorarlberg,82,Vorarlberg-Süd,804,Feldkirch
+1,Ost,9,Wien,91,Wien-Mitte-Südost,901,"Wien 1., Innere Stadt"
+1,Ost,9,Wien,91,Wien-Mitte-Südost,902,"Wien 2., Leopoldstadt"
+1,Ost,9,Wien,91,Wien-Mitte-Südost,903,"Wien3.,  Landstraße"
+1,Ost,9,Wien,91,Wien-Mitte-Südost,904,"Wien 4., Wieden"
+1,Ost,9,Wien,91,Wien-Mitte-Südost,905,"Wien 5., Margareten"
+1,Ost,9,Wien,91,Wien-Mitte-Südost,906,"Wien 6., Mariahilf"
+1,Ost,9,Wien,91,Wien-Mitte-Südost,907,"Wien 7., Neubau"
+1,Ost,9,Wien,91,Wien-Mitte-Südost,908,"Wien 8., Josefstadt"
+1,Ost,9,Wien,91,Wien-Mitte-Südost,909,"Wien 9., Alsergrund"
+1,Ost,9,Wien,91,Wien-Mitte-Südost,910,"Wien 10., Favoriten"
+1,Ost,9,Wien,91,Wien-Mitte-Südost,911,"Wien 11., Simmering"
+1,Ost,9,Wien,91,Wien-Mitte-Südost,920,"Wien 20., Brigittenau"
+1,Ost,9,Wien,92,Wien-West,912,"Wien 12., Meidling"
+1,Ost,9,Wien,92,Wien-West,913,"Wien 13., Hietzing"
+1,Ost,9,Wien,92,Wien-West,914,"Wien 14., Penzing"
+1,Ost,9,Wien,92,Wien-West,915,"Wien 15., Rudolfsheim-Fünfhaus"
+1,Ost,9,Wien,92,Wien-West,916,"Wien 16., Ottakring"
+1,Ost,9,Wien,92,Wien-West,917,"Wien 17., Hernals"
+1,Ost,9,Wien,92,Wien-West,918,"Wien 18., Währing"
+1,Ost,9,Wien,92,Wien-West,919,"Wien 19., Döbling"
+1,Ost,9,Wien,92,Wien-West,923,"Wien 23., Liesing"
+1,Ost,9,Wien,93,Wien-Nordost,921,"Wien 21., Floridsdorf"
+1,Ost,9,Wien,93,Wien-Nordost,922,"Wien 22., Donaustadt"

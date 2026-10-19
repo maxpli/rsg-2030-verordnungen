@@ -1,0 +1,34 @@
+# Zweitlesung RSG 2030 – OÖ BL
+# Verfahren: KI-Lesung des Seitenbilds, ohne Kenntnis der Werte der ersten Lesung (rsg2030/scripts/zweitlesung_ki.py)
+# Modell: claude-opus-5-5 · Aufwand: high · Anweisung: Version c050ac46d003 · Datum: 2026-10-16
+# Quelle: 4.VO_RSG_OOe_2030_Anlage.pdf S.9 · Bild 2576x1822 px, SHA-256 84827eafa64a62a8
+#Kopf	AM*	AN	KIJU	KJC*	KJP	CH	NCH*	IM	GGH	NEU	PSY	DER	AU	HNO	URO	PCH*	PUL*	ORTR*	MKG	ZMK*	STR	RAD	NUK	PMR	PAT	LAB	SON/IDB	gesamt
+#Abschnitt	IST ÄAVE 2022
+ÄAVE spitalsambulant	24,4	-	37,8	-	3,9	48,9	-	113,0	45,4	30,2	29,4	19,2	39,8	20,4	22,0	-	9,9	113,8	10,1	0,0	n.v.	n.v.	n.v.	n.v.	n.v.	n.v.	-	568,3
+ÄAVE niedergelassene ÄrztInnen gesamt (mit Kassenvertrag)	695,3	-	38,9	-	6,8	12,0	-	39,9	68,5	20,8	20,2	35,9	62,9	36,6	25,7	-	24,4	39,6	0,0	455,5	n.v.	n.v.	n.v.	n.v.	n.v.	n.v.	-	1582,9
+ÄAVE in selbstständigen Ambulatorien (mit Kassenvertrag)	1,0	-	0,0	-	0,5	0,0	-	0,8	0,0	0,0	2,4	0,0	0,0	0,0	0,0	-	0,0	0,0	0,0	0,0	n.v.	n.v.	n.v.	n.v.	n.v.	n.v.	-	4,6
+ÄAVE in Kassenambulatorien (kasseneigene selbstständige Ambulatorien)	1,0	-	0,0	-	0,0	0,0	-	0,0	0,0	0,0	0,2	0,0	0,0	0,0	0,0	-	0,0	0,0	0,0	79,1	n.v.	n.v.	n.v.	n.v.	n.v.	n.v.	-	80,2
+IST ÄAVE insgesamt 2022	721,6	-	76,7	-	11,2	60,9	-	153,6	113,9	51,0	52,2	55,1	102,8	57,0	47,7	-	34,3	153,4	10,1	534,6	n.v.	n.v.	n.v.	n.v.	n.v.	n.v.	-	2236,0
+- davon in VGF (Gruppenpraxen, PVE, Ambulatorien) gesamt	183,0	-	3,3	-	0,6	0,2	-	7,5	1,6	0,4	8,1	5,7	7,8	5,3	2,3	-	5,2	5,2	-	82,9	n.v.	n.v.	n.v.	n.v.	n.v.	n.v.	-	319,2
+- davon in PVE (Zentren und Netzwerke)	21,7		0,3																									22,0
+ÄAVE WahlärztInnen und in selbstständigen Ambulatorien (ohne Kassenvertrag)	18,2	-	5,2	-	0,3	2,6	-	10,3	22,2	2,1	5,6	7,5	8,1	3,3	2,3	-	0,2	7,1	0,3	23,4	n.v.	n.v.	n.v.	n.v.	n.v.	n.v.	-	118,5
+#Abschnitt	IST vertragsärztliche Planstellen 2022*
+ÖGK - Planstellen	677,7	-	39,0	-	7,0	12,7	-	44,2	72,0	21,5	24,2	34,5	59,9	35,5	25,0	-	23,8	36,1	-	381,0	-	20,0	-	-	-	6,0	-	1520,1
+SVS - Planstellen	680,0	-	39,0	-	7,0	14,7	-	45,5	75,0	21,5	24,7	38,0	61,4	35,5	25,0	-	27,3	37,6	-	-	-	22,0	-	-	-	6,0	-	1160,2
+BVAEB - Planstellen	677,7	-	39,0	-	7,0	12,7	-	44,2	72,0	21,5	24,2	34,5	59,9	35,5	25,0	-	23,8	36,1	-	381,0	-	20,0	-	-	-	6,0	-	1520,1
+IST Anzahl Ambulatorien-Standorte (mit Kassenvertrag und kasseneigen) gesamt 2022	2	-	0	-	2	0	-	0	0	0	2	0	0	0	0	-	0	0	-	14	-	0	-	-	-	0	-	20
+#Abschnitt	PLAN ÄAVE 2030
+ÄAVE spitalsambulant*	0,0	-	37,8	-	4,0	49,1	-	117,1	46,2	30,2	30,2	19,8	39,8	20,4	22,5	-	9,9	113,8	10,1	0,0	n.v.	n.v.	n.v.	n.v.	n.v.	n.v.	25,1	576,0
+ÄAVE niedergelassene ÄrztInnen und in selbstständigen Ambulatorien (mit Kassenvertrag und kasseneigene) gesamt	804,8	-	54,4	-	13,1	16,5	-	55,2	82,5	26,8	32,4	44,9	68,2	42,9	31,8	-	28,3	45,5	0,0	606,6	n.v.	n.v.	n.v.	n.v.	n.v.	n.v.	0,0	1953,9
+PLAN ÄAVE insgesamt 2030	804,8	-	92,2	-	17,1	65,6	-	172,3	128,7	57,0	62,6	64,7	108,0	63,3	54,3	-	38,2	159,3	10,1	606,6	n.v.	n.v.	n.v.	n.v.	n.v.	n.v.	25,1	2529,9
+- davon in VGF (PVE, Ambulatorien)	97,0		7,0																									104,0
+- davon zumindest in PVE (Zentren und Netzwerke)	92,0		7,0																									99,0
+#Abschnitt	PLAN Sachleistungsstellen 2030
+Gemeinsame Sachleistungsstellen aller KV-Träger	706,6	-	47,0	-	13,0	16,0	-	53,7	76,0	25,2	34,5	40,2	62,2	38,0	27,7	-	26,5	38,6	0,0	480,3	-	20,0	-	-	-	6,0	-	1711,5
+- davon maximal als vertragsärztliche Planstellen in %	99,6		100,0		92,3	100,0		100,0	100,0	100,0	90,4	100,0	100,0	100,0	100,0		100,0	100,0	100,0	79,1		100,0				100,0		
+zusätzliche ÖGK-Sachleistungsstellen	0	-	0	-	0	0	-	0	0	0	0	0	0	0	0	-	0	0	0	0	-	0	-	-	-	0	-	0
+- davon maximal als vertragsärztliche Planstellen in %																												
+zusätzliche SVS-Sachleistungsstellen	4,8	-	0,0	-	0,0	1,0	-	4,5	4,5	1,0	1,0	5,8	0,0	1,5	1,5	-	3,0	2,8	0,0	1,5	-	2,0	-	-	-	0,0	-	34,9
+- davon maximal als vertragsärztliche Planstellen in %	58,3					100,0		22,2	66,7	0,0	0,0	74,1		0,0			100,0	46,4		0,0		100,0						
+zusätzliche BVAEB-Sachleistungsstellen	0	-	0	-	0	0	-	0	0	0	0	0	0	0	0	-	0	0	0	0	-	0	-	-	-	0	-	0
+- davon maximal als vertragsärztliche Planstellen in %																												

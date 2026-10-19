@@ -1,0 +1,41 @@
+# Wöchentlich: neue RSG-2030-Verordnungen im RIS? Monatlich zusätzlich: wurde eine Quelle online ersetzt (Prüfsumme),
+# und ist jede Archivkopie noch die geprüfte Fassung?
+# Bei einem Hinweis schlägt der Lauf fehl, GitHub schickt die übliche Mail (docs/PIPELINE.md).
+# Achtung: In öffentlichen Repos schaltet GitHub zeitgesteuerte Workflows nach 60 Tagen ohne Aktivität ab.
+name: Wächter
+
+on:
+  schedule:
+    - cron: "17 6 * * 1"  # montags 06:17 UTC: RIS
+    - cron: "47 6 1 * *"  # am 1. jedes Monats: zusätzlich Originale und Archivkopien der URL-Quellen (je ~80 MB)
+  workflow_dispatch:
+    inputs:
+      quellen:
+        description: "Auch die Originale der URL-Quellen prüfen (~80 MB)"
+        type: boolean
+        default: false
+      archiv:
+        description: "Auch die Archivkopien der URL-Quellen prüfen (~80 MB, Wayback Machine)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  waechter:
+    runs-on: ubuntu-24.04  # bewusst fest
+    timeout-minutes: 30  # die Wayback Machine ist manchmal sehr langsam; lieber ein Hinweis als ein hängender Lauf
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version-file: .python-version
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - run: pip install -c requirements.txt -e .
+      - name: Neue Verordnungen oder Quellen?
+        env:
+          QUELLEN: ${{ github.event.schedule == '47 6 1 * *' || inputs.quellen }}
+          ARCHIV: ${{ github.event.schedule == '47 6 1 * *' || inputs.archiv }}
+        run: python -m rsg2030 waechter $([ "$QUELLEN" = "true" ] && echo --quellen) $([ "$ARCHIV" = "true" ] && echo --archiv)

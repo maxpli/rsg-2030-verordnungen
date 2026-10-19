@@ -1,0 +1,62 @@
+# Lockfile: exakte Versionen ALLER Pakete (direkt + indirekt), mit denen die veröffentlichten Daten entstanden sind
+# (Python 3.13). Direkte Abhängigkeiten stehen in pyproject.toml. Installation (siehe README):
+#   python3.13 -m venv .venv && .venv/bin/pip install -c requirements.txt -e ".[dev]"
+# Das Auslesen hängt an pdfplumber/pdfminer: eine andere Version kann Text minimal anders zerlegen –
+# Versionen nur bewusst ändern, dann `python -m rsg2030 alles` + alle Tests (Prüfsummen müssen gleich bleiben) und neu
+# erzeugen: .venv/bin/pip freeze --exclude-editable > requirements.txt   (danach diesen Kopf wieder einsetzen)
+ast_serialize==0.13.0
+certifi==2026.7.22
+cffi==2.1.1
+cfgv==3.5.0
+charset-normalizer==3.5.2
+cryptography==50.0.2
+defusedxml==0.7.1
+distlib==0.4.3
+et_xmlfile==2.0.0
+filelock==4.1.2
+identify==2.6.20
+iniconfig==2.3.1
+librt==0.16.0
+mypy==2.4.0
+mypy_extensions==1.1.0
+nodeenv==1.11.0
+numpy==2.5.1
+odfpy==1.4.1
+openpyxl==3.1.5
+packaging==26.3
+pandas==3.0.1
+pathspec==1.1.1
+pdfminer.six==20260107
+pdfplumber==0.11.10
+pillow==12.3.0
+platformdirs==4.13.0
+pluggy==1.6.0
+pre_commit==4.7.0
+pycparser==3.11
+Pygments==2.21.0
+pypdfium2==5.11.0
+pytest==9.0.2
+python-dateutil==2.9.0.post0
+python-discovery==1.6.2
+PyYAML==6.0.3
+ruff==0.17.0
+six==1.17.0
+typing_extensions==4.16.0
+virtualenv==21.14.7
+
+# Nur für die Zweitlesung der Seitenbilder (Pflege, nicht für die Daten): pip install -c requirements.txt -e ".[zweitlesung]"
+annotated-types==0.8.0
+anthropic==1.15.0
+anyio==4.15.1
+docstring_parser==0.18.0
+h11==0.16.0
+httpcore2==2.13.1
+httpx2==2.13.1
+idna==3.20
+jiter==0.17.0
+opentelemetry-api==1.45.1
+pydantic==2.14.1
+pydantic_core==2.50.1
+sniffio==1.3.1
+truststore==0.10.5
+typing-inspection==0.4.4

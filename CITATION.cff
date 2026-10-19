@@ -1,0 +1,66 @@
+cff-version: 1.2.0
+message: "Wenn Sie diese Daten oder diesen Code verwenden, zitieren Sie bitte so."
+title: "RSG 2030 – Planungsmatrizen der Verordnungen"
+abstract: >-
+  Die Planungsmatrizen der Regionalen Strukturpläne Gesundheit (RSG) 2030 aller neun Bundesländer – ambulante
+  ärztliche Kapazität in ÄAVE je Bundesland, Versorgungsregion und Fach, IST und PLAN 2030 –, aus den Verordnungen
+  ausgelesen, geprüft und mit jeder Korrektur begründet; dazu je Region und Fach die Versorgungsdichte und ihr
+  Vergleich mit dem Versorgungsdichte-Soll-Intervall des Österreichischen Strukturplans Gesundheit (ÖSG): Lage (unter,
+  im, über), Position und Abstand in ÄAVE. Die Dateien erzeugt der Code aus öffentlichen Quellen; jede Version ist
+  über Prüfsummen Byte für Byte nachprüfbar.
+# Zitiert werden vor allem die Dateien am Release; der Code, der sie erzeugt, gehört dazu (repository-code)
+type: dataset
+authors:
+  - family-names: Plischke
+    given-names: Max
+    email: max.plischke@loesungswerk.at
+    orcid: "https://orcid.org/0000-0002-7410-2611"
+version: "2026.1"
+date-released: 2026-10-19
+# Code: MIT; erzeugte Daten: CC BY 4.0 (LIZENZ_DATEN.md)
+license:
+  - MIT
+  - CC-BY-4.0
+url: "https://github.com/maxpli/rsg-2030-verordnungen/releases"
+repository-code: "https://github.com/maxpli/rsg-2030-verordnungen"
+keywords:
+  - RSG 2030
+  - Regionaler Strukturplan Gesundheit
+  - Planungsmatrix
+  - ÖSG
+  - ÄAVE
+  - Versorgungsdichte
+  - ambulante Versorgung
+  - Österreich
+# Quellen wie in LIZENZ_DATEN.md (Namensnennung). Vor dem Tag date-released und je Referenz date-accessed auf den Tag
+# des Release setzen: Der Release-Lauf lädt jede Quelle frisch und prüft sie per Prüfsumme (docs/PIPELINE.md, «Release»).
+references:
+  - type: legal-rule
+    title: "Verordnungen über die Verbindlicherklärung (von Teilen) der Regionalen Strukturpläne Gesundheit 2030"
+    date-accessed: 2026-10-19
+    authors:
+      - name: "Gesundheitsplanungs GmbH"
+    # Je Land eine Verordnung (Kärnten zwei) im RIS; jede steht mit Dokumentnummer im Register
+    url: "https://github.com/maxpli/rsg-2030-verordnungen/blob/main/rsg2030/quellen/quellen.csv"
+  - type: data
+    title: "Bevölkerung zum Jahresanfang und Bevölkerungsprognose"
+    date-accessed: 2026-10-19
+    authors:
+      - name: "Statistik Austria"
+    url: "https://data.statistik.gv.at"
+    license: CC-BY-4.0
+  - type: data
+    title: "ÖROK-Prognose 2021"
+    date-accessed: 2026-10-19
+    authors:
+      - name: "Österreichische Raumordnungskonferenz (ÖROK)"
+    license: CC-BY-4.0
+  - type: report
+    title: "Österreichischer Strukturplan Gesundheit 2023, Stand 10.10.2025"
+    date-accessed: 2026-10-19
+    authors:
+      - name: "BMASGPK"
+      - name: "Gesundheit Österreich GmbH (GÖG)"
+    number: "ÖSG-Gutachten 5/2025 (RIS: SPG_AT_OSG_G_20251010_5_2025)"
+    url: "https://www.ris.bka.gv.at/Dokument.wxe?Abfrage=Spg&Dokumentnummer=SPG_AT_OSG_G_20251010_5_2025"
+    notes: "Richtwerte aus dem Textband (RIS); Versorgungsregionen aus der Regionalen Gliederung, Stand 2023 (GÖG)"

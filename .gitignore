@@ -1,0 +1,32 @@
+# Quellen und Ergebnisse entstehen beim Nutzer (python -m rsg2030 alles), nur die README je Ordner liegt in git
+daten_original/*
+!daten_original/README.md
+daten_ergebnis/*
+!daten_ergebnis/README.md
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv
+
+# Caches der Prüfwerkzeuge
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Editor / System
+.DS_Store
+.idea/
+.vscode/
+~$*.xlsx
+
+# Konfliktkopien synchronisierter Ordner (z. B. iCloud: «datei 2.txt», «.venv 2»)
+* [0-9]
+* [0-9].*
+
+# Geheimnisse (API-Schlüssel) gehören nicht ins Repo
+.env
+.env.*

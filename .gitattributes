@@ -1,0 +1,6 @@
+# Zeilenenden vereinheitlichen
+* text=auto
+# Daten-Dateien byte-genau lassen: Prüfsummen und der zeichengenaue Vergleich der Tests hängen daran
+*.csv -text
+# Excel-Eingaben im Diff als Text zeigen (Einrichtung: rsg2030/scripts/xlsx_als_text.py)
+*.xlsx diff=xlsx

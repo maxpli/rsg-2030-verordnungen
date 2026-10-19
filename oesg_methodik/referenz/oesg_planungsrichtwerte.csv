@@ -1,0 +1,31 @@
+Fachrichtung;OESG_Code;Err_Min;VDmin;VDmax;VD2021;BEVmin;Fussnote;Quelle;Anmerkung
+AM;AM;10;34,9;64,8;48,7;2000;**;ÖSG 2023 Textband Stand 10.10.2025 S.37;Allgemeinmedizin – Legende **: «AM inkl. ZAE (in RSG-PM: SON/IDB) und EVA»
+AN;AN;;;;;;;ÖSG 2023 Textband;Kein PRW in Ambulant-Matrix (RSG-Spalte Anästhesiologie)
+KIJU;KIJU;20;4,2;7,9;6,0;17000;**;ÖSG 2023 Textband Stand 10.10.2025 S.37;
+KJC;KJC;;;;;;;ÖSG 2023 Textband;Kein PRW (*) – in CH enthalten (Vorlage Fußnote (2) «zugeordnet zu CH»)
+KJP;KJP;30;0,8;1,4;1,0;100000;1;ÖSG 2023 Textband Stand 10.10.2025 S.37;PRW angelehnt an DE-Bedarfsplanung
+CH;CH;;4,5;8,4;6,3;;*;ÖSG 2023 Textband Stand 10.10.2025 S.37;Err. (Min.) nicht definiert (*)
+NCH;NCH;;;;;;;ÖSG 2023 Textband;Kein PRW (*)
+IM;IM;20;14,4;26,8;18,2;6000;**;ÖSG 2023 Textband Stand 10.10.2025 S.37;Innere Medizin
+PUL;PUL;;1,6;3,0;2,2;45000;;ÖSG 2023 Textband Stand 10.10.2025 S.37;Teilbereich IM-PUL
+GGH;GGH;30;7,0;12,9;9,8;10000;;ÖSG 2023 Textband Stand 10.10.2025 S.37;
+NEU;NEU;30;2,4;4,5;3,4;30000;;ÖSG 2023 Textband Stand 10.10.2025 S.37;
+PSY;PSY;30;3,3;6,0;4,1;24000;;ÖSG 2023 Textband Stand 10.10.2025 S.37;
+DER;DER;30;3,2;5,9;4,5;22000;;ÖSG 2023 Textband Stand 10.10.2025 S.37;
+AU;AU;30;5,3;9,8;7,3;14000;;ÖSG 2023 Textband Stand 10.10.2025 S.37;
+HNO;HNO;30;2,9;5,4;4,2;24000;;ÖSG 2023 Textband Stand 10.10.2025 S.37;
+URO;URO;30;2,5;4,6;3,5;29000;;ÖSG 2023 Textband Stand 10.10.2025 S.37;
+PCH;PCH;;;;;;;ÖSG 2023 Textband;Kein PRW (*) – in CH enthalten (Tabellenband S.252: «unter der CH subsummiert»)
+OR;OR;;;;;;;ÖSG 2023 Textband;In ORTR-Summe enthalten (Fußnote 2)
+UCH;UCH;;;;;;;ÖSG 2023 Textband;In ORTR-Summe enthalten (Fußnote 2)
+ORTR;ORTR;30;7,4;13,8;10,4;10000;2;ÖSG 2023 Textband Stand 10.10.2025 S.37;Summe OR + UCH (UC) + ORTR je Zeilentyp (Fußnote 2)
+MKG;MKG;;0,5;0,9;0,7;;*;ÖSG 2023 Textband Stand 10.10.2025 S.37;
+ZMK;ZMK;20;28,3;52,6;40,4;2500;;ÖSG 2023 Textband Stand 10.10.2025 S.37;Zahn-, Mund- und Kieferheilkunde inkl. KFO
+KFO;KFO;;2,8;5,1;3,9;;;ÖSG 2023 Textband Stand 10.10.2025 S.37;«- davon mit kieferorthopädischem Schwerpunkt» (Unterzeile von ZMK)
+STR;STR;;;;;;;ÖSG 2023 Textband;Kein Ambulant-PRW (stationär)
+RAD;RAD;;;;;;;ÖSG 2023 Textband;
+NUK;NUK;;;;;;;ÖSG 2023 Textband;
+PMR;PMR;;;;;;;ÖSG 2023 Textband;
+PAT;PAT;;;;;;;ÖSG 2023 Textband;
+LAB;LAB;;;;;;;ÖSG 2023 Textband;
+SON/IDB;SON/IDB;;;;;;;ÖSG 2023 Textband;spitalsambulant = ZAE – im AM-Richtwert enthalten

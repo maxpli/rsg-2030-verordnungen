@@ -1,0 +1,80 @@
+# Bei einem Versions-Tag (z. B. 2026.1): alles frisch erzeugen wie ein Nutzer beim ersten Mal, gegen die veröffentlichten
+# Prüfsummen vergleichen und die Dateien an das Release hängen. So sind die Dateien am Release nachweislich aus diesem
+# Code und den öffentlichen Quellen entstanden (Lauf und Protokoll sind unter «Actions» einsehbar), nicht auf einem
+# privaten Rechner.
+# Tags «test-*» tun dasselbe, legen das Release aber nur als Entwurf an: zum Ausprobieren, sichtbar nur für das Team.
+name: Release
+
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+"
+      - "test-*"
+
+permissions:
+  contents: write  # nur dieser Workflow schreibt: Release anlegen, Dateien anhängen
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04  # bewusst fest; Wechsel auf ein neueres System als eigene Änderung
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version-file: .python-version
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - run: pip install -c requirements.txt -e ".[dev]"
+      - name: Tag = Version in pyproject.toml
+        if: ${{ !startsWith(github.ref_name, 'test-') }}
+        run: |
+          version=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          [ "$version" = "$GITHUB_REF_NAME" ] || { echo "Tag $GITHUB_REF_NAME, aber pyproject.toml sagt $version"; exit 1; }
+      # Datum von Hand vor dem Tag (docs/PIPELINE.md, «Release»): Nachträglich eingetragen fehlte es im Tag selbst.
+      # Gleichheit von date-accessed und date-released prüft tests/test_zitation.py in der Testsuite unten.
+      - name: CITATION.cff = Version, Datum des Release gesetzt
+        if: ${{ !startsWith(github.ref_name, 'test-') }}
+        run: |
+          python - <<'EOF'
+          import datetime, os, sys, yaml
+          cff = yaml.safe_load(open("CITATION.cff", encoding="utf-8"))
+          tag, datum = os.environ["GITHUB_REF_NAME"], cff.get("date-released")
+          fehler = []
+          if cff.get("version") != tag:
+              fehler.append(f"version {cff.get('version')!r}, Tag {tag}")
+          if not isinstance(datum, datetime.date):
+              fehler.append("date-released fehlt (JJJJ-MM-TT)")
+          elif datum > datetime.date.today() + datetime.timedelta(days=1):  # Runner rechnet in UTC, Wien ist voraus
+              fehler.append(f"date-released {datum} liegt in der Zukunft")
+          print("CITATION.cff: " + ("; ".join(fehler) or "in Ordnung"))
+          sys.exit(1 if fehler else 0)
+          EOF
+      # Bewusst ohne Cache: dieselben Quellen, die ein Nutzer bekommt
+      - name: Vom Download bis zur Versorgungsdichte
+        run: python -m rsg2030 alles
+      - name: Ergebnis = veröffentlichte Version
+        run: python -c "import json,sys; d=[json.load(open(f'daten_ergebnis/Laufprotokoll_{s}.json')) for s in ('daten','versorgungsdichte')]; sys.exit(0 if all(x['Abgleich_Version'] for x in d) else 1)"
+      - name: Volle Testsuite
+        run: pytest
+      - name: Dateien an das Release hängen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd daten_ergebnis
+          dateien="RSG_2030_Planungsmatrizen.csv RSG_2030_Versorgungsdichte.csv RSG_2030_Planungsmatrizen.xlsx Pruefbericht.md Laufprotokoll_daten.json Laufprotokoll_versorgungsdichte.json"
+          sha256sum $dateien > SHA256SUMS.txt
+          notizen="Erzeugt von GitHub Actions aus diesem Tag: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
+          Die beiden CSV-Dateien entsprechen Byte für Byte den Prüfsummen in rsg2030/erwartete_ausgaben.csv (SHA256SUMS.txt).
+          Bitte vor der Verwendung lesen: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/blob/$GITHUB_REF_NAME/docs/DATEN.md#fallstricke
+          Jede Spalte: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/blob/$GITHUB_REF_NAME/docs/DATEN.md
+          Was sich geändert hat: CHANGELOG.md. Lizenz der Daten: CC BY 4.0 (LIZENZ_DATEN.md)."
+          # Erst Entwurf, dann Dateien, dann veröffentlichen: Nie ein öffentliches Release ohne Dateien; wer auf
+          # «veröffentlicht» reagiert (z. B. Zenodo), sieht es erst vollständig.
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 \
+            || gh release create "$GITHUB_REF_NAME" --draft --verify-tag --title "$GITHUB_REF_NAME" --notes "$notizen"
+          gh release upload "$GITHUB_REF_NAME" $dateien SHA256SUMS.txt --clobber
+          case "$GITHUB_REF_NAME" in
+            test-*) echo "Test-Tag: Release bleibt Entwurf" ;;
+            *) gh release edit "$GITHUB_REF_NAME" --draft=false --latest ;;
+          esac

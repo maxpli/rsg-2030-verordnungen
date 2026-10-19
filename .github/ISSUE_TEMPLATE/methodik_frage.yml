@@ -1,0 +1,10 @@
+name: Frage oder Hinweis zur Methodik
+description: Fachzuordnung, Bevölkerung, Soll-Intervalle, Wahlärzt:innen …
+labels: ["Methodik"]
+body:
+  - type: textarea
+    id: frage
+    attributes:
+      label: Frage oder Hinweis
+      description: Bitte, wenn möglich, mit Quelle (Dokument und Seite) – wie in docs/METHODIK.md.
+    validations: { required: true }

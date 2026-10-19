@@ -1,0 +1,24 @@
+# Prüfungen vor jedem Commit (einmalig aktivieren: .venv/bin/pre-commit install).
+# Schnell und ohne Quelldaten; mypy und die Tests laufen in der CI (.github/workflows/tests.yml).
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      # Quellen und Ausgaben gehören nicht in git (siehe .gitignore); große Dateien sind fast immer ein Versehen
+      - id: check-added-large-files
+        args: ["--maxkb=200"]
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: end-of-file-fixer
+        exclude: \.(csv|xlsx)$  # Daten-Dateien unverändert lassen (Prüfsummen)
+      - id: trailing-whitespace
+        exclude: \.(csv|xlsx)$
+        args: ["--markdown-linebreak-ext=md"]  # zwei Leerzeichen = Zeilenumbruch in Markdown
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.0  # gleich wie in pyproject.toml
+    hooks:
+      - id: ruff-check
+        args: ["--fix"]
+      - id: ruff-format

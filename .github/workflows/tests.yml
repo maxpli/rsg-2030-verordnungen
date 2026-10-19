@@ -1,0 +1,99 @@
+# Bei jedem Push/PR: schnelle Prüfung (ohne Quelldaten) und die volle Testsuite mit zwischengespeicherten Quellen –
+# so fällt jede Änderung am Auslesen, an Korrekturen oder an der Versorgungsdichte sofort auf (Prüfsummen).
+# Auf Knopfdruck: alles wie ein Nutzer beim ersten Mal, mit frischem Download ohne Zwischenspeicher.
+name: Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      voll:
+        description: "Quellen frisch laden, alles erzeugen und die volle Testsuite laufen lassen (~15 min)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  schnell:
+    runs-on: ubuntu-24.04  # bewusst fest; Wechsel auf ein neueres System als eigene Änderung
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version-file: .python-version
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - name: Installieren (exakte Versionen aus requirements.txt)
+        run: pip install -c requirements.txt -e ".[dev]"
+      - name: ruff
+        run: |
+          ruff check .
+          ruff format --check .
+      - name: mypy
+        run: mypy
+      - name: Tests ohne Quelldaten
+        run: pytest -m "not slow"
+
+  daten:
+    # Quellen aus dem Zwischenspeicher (Schlüssel = Register): RIS und statistik.at werden nur angefragt, wenn sich
+    # quellen.csv ändert. Prüfsummen prüft der Download trotzdem bei jedem Lauf.
+    if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.voll) }}
+    runs-on: ubuntu-24.04  # bewusst fest; Wechsel auf ein neueres System als eigene Änderung
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version-file: .python-version
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - run: pip install -c requirements.txt -e ".[dev]"
+      - name: Quellen aus dem Zwischenspeicher
+        id: quellen
+        uses: actions/cache/restore@v6
+        with:
+          path: daten_original
+          key: daten-original-${{ hashFiles('rsg2030/quellen/quellen.csv') }}
+      - name: Fehlende Quellen laden, Prüfsummen prüfen
+        run: python -m rsg2030 download
+      # Gleich nach dem Download speichern: ein späterer Testfehler soll nicht den nächsten Download auslösen
+      - if: steps.quellen.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: daten_original
+          key: ${{ steps.quellen.outputs.cache-primary-key }}
+      - name: Auslesen, prüfen, Versorgungsdichte
+        run: |
+          python -m rsg2030 daten
+          python -m rsg2030 versorgungsdichte
+      - name: Langsame Tests (Pipeline, Prüfsummen, Bevölkerung, Seitenregister)
+        run: pytest -m slow
+
+  voll:
+    if: github.event_name == 'workflow_dispatch' && inputs.voll
+    runs-on: ubuntu-24.04  # bewusst fest; Wechsel auf ein neueres System als eigene Änderung
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version-file: .python-version
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - run: pip install -c requirements.txt -e ".[dev]"
+      # Bewusst ohne Cache: der Lauf soll genau das zeigen, was ein Nutzer beim ersten Mal erlebt
+      - name: Vom Download bis zur Versorgungsdichte
+        run: python -m rsg2030 alles
+      - name: Ergebnis = veröffentlichte Version
+        run: python -c "import json,sys; d=[json.load(open(f'daten_ergebnis/Laufprotokoll_{s}.json')) for s in ('daten','versorgungsdichte')]; sys.exit(0 if all(x['Abgleich_Version'] for x in d) else 1)"
+      - name: Volle Testsuite
+        run: pytest
+      - name: Laufprotokolle aufheben
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: laufprotokolle
+          path: daten_ergebnis/Laufprotokoll_*.json

@@ -1,0 +1,34 @@
+# Zweitlesung RSG 2030 – Tirol VR 72
+# Verfahren: KI-Lesung des Seitenbilds, ohne Kenntnis der Werte der ersten Lesung (rsg2030/scripts/zweitlesung_ki.py)
+# Modell: claude-opus-5-5 · Aufwand: high · Anweisung: Version c050ac46d003 · Datum: 2026-10-16
+# Quelle: VO_RSG_Tirol_2030_Anlage.pdf S.5 · Bild 2576x1822 px, SHA-256 fb35e5786b431724
+#Kopf	AM	AN	KIJU	KJC(1)	KJP(2)	CH	NCH(3)	IM	GGH	NEU	PSY	DER	AU	HNO	URO	PCH(1)	PUL	ORTR(4)	MKG	ZMK(5)	KFO	RAD(6)	NUK(6)	PMR(6)	PAT(6)	LAB(6)	SON/IDB(7)	gesamt
+#Abschnitt	IST ÄAVE 2023
+ÄAVE spitalsambulant	-	-	6,7	-	-	3,8	-	4,8	3,0	-	7,2	-	-	-	-	-	-	5,0	-	-	-	n.v.	n.v.	n.v.	n.v.	n.v.	1,5	32,0
+ÄAVE niedergelassene ÄrztInnen gesamt (mit Kassenvertrag)	70,2	-	2,5	-	1,4	0,8	-	8,7	7,6	3,3	2,7	2,9	4,9	3,4	2,7	-	2,1	5,4	-	42,8	3,9	n.v.	n.v.	n.v.	n.v.	n.v.	n.v.	165,3
+ÄAVE in selbstständigen Ambulatorien (mit Kassenvertrag)	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	n.v.	n.v.	n.v.	n.v.	n.v.	n.v.	-
+ÄAVE in Kassenambulatorien (kasseneigene selbstständige Ambulatorien)	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	1,0	-	n.v.	n.v.	n.v.	n.v.	n.v.	n.v.	1,0
+IST ÄAVE insgesamt 2023	70,2	-	9,1	-	1,4	4,6	-	13,5	10,6	3,3	10,0	2,9	4,9	3,4	2,7	-	2,1	10,3	-	43,8	3,9	n.v.	n.v.	n.v.	n.v.	n.v.	1,5	198,3
+- davon in VGF (Gruppenpraxen, PVE, Ambulatorien) gesamt	1,1	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	1,0	-	n.v.	n.v.	n.v.	n.v.	n.v.	n.v.	2,1
+- davon in PVE (Zentren und Netzwerke)	-		-																									-
+ÄAVE WahlärztInnen und in selbstständigen Ambulatorien (ohne Kassenvertrag)	0,8	-	0,4	-	0,0	0,0	-	1,7	1,4	0,0	0,4	0,5	0,8	0,2	0,0	-	0,0	0,3	0,6	3,6	0,2	n.v.	n.v.	n.v.	n.v.	n.v.	n.v.	10,9
+#Abschnitt	IST vertragsärztliche Planstellen 2023
+ÖGK - Planstellen	61	-	3	-	1	1	-	6	6	3	3	3	4	3	3	-	2	3	-	36	4	1	-	-	-	-	-	143
+SVS - Planstellen	61	-	4	-	-	1	-	8	6	3	3	3	4	3	3	-	2	5	-	-	4	1	-	-	1	-	-	112
+BVAEB - Planstellen	64	-	3	-	1	1	-	8	6	3	3	3	4	4	3	-	2	3	-	39	4	1	-	-	1	-	-	153
+IST Anzahl Ambulatorien-Standorte (mit Kassenvertrag und kasseneigen) gesamt 2023	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	1	-	-	-	-	-	-	-	1
+#Abschnitt	PLAN ÄAVE 2030
+ÄAVE spitalsambulant	-	-	6,7	-	1,5	3,8	-	4,8	3,0	1,0	7,2	-	-	-	-	-	-	5,0	-	-	-	n.v.	n.v.	n.v.	n.v.	n.v.	1,5	34,5
+ÄAVE niedergelassene ÄrztInnen und in selbst-ständigen Ambulatorien (mit Kassenvertrag und kasseneigene) gesamt	75,9	-	2,5	-	2,0	0,8	-	8,7	8,8	3,3	4,4	4,0	6,1	4,3	2,7	-	2,1	5,4	-	43,8	3,9	n.v.	n.v.	n.v.	n.v.	n.v.	n.v.	178,5
+PLAN ÄAVE insgesamt 2030	75,9	-	9,1	-	3,5	4,6	-	13,5	11,8	4,3	11,7	4,0	6,1	4,3	2,7	-	2,1	10,3	-	43,8	3,9	n.v.	n.v.	n.v.	n.v.	n.v.	1,5	213,0
+- davon zumindest in PVE (Zentren und Netzwerke)	6,8		-																									6,8
+#Abschnitt	PLAN Sachleistungsstellen 2030 (8)
+Gemeinsame Sachleistungsstellen aller KV-Träger	62	-	3	-	2	1	-	6	6	3	4	3	5	4	3	-	2	3	-	36	4	1	-	-	-	-	1	149
+- davon maximal als vertragsärztliche Planstellen in %	100%	-	100%	-	100%	100%	-	100%	100%	100%	100%	100%	100%	100%	100%	-	100%	100%	-	95%	100%	100%	-	-	-	-	0%	98%
+- davon in EVA	-																											-
+zusätzliche ÖGK-Sachleistungsstellen	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+- davon maximal als vertragsärztliche Planstellen in %	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-	-
+zusätzliche SVS-Sachleistungsstellen	-	-	1	-	-	-	-	2	-	-	-	-	-	-	-	-	-	2	-	-	-	-	-	-	1	-	-	6
+- davon maximal als vertragsärztliche Planstellen in %	-	-	100%	-	-	-	-	100%	-	-	-	-	-	-	-	-	-	100%	-	-	-	-	-	-	100%	-	-	100%
+zusätzliche BVAEB-Sachleistungsstellen	3	-	-	-	-	-	-	2	-	-	-	-	-	1	-	-	-	-	-	-	-	-	-	-	1	-	-	7
+- davon maximal als vertragsärztliche Planstellen in %	100%	-	-	-	-	-	-	100%	-	-	-	-	-	100%	-	-	-	-	-	-	-	-	-	-	100%	-	-	100%

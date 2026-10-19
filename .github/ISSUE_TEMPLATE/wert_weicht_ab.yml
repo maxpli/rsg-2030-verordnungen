@@ -1,0 +1,34 @@
+name: Wert weicht vom PDF ab
+description: Eine Zahl in den Daten stimmt nicht mit der Verordnung überein
+labels: ["Daten"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Danke! Bitte so genau wie möglich – jede Korrektur wird eine begründete Zeile in `korrekturen.csv`.
+  - type: input
+    id: land
+    attributes: { label: Land, placeholder: "z. B. Kärnten" }
+    validations: { required: true }
+  - type: input
+    id: matrix
+    attributes: { label: "Matrix (Bundesland oder Versorgungsregion)", placeholder: "z. B. VR 21" }
+    validations: { required: true }
+  - type: input
+    id: zelle
+    attributes: { label: "Abschnitt, Zeile, Fach", placeholder: "z. B. PLAN, ÄAVE insgesamt, IM" }
+    validations: { required: true }
+  - type: input
+    id: werte
+    attributes: { label: "Wert in den Daten → Wert im PDF", placeholder: "z. B. 12,1 → 21,1" }
+    validations: { required: true }
+  - type: input
+    id: fundstelle
+    attributes: { label: "PDF und Seite", placeholder: "z. B. Anhang, S.99" }
+    validations: { required: true }
+  - type: input
+    id: version
+    attributes: { label: Version, description: "aus dem Laufprotokoll oder pyproject.toml", placeholder: "2026.1" }
+  - type: textarea
+    id: anmerkung
+    attributes: { label: Anmerkung }

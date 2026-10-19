@@ -1,0 +1,79 @@
+[build-system]
+requires = ["setuptools>=80"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rsg-2030-verordnungen"
+version = "2026.1"
+description = "RSG 2030: Planungsmatrizen der Verordnungen ausgelesen und geprüft, mit Versorgungsdichte im Vergleich zum Versorgungsdichte-Soll-Intervall (ÖSG)"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE", "LIZENZ_DATEN.md"]
+authors = [{ name = "Max Plischke" }]
+# Nur 3.13 ist geprüft: pdfplumber/pdfminer zerlegen Text versionsabhängig (siehe requirements.txt)
+requires-python = ">=3.13,<3.14"
+# Exakt gepinnt: die veröffentlichten Prüfsummen entstanden mit genau diesen Versionen.
+# Indirekte Abhängigkeiten pinnt requirements.txt (Installation: siehe README).
+dependencies = [
+    "pandas==3.0.1",
+    "numpy==2.5.1",
+    "openpyxl==3.1.5",
+    "odfpy==1.4.1",
+    "pdfplumber==0.11.10",
+    "pdfminer.six==20260107",
+    "pypdfium2==5.11.0",
+    "Pillow==12.3.0",
+    "certifi==2026.7.22",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==9.0.2",
+    "ruff==0.17.0",
+    "mypy==2.4.0",
+    "pre-commit==4.7.0",
+    "PyYAML==6.0.3",  # CITATION.cff lesen (tests/test_zitation.py, Release-Lauf)
+]
+# Zweitlesung der Seitenbilder mit der Claude-API (rsg2030/scripts/zweitlesung_ki.py) – nur für die Pflege
+zweitlesung = [
+    "anthropic==1.15.0",
+]
+
+[project.urls]
+Repository = "https://github.com/maxpli/rsg-2030-verordnungen"
+
+[tool.setuptools]
+packages = ["oesg_methodik", "rsg2030", "rsg2030.quellen", "rsg2030.scripts"]
+
+[tool.setuptools.package-data]
+# Gehört zum Paket, damit es auch installiert (nicht nur im Klon) vollständig ist
+oesg_methodik = ["referenz/*.csv"]
+rsg2030 = ["erwartete_ausgaben.csv", "eingaben/*/*.csv", "eingaben/*/*.xlsx", "eingaben/*/zweitlesung/*.tsv"]
+"rsg2030.quellen" = ["quellen.csv"]  # mit Spalte Lizenz je Quelle
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["--strict-markers"]
+markers = ["slow: liest die Quelldateien bzw. läuft die ganze Pipeline (~2 min)"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+
+[tool.ruff.lint]
+# E/W/F: Fehler und Stil · I: Import-Reihenfolge · B: typische Fehlerquellen · UP: moderne Syntax
+select = ["E", "W", "F", "I", "B", "UP"]
+ignore = [
+    "E501",  # Zeilenlänge regelt der Formatter; lange Texte/URLs bleiben ungebrochen
+    "B905",  # zip(strict=…) nicht überall erzwingen
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["oesg_methodik", "rsg2030"]
+
+[tool.mypy]
+python_version = "3.13"
+files = ["oesg_methodik", "rsg2030", "tests"]
+ignore_missing_imports = true  # pandas-stubs bewusst nicht: zu viele Falschmeldungen bei Spaltennamen
+check_untyped_defs = true
+warn_unused_ignores = true
