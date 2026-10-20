@@ -1,7 +1,7 @@
 """Webseite zur Tabelle Versorgungsdichte bauen: `data.json` und die Dateien aus `web/` → `daten_ergebnis/web/`.
 
-Die Seite ist eine Ansicht des Datensatzes (docs/WEB.md): Sie zeigt nur, was in `RSG_2030_Versorgungsdichte.csv`
-steht. Gelesen wird die Tabelle in `daten_ergebnis/` – lokal nach `python -m rsg2030 versorgungsdichte`, im Workflow
+Die Seite stellt die Tabelle mit Lesehilfen dar (docs/WEB.md); die Werte übernimmt sie unverändert aus
+`RSG_2030_Versorgungsdichte.csv`. Gelesen wird die Tabelle in `daten_ergebnis/` – lokal nach `python -m rsg2030 versorgungsdichte`, im Workflow
 die Datei des Release. Gebaut wird nur, wenn sie Byte für Byte der Version dieses Pakets entspricht
 (`erwartete_ausgaben.csv`); nur dann darf die Seite «Release <Version>» sagen.
 

@@ -180,7 +180,7 @@ function vorbehalte(r, f, wI, wP) {
   if (r.land === "OÖ" && S.abschnitt === "PLAN")
     out.push({ fallstrick: 8, text: `<b>OÖ PLAN spitalsambulant</b> ist laut Fußnote das fortgeschriebene IST 2022, kein neuer Plan.` });
   if (r.land === "Wien")
-    out.push({ fallstrick: 11, text: `<b>Wien</b> ist nicht Basis der Soll-Intervalle (Bundesdurchschnitt ohne Wien) und versorgt das Umland mit; Werte über VDmax sind hier zu erwarten.` });
+    out.push({ fallstrick: 11, text: `<b>Wien</b> ist nicht Basis der Soll-Intervalle (Bundesdurchschnitt ohne Wien) und versorgt das Umland mit; Regionen mit Zentrumsfunktion liegen deshalb eher höher.` });
   if (klein(w))
     out.push({ fallstrick: 6, text: `<b>Weniger als 1 ÄAVE vom Intervall entfernt.</b> Lage und Position sind hier nicht belastbar.` });
   if (S.ebene === "VR")

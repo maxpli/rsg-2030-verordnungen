@@ -2,8 +2,11 @@
 
 Eine Webseite zeigt die Tabelle Versorgungsdichte (`RSG_2030_Versorgungsdichte.csv`) zum Nachsehen: je
 Versorgungsregion und Fach, ob die Sachleistung unter, im oder über dem Versorgungsdichte-Soll-Intervall (ÖSG) liegt.
-Wie die Excel-Mappe ist sie eine **Ansicht des Datensatzes**: Sie zeigt nur, was in den veröffentlichten Dateien steht,
-und übernimmt die Vorbehalte aus [DATEN.md](DATEN.md#fallstricke).
+Sie ist eine **Darstellung der Tabelle mit Lesehilfen**: Die Werte stehen unverändert in der Tabelle; Farbstufen,
+Schraffur, Anteilsbalken, die Sätze in Worten und die Vorbehaltstexte sind Festlegungen der Darstellung, hier
+begründet («Darstellungsregeln», «Entscheidungen»). Die Vorbehalte kommen aus [DATEN.md](DATEN.md#fallstricke) und
+urteilen nicht über sie hinaus. Anders als die Excel-Mappe, die die Matrizen so zeigt, wie sie gedruckt sind, liest die
+Seite die Zahlen also vor.
 
 **Stand:** Seite, Befehl, Tests und Workflow sind im Repo; veröffentlicht ist sie noch nicht. Offene Punkte stehen in
 [offene_punkte.md](offene_punkte.md#webseite).
@@ -76,9 +79,10 @@ Jede Entscheidung mit Grund, damit sie sich später nachvollziehen oder bewusst 
    die Werkzeugleiste klebt nicht oben, weil sie umgebrochen ein Drittel des Bildschirms belegte.
 10. **Kachelkarte:** Steiermark direkt unter Ober- und Niederösterreich, Kärnten unter Salzburg und Steiermark,
     Osttirol abgesetzt neben Kärnten. Wo das Raster nicht reicht, liegt eine Nachbarschaft ungenau.
-11. **Im Datensatz-Repo statt in einem eigenen.** Die Seite ist eine Ansicht des Datensatzes wie die Excel-Mappe. Im
-    selben Repo lassen sich die Vorbehalte im selben Commit nachziehen wie die Daten (Regel «Vorbehalte folgen den
-    Daten» in CLAUDE.md). In ein eigenes Repo gehörte sie erst, wenn sie Daten von außerhalb oder Analysen zeigte.
+11. **Im Datensatz-Repo statt in einem eigenen.** Die Seite stellt den Datensatz dar und bildet keine neuen
+    Kennzahlen. Im selben Repo lassen sich die Vorbehalte im selben Commit nachziehen wie die Daten (Regel «Vorbehalte
+    folgen den Daten» in CLAUDE.md). In ein eigenes Repo gehörte sie, sobald sie Daten von außerhalb, neue Kennzahlen
+    oder Bewertungen über die Fallstricke hinaus zeigte.
 12. **Veröffentlichung aus dem Release.** Ein eigener Workflow (`webseite.yml`) baut die Seite nach jedem
     erfolgreichen Lauf des Release-Workflows und wenn sich die Seite auf `main` ändert. Er rechnet die Daten nicht
     neu, sondern lädt die CSV des aktuellen Release und prüft sie gegen dessen `SHA256SUMS.txt`. Passt die Seite nicht
