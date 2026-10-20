@@ -5,7 +5,7 @@ Versorgungsregion und Fach, ob die Sachleistung unter, im oder über dem Versorg
 Wie die Excel-Mappe ist sie eine **Ansicht des Datensatzes**: Sie zeigt nur, was in den veröffentlichten Dateien steht,
 und übernimmt die Vorbehalte aus [DATEN.md](DATEN.md#fallstricke).
 
-**Stand:** Seite, Befehl und Tests sind im Repo; veröffentlicht ist sie noch nicht. Offene Punkte stehen in
+**Stand:** Seite, Befehl, Tests und Workflow sind im Repo; veröffentlicht ist sie noch nicht. Offene Punkte stehen in
 [offene_punkte.md](offene_punkte.md#webseite).
 
 ---
@@ -78,11 +78,11 @@ Jede Entscheidung mit Grund, damit sie sich später nachvollziehen oder bewusst 
 11. **Im Datensatz-Repo statt in einem eigenen.** Die Seite ist eine Ansicht des Datensatzes wie die Excel-Mappe. Im
     selben Repo lassen sich die Vorbehalte im selben Commit nachziehen wie die Daten (Regel «Vorbehalte folgen den
     Daten» in CLAUDE.md). In ein eigenes Repo gehörte sie erst, wenn sie Daten von außerhalb oder Analysen zeigte.
-12. **Veröffentlichung aus dem Release.** Ein eigener Workflow baut die Seite, wenn ein Release veröffentlicht wird
-    oder sich die Seite auf `main` ändert. Er rechnet die Daten nicht neu, sondern lädt die CSV des aktuellen Release
-    und prüft sie gegen dessen `SHA256SUMS.txt`. Passt die Seite nicht zu den Daten (z. B. fehlende Spalte), bricht er
-    ab, und die bisherige Seite bleibt. Die Fußzeile nennt Datenstand (Release, Prüfsumme) und Stand der Seite
-    (Commit). Für Änderungen an der Seite braucht es kein neues Release.
+12. **Veröffentlichung aus dem Release.** Ein eigener Workflow (`webseite.yml`) baut die Seite nach jedem
+    erfolgreichen Lauf des Release-Workflows und wenn sich die Seite auf `main` ändert. Er rechnet die Daten nicht
+    neu, sondern lädt die CSV des aktuellen Release und prüft sie gegen dessen `SHA256SUMS.txt`. Passt die Seite nicht
+    zu den Daten (z. B. fehlende Spalte), bricht er ab, und die bisherige Seite bleibt. Die Fußzeile nennt Datenstand
+    (Release, Prüfsumme) und Stand der Seite (Commit). Für Änderungen an der Seite braucht es kein neues Release.
 
 ## Aufbau
 
@@ -93,7 +93,7 @@ web/                  die Seite: index.html, app.js, style.css
   faecher.csv           Fächer in der Reihenfolge der Spalten, Name, «Teil von» (PUL → IM, KFO → ZMK)
 rsg2030/web.py        «python -m rsg2030 web»: Tabelle Versorgungsdichte → data.json, Seite nach daten_ergebnis/web/
 tests/test_web.py     Kacheln, Fächer, Vorbehalte, Farben, data.json (siehe «Wer prüft was»)
-.github/workflows/webseite.yml   bauen und auf GitHub Pages veröffentlichen (folgt)
+.github/workflows/webseite.yml   bauen und auf GitHub Pages veröffentlichen
 ```
 
 Die fertige Seite liegt wie alle Ergebnisse nicht in git. Die Seite lädt `data.json` und rechnet nichts nach; jede

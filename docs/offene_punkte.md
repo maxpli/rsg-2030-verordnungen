@@ -94,8 +94,8 @@ eigene, gekennzeichnete Größe, nicht als Wert der Verordnungen. Eine solche Qu
 
 Was an der Webseite ([WEB.md](WEB.md)) noch offen ist.
 
-1. **Veröffentlichen:** Workflow `webseite.yml`. GitHub Pages muss im Repo eingeschaltet werden (Settings → Pages →
-   Quelle «GitHub Actions»). Vorher sieht sich ein Mensch die Seite im Browser an, auch am Handy.
+1. **Veröffentlichen:** GitHub Pages im Repo einschalten (Settings → Pages → Quelle «GitHub Actions»); danach baut
+   `webseite.yml` die Seite. Vorher sieht sich ein Mensch die Seite im Browser an, auch am Handy.
 2. **Vorbehaltstexte gegenlesen:** Die Texte der Detailspalte sind aus den Fallstricken abgeleitet, aber nicht wörtlich
    übernommen. Jeder muss seinen Fallstrick nennen; die Formulierung bestätigt der Herausgeber.
 3. **Weitere Zeilen der Tabelle Versorgungsdichte zeigen?** Heute nur `insgesamt`. Möglich wären `spitalsambulant` und

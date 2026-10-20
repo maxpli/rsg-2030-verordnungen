@@ -1,0 +1,82 @@
+# Webseite (docs/WEB.md) bauen und auf GitHub Pages veröffentlichen.
+# Die Daten werden hier nicht neu erzeugt: Die Tabelle Versorgungsdichte kommt aus dem aktuellen Release und wird gegen
+# dessen SHA256SUMS.txt geprüft; «python -m rsg2030 web» prüft sie zusätzlich gegen rsg2030/erwartete_ausgaben.csv und
+# baut nur, wenn beides passt. Schlägt etwas fehl, bleibt die bisherige Seite online.
+#
+# Auslöser:
+# - nach einem erfolgreichen Lauf von «Release». Das Ereignis «Release veröffentlicht» taugt dafür nicht: release.yml
+#   veröffentlicht mit dem GITHUB_TOKEN, und solche Ereignisse starten absichtlich keine weiteren Workflows.
+# - wenn sich die Seite auf main ändert (dann mit den Daten des aktuellen Release; kein neues Release nötig)
+# - auf Knopfdruck
+name: Webseite
+
+on:
+  workflow_run:
+    workflows: [Release]
+    types: [completed]
+  push:
+    branches: [main]
+    paths:
+      - "web/**"
+      - "rsg2030/web.py"
+      - ".github/workflows/webseite.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Nie zwei Veröffentlichungen gleichzeitig; eine laufende wird nicht abgebrochen
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  bauen:
+    # nach «Release» nur, wenn er erfolgreich war (Test-Tags erzeugen nur Entwürfe; die zählen nicht als aktuelles Release)
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04  # bewusst fest; Wechsel auf ein neueres System als eigene Änderung
+    timeout-minutes: 15
+    steps:
+      # Seite immer vom Stand auf main, auch nach «Release» (dessen Tag zeigt auf einen Commit von main)
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+      - uses: actions/setup-python@v7
+        with:
+          python-version-file: .python-version
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - name: Installieren (exakte Versionen aus requirements.txt)
+        run: pip install -c requirements.txt -e ".[dev]"
+      - name: Tests der Seite
+        run: pytest tests/test_web.py -m "not slow"
+      - name: Tabelle Versorgungsdichte aus dem aktuellen Release, gegen SHA256SUMS.txt geprüft
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=$(gh release view --json tagName --jq .tagName)
+          echo "Aktuelles Release: $tag"
+          mkdir -p daten_ergebnis
+          cd daten_ergebnis
+          gh release download "$tag" --pattern RSG_2030_Versorgungsdichte.csv --pattern SHA256SUMS.txt --clobber
+          grep ' RSG_2030_Versorgungsdichte.csv$' SHA256SUMS.txt | sha256sum --check --strict
+      - name: Seite bauen
+        run: python -m rsg2030 web
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: daten_ergebnis/web
+
+  veroeffentlichen:
+    needs: bauen
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      pages: write     # Seite auf GitHub Pages stellen
+      id-token: write  # damit GitHub prüfen kann, dass die Seite aus diesem Workflow kommt
+    environment:
+      name: github-pages
+      url: ${{ steps.veroeffentlichen.outputs.page_url }}
+    steps:
+      - id: veroeffentlichen
+        uses: actions/deploy-pages@v5
