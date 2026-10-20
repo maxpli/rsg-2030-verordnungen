@@ -48,7 +48,7 @@ const lageText = (w) => !w ? "kein Wert" : w.lage === "im" ? "im Intervall" : w.
 const pill = (w) => `<span class="pill"><i class="k-${klasse(w)}"></i>${lageText(w)}</span>`;
 
 /* Kopf und Fußzeile: Datenstand und Stand der Seite */
-document.getElementById("eyebrow").textContent = `Tabelle Versorgungsdichte · Release ${M.version}`;
+document.getElementById("eyebrow").textContent = `RSG-2030-Verordnungen · Release ${M.version}`;
 document.getElementById("footer").innerHTML = `
   <div>Quelle: <span class="nb">${esc(M.datei)}</span>, <a href="${M.repo}/releases/tag/${M.version}" target="_blank" rel="noopener">Release ${esc(M.version)}</a> von <a href="${M.repo}" target="_blank" rel="noopener">${esc(M.repo.replace("https://github.com/", ""))}</a> · SHA-256 <span class="num" style="word-break:break-all">${esc(M.sha256)}</span></div>
   <div>Stand der Seite: <a href="${M.repo}/commit/${M.commit}" target="_blank" rel="noopener" class="num">${esc(M.commit.slice(0, 7))}</a> · Alle Vorbehalte: <a href="${DATEN_MD}" target="_blank" rel="noopener">docs/DATEN.md, Fallstricke</a> · Daten CC BY 4.0</div>`;
