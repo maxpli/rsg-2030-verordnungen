@@ -88,6 +88,7 @@ Jede Entscheidung mit Grund, damit sie sich später nachvollziehen oder bewusst 
 
 ```
 web/                  die Seite: index.html, app.js, style.css
+  fonts/                IBM Plex, selbst ausgeliefert (Lizenz SIL OFL, fonts/README.md)
   kacheln.csv           je Region Spalte und Zeile der Kachelkarte und die Beschriftung der Kachel (VR und BL)
   faecher.csv           Fächer in der Reihenfolge der Spalten, Name, «Teil von» (PUL → IM, KFO → ZMK)
 rsg2030/web.py        «python -m rsg2030 web»: Tabelle Versorgungsdichte → data.json, Seite nach daten_ergebnis/web/
@@ -123,5 +124,6 @@ dann nicht laden darf; dafür der kleine Server.
 | Zahl auf der Seite weicht von der Tabelle ab | Test (ganze Suite): `data.json` gegen die Tabelle |
 | ein Vorbehalt verweist auf einen Fallstrick, den es nicht mehr gibt | Test: jeder Vorbehalt nennt seinen Fallstrick, und den gibt es in DATEN.md |
 | Farbstufen nicht unterscheidbar | Test: Abstände benachbarter Stufen aus `style.css` nachgerechnet, normal und bei Protanopie und Deuteranopie, hell und dunkel; dunkle Farben gleich, ob über die Systemeinstellung oder den Schalter |
+| Seite lädt etwas von fremden Servern (z. B. Schriften von Google: IP-Adresse jeder Besucherin dorthin) | Test: keine Schriften, Skripte oder Stile von außen; jede Schrift der CSS liegt in `web/fonts/` |
 | Seite lädt nicht, Fehler im Skript, Seite am Handy breiter als der Bildschirm | ein Mensch vor der Veröffentlichung; später ein Test im Browser |
 | ein Vorbehalt ist fachlich falsch oder missverständlich formuliert | der Herausgeber |

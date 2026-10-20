@@ -103,6 +103,3 @@ Was an der Webseite ([WEB.md](WEB.md)) noch offen ist.
    Veränderung IST → PLAN. Offen ist, was davon die Seite tragen soll, ohne unübersichtlich zu werden.
 4. **Test im Browser:** Seite lädt ohne Fehler, keine seitliche Verschiebung bei Handy-Breite. Bis dahin prüft das ein
    Mensch.
-5. **Schriften:** Die Seite lädt IBM Plex von Google Fonts. Dabei geht die IP-Adresse jeder Besucherin an Google; für
-   eine öffentliche Seite datenschutzrechtlich heikel. Vor der Veröffentlichung die Schriften selbst ausliefern (IBM
-   Plex steht unter der SIL Open Font License) oder Systemschriften verwenden.

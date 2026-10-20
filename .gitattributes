@@ -4,3 +4,5 @@
 *.csv -text
 # Excel-Eingaben im Diff als Text zeigen (Einrichtung: rsg2030/scripts/xlsx_als_text.py)
 *.xlsx diff=xlsx
+# Schriften der Webseite (web/fonts/) unverändert lassen
+*.woff2 binary

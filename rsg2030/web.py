@@ -34,8 +34,8 @@ from rsg2030.protokoll import einrichten, schreibe_laufprotokoll
 
 log = logging.getLogger(__name__)
 
-SEITE = ("index.html", "app.js", "style.css")
-"""Dateien aus `web/`, die zur Seite gehören (die CSV-Dateien dort sind Eingaben für `data.json`)."""
+SEITE = ("index.html", "app.js", "style.css", "fonts")
+"""Dateien und Ordner aus `web/`, die zur Seite gehören (die CSV-Dateien dort sind Eingaben für `data.json`)."""
 
 SPALTEN = [
     "Land", "Ebene", "Region_ID", "Abschnitt", "Jahr", "Zeile_ID", "Fach", "AAVE", "Zuschnitt", "Bevoelkerung",
@@ -200,7 +200,11 @@ def baue_seite(tabelle_csv: Path, ziel: Path) -> Path:
         shutil.rmtree(ziel)
     ziel.mkdir(parents=True)
     for name in SEITE:
-        shutil.copyfile(web_dir() / name, ziel / name)
+        quelle = web_dir() / name
+        if quelle.is_dir():
+            shutil.copytree(quelle, ziel / name)
+        else:
+            shutil.copyfile(quelle, ziel / name)
     pfad = ziel / "data.json"
     pfad.write_text(
         json.dumps(daten, ensure_ascii=False, separators=(",", ":"), allow_nan=False) + "\n", encoding="utf-8"

@@ -218,3 +218,24 @@ def test_data_json_gleich_tabelle():
             soll = r[spalte]
             assert wert == (int(soll) if spalte in ("Bevoelkerung", "Jahr") else soll), (r["Region_ID"], spalte)
     assert {(r["ebene"], r["id"]) for r in d["regionen"]} == set(zip(ins["Ebene"], ins["Region_ID"].astype(str)))
+
+
+# --- nichts von fremden Servern -------------------------------------------------------------------------------------
+
+
+def test_seite_laedt_nichts_von_fremden_servern():
+    """Schriften, Skripte und Stile kommen aus web/ selbst; Links (<a href>) auf GitHub sind erlaubt (Datenschutz)."""
+    html = (WEB / "index.html").read_text(encoding="utf-8")
+    css = (WEB / "style.css").read_text(encoding="utf-8")
+    js = (WEB / "app.js").read_text(encoding="utf-8")
+    assert not re.findall(r"<(?:link|script|img|iframe)[^>]+(?:href|src)=\"(?:https?:)?//", html)
+    assert not re.findall(r"@import|url\(\s*[\"']?(?:https?:)?//", css)
+    assert not re.findall(r"\b(?:fetch|import)\s*\(\s*[\"'`](?:https?:)?//", js)
+
+
+def test_jede_schrift_der_css_liegt_in_web_fonts():
+    css = (WEB / "style.css").read_text(encoding="utf-8")
+    dateien = re.findall(r"url\(\"(fonts/[^\"]+)\"\)", css)
+    assert dateien, "keine @font-face gefunden"
+    assert [d for d in dateien if not (WEB / d).is_file()] == []
+    assert (WEB / "fonts" / "OFL.txt").is_file(), "Lizenz der Schriften fehlt"
