@@ -53,6 +53,17 @@ document.getElementById("footer").innerHTML = `
   <div>Quelle: <span class="nb">${esc(M.datei)}</span>, <a href="${M.repo}/releases/tag/${M.version}" target="_blank" rel="noopener">Release ${esc(M.version)}</a> von <a href="${M.repo}" target="_blank" rel="noopener">${esc(M.repo.replace("https://github.com/", ""))}</a> · SHA-256 <span class="num" style="word-break:break-all">${esc(M.sha256)}</span></div>
   <div>Stand der Seite: <a href="${M.repo}/commit/${M.commit}" target="_blank" rel="noopener" class="num">${esc(M.commit.slice(0, 7))}</a> · Alle Vorbehalte: <a href="${DATEN_MD}" target="_blank" rel="noopener">docs/DATEN.md, Fallstricke</a> · Daten CC BY 4.0</div>`;
 
+/* Über diese Daten: der Weg von der Seite in den Datensatz. Alle Links auf das Release, aus dem die Daten der Seite
+   stammen (nicht «latest»), damit Downloads und Doku zu den gezeigten Zahlen passen. */
+const REL = `${M.repo}/releases/download/${M.version}`, DOC = `${M.repo}/blob/${M.version}`;
+const link = (href, text) => `<a href="${href}" target="_blank" rel="noopener">${text}</a>`;
+document.getElementById("about").innerHTML = `
+  <h2 id="h-about">Über diese Daten</h2>
+  <p>Diese Seite zeigt einen Ausschnitt aus dem Datensatz <b>RSG 2030 – Planungsmatrizen der Verordnungen</b>: die Zeile «insgesamt» der Tabelle Versorgungsdichte. Der Datensatz enthält außerdem jede Zelle aller 41 Planungsmatrizen (9 Bundesländer, 32 Versorgungsregionen), auch Planstellen, Wahlärzt:innen und Fächer ohne Richtwert. Zu jedem Wert steht dort, woher er kommt: PDF, Seite, Originaltext und, wo korrigiert wurde, die Regel mit Begründung.</p>
+  <p><b>Herunterladen</b> (Release ${esc(M.version)}): ${link(`${REL}/RSG_2030_Versorgungsdichte.csv`, "Tabelle Versorgungsdichte (CSV)")} · ${link(`${REL}/RSG_2030_Planungsmatrizen.csv`, "Tabelle Planungsmatrizen (CSV)")} · ${link(`${REL}/RSG_2030_Planungsmatrizen.xlsx`, "Excel-Mappe zum Nachsehen")} · ${link(`${REL}/Pruefbericht.md`, "Prüfbericht")}. Vor der Verwendung bitte die ${link(DATEN_MD, "Fallstricke")} lesen.</p>
+  <p><b>Wie die Daten abgesichert sind:</b> Jede Quelldatei ist mit Prüfsumme registriert, jede Zelle wird zweimal unabhängig gelesen, Rechenprüfungen laufen bei jeder Erzeugung, und was keine Maschine prüfen kann, entscheidet ein Mensch am PDF. ${link(`${DOC}/docs/PRUEFUNG.md`, "Mehr dazu")}</p>
+  <p><b>Zitieren:</b> ${link(`${DOC}/CITATION.cff`, "CITATION.cff")} · <b>Fehler gefunden?</b> Issue ${link(`${M.repo}/issues/new?template=wert_weicht_ab.yml`, "«Wert weicht vom PDF ab»")} oder ${link(`${M.repo}/issues/new?template=methodik_frage.yml`, "«Frage zur Methodik»")}</p>`;
+
 /* Tooltip */
 const tip = document.getElementById("tip");
 function showTip(ev, html) {

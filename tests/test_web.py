@@ -239,3 +239,10 @@ def test_jede_schrift_der_css_liegt_in_web_fonts():
     assert dateien, "keine @font-face gefunden"
     assert [d for d in dateien if not (WEB / d).is_file()] == []
     assert (WEB / "fonts" / "OFL.txt").is_file(), "Lizenz der Schriften fehlt"
+
+
+def test_links_auf_das_release_der_daten_nicht_auf_latest():
+    """Downloads und Doku passen nur dann zu den gezeigten Zahlen, wenn sie auf dasselbe Release zeigen."""
+    js = (WEB / "app.js").read_text(encoding="utf-8")
+    assert "releases/download/${M.version}" in js
+    assert "releases/latest" not in js

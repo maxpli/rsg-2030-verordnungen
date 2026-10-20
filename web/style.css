@@ -175,6 +175,13 @@ svg .blb { fill: none; stroke: var(--line-2); stroke-width: 1.25; stroke-linecap
 .tip b { font-weight: 600 }
 .tip .t2 { color: var(--muted) }
 
+/* Über diese Daten */
+.about { display: grid; gap: 10px; max-width: 100ch; font-size: 13.5px; color: var(--ink-2) }
+.about h2 { color: var(--ink) }
+.about p { margin: 0 }
+.about b { color: var(--ink); font-weight: 600 }
+.about a { color: var(--accent) }
+
 footer { color: var(--muted); font-size: 12px; display: grid; gap: 4px; border-top: 1px solid var(--line); padding-top: 14px }
 footer a { color: var(--accent) }
 .nb { white-space: nowrap }

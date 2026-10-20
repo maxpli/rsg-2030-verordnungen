@@ -22,6 +22,7 @@ Versorgungsregionen und Bundesländern.
 | Detailspalte | eine Region und ein Fach: VD, ÄAVE, Bevölkerung, Lage, Position und ÄAVE-Abstand für IST und PLAN, ein Satz in Worten («Bis zur Untergrenze fehlen … ÄAVE Sachleistung») und die Vorbehalte, die für diese Zelle gelten |
 | Positions-Plot | ein Fach, alle Regionen: Position im Soll-Intervall, IST → PLAN, dazu der ÄAVE-Abstand |
 | Kachelkarte | jede Region als gleich große Kachel, grob nach Lage angeordnet, Landesgrenzen als Linien |
+| Über diese Daten | was der Datensatz außerdem enthält, Downloads, wie die Daten abgesichert sind, Zitieren und Fehler melden; alle Links auf das Release, aus dem die Daten der Seite stammen |
 
 Über allem steht dauerhaft, wie «unter» zu lesen ist (Fallstricke 1 und 11): ohne Wahlärzt:innen, ohne
 Patientenströme, innerhalb des Intervalls kein Unterschied.
