@@ -17,6 +17,7 @@ Doku (maßgeblich für die Methodik – vor jeder Änderung am Verhalten lesen):
 - [docs/PRUEFUNG.md](docs/PRUEFUNG.md): Prüfkonzept (5 Ebenen), was jede belegt und was nicht
 - [docs/PIPELINE.md](docs/PIPELINE.md): Betrieb: Schritte des Laufs, Eingaben, Syntax der Korrekturregeln, neue Verordnung aufnehmen
 - [docs/offene_punkte.md](docs/offene_punkte.md): offene Entscheidungen und Aufgaben
+- [docs/WEB.md](docs/WEB.md): Webseite zum Nachsehen: was sie zeigt, Darstellungsregeln, Entscheidungen, wer was prüft
 
 ## Regeln für die Doku
 
@@ -27,7 +28,9 @@ Doku (maßgeblich für die Methodik – vor jeder Änderung am Verhalten lesen):
   `daten_ergebnis/Pruefbericht.md`; das CHANGELOG hält sie je Version fest.
 - Eine Datenänderung (Prüfsumme in `rsg2030/erwartete_ausgaben.csv`) bekommt einen Eintrag in CHANGELOG.md mit Grund
   und eine neue Version (`pyproject.toml`, `CITATION.cff`).
-- Keine Verweise auf andere Projekte oder auf Analysen; dieses Repo ist nur der Datensatz.
+- Keine Verweise auf andere Projekte oder auf Analysen; dieses Repo ist nur der Datensatz. Ansichten des Datensatzes
+  (Excel-Mappe, Webseite) gehören dazu: Sie zeigen nur, was in den veröffentlichten Dateien steht, und übernehmen die
+  Vorbehalte aus docs/DATEN.md. Analysen und Daten von außerhalb gehören nicht hierher.
 - Jede Zahl, die wir für eine Aussage oder Entscheidung der Doku gerechnet oder ausgezählt haben, ist nachrechenbar:
   aus den Ausgaben, einem Test oder einem Skript unter `rsg2030/scripts/` – nie nur aus einer einmaligen Rechnung
   außerhalb des Repos. Abgelesene Werte stehen mit Dokument und Seite da.

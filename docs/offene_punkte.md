@@ -89,3 +89,19 @@ geprüft, wo sie steht (Wien), nicht abgeleitet. Für alle Länder bräuchte es 
 Wahlärzt:innen im IST-Jahr übernehmen und für 2030 als Szenario fortschreiben (gleiche Zahl oder gleiche Dichte) – als
 eigene, gekennzeichnete Größe, nicht als Wert der Verordnungen. Eine solche Quelle ist das RSG-Monitoring der GÖG
 (Zeile «ÄAVE WahlärztInnen», je Land und Jahr; PRUEFUNG.md, «Abgleich mit dem RSG-Monitoring»).
+
+## Webseite
+
+Was an der Webseite ([WEB.md](WEB.md)) noch offen ist.
+
+1. **Code ins Repo:** den Prototyp nach `web/` übernehmen, `python -m rsg2030 web` und die Tests aus WEB.md, «Wer prüft
+   was».
+2. **Veröffentlichen:** Workflow `webseite.yml`. GitHub Pages muss im Repo eingeschaltet werden (Settings → Pages →
+   Quelle «GitHub Actions»). Vorher sieht sich ein Mensch die Seite im Browser an, auch am Handy.
+3. **Vorbehaltstexte gegenlesen:** Die Texte der Detailspalte sind aus den Fallstricken abgeleitet, aber nicht wörtlich
+   übernommen. Jeder muss seinen Fallstrick nennen; die Formulierung bestätigt der Herausgeber.
+4. **Weitere Zeilen der Tabelle Versorgungsdichte zeigen?** Heute nur `insgesamt`. Möglich wären `spitalsambulant` und
+   `extramural` (Aufteilung, ohne Soll-Intervall; Fallstrick 10), `pve` (nur AM und KIJU, im PLAN Mindestwert) und die
+   Veränderung IST → PLAN. Offen ist, was davon die Seite tragen soll, ohne unübersichtlich zu werden.
+5. **Test im Browser:** Seite lädt ohne Fehler, keine seitliche Verschiebung bei Handy-Breite. Bis dahin prüft das ein
+   Mensch.
