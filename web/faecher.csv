@@ -1,0 +1,18 @@
+Fach,Name,Teil_von
+AM,Allgemeinmedizin,
+KIJU,Kinder- und Jugendheilkunde,
+KJP,Kinder- und Jugendpsychiatrie,
+CH,"Chirurgie (inkl. KJC, PCH)",
+IM,Innere Medizin (inkl. PUL),
+PUL,Pulmologie,IM
+GGH,Frauenheilkunde und Geburtshilfe,
+NEU,Neurologie,
+PSY,Psychiatrie,
+DER,Dermatologie,
+AU,Augenheilkunde,
+HNO,"Hals-, Nasen- und Ohrenheilkunde",
+URO,Urologie,
+ORTR,Orthopädie und Traumatologie,
+MKG,"Mund-, Kiefer- und Gesichtschirurgie",
+ZMK,"Zahn-, Mund- und Kieferheilkunde (inkl. KFO)",
+KFO,Kieferorthopädie,ZMK

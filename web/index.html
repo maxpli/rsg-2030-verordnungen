@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RSG 2030 Versorgungsdichte</title>
+<meta name="description" content="Versorgungsdichte der RSG 2030 je Versorgungsregion und Fach im Versorgungsdichte-Soll-Intervall des ÖSG.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow" id="eyebrow">Tabelle Versorgungsdichte</div>
+    <h1>Versorgungsdichte der RSG 2030 im ÖSG-Soll-Intervall</h1>
+    <p class="lede">ÄAVE je 100.000 Einwohner:innen, Zeile «insgesamt», je Versorgungsregion und Fach. Die Farbe zeigt, ob die Sachleistung unter, im oder über dem Versorgungsdichte-Soll-Intervall des ÖSG liegt.</p>
+  </header>
+
+  <div class="notice"><b>So lesen:</b> Gezählt ist nur die Sachleistung, ohne Wahlärzt:innen; das Soll-Intervall gilt mit ihnen. <b>«unter»</b> heißt deshalb: die Sachleistung allein reicht nicht bis VDmin. Es heißt nicht «unterversorgt nach ÖSG». Patientenströme zwischen Regionen sind nicht berücksichtigt. Innerhalb des Intervalls macht der ÖSG keinen Unterschied, deshalb ist dort alles grau.</div>
+
+  <div class="toolbar" role="toolbar" aria-label="Ansicht wählen">
+    <div class="ctl"><span>Stand</span>
+      <div class="seg" id="seg-abschnitt"><button type="button" id="b-ist" data-v="IST">IST 2022/23</button><button type="button" id="b-plan" data-v="PLAN">PLAN 2030</button></div></div>
+    <div class="ctl"><span>Ebene</span>
+      <div class="seg" id="seg-ebene"><button type="button" id="b-vr" data-v="VR">Versorgungsregionen</button><button type="button" id="b-bl" data-v="BL">Bundesländer</button></div></div>
+    <div class="ctl"><span>Fach</span><select id="sel-fach" aria-label="Fach"></select></div>
+    <label class="chk"><input type="checkbox" id="chk-hatch" checked> Abstand unter 1 ÄAVE schraffieren</label>
+  </div>
+
+  <div class="legend" aria-label="Legende">
+    <span class="grp"><span class="ramp"><i class="sw k-u3"></i><i class="sw k-u2"></i><i class="sw k-u1"></i></span> unter VDmin</span>
+    <span class="grp"><i class="sw k-in"></i> im Soll-Intervall</span>
+    <span class="grp"><span class="ramp"><i class="sw k-o1"></i><i class="sw k-o2"></i><i class="sw k-o3"></i></span> über VDmax</span>
+    <span class="grp">Abstufung: bis ¼, bis ½, mehr als ½ Intervallbreite außerhalb</span>
+    <span class="grp"><i class="sw k-u2 hatched"></i> weniger als 1 ÄAVE vom Intervall entfernt</span>
+    <span class="grp"><i class="sw k-na"></i> kein Wert</span>
+  </div>
+
+  <div class="top">
+    <section class="panel" aria-labelledby="h-mx">
+      <div class="panel-head"><h2 id="h-mx">Regionen × Fächer</h2><p class="sub" id="mx-sub"></p></div>
+      <div class="share" id="mx-share"></div>
+      <div class="mx-scroll"><table class="mx" id="mx"></table></div>
+    </section>
+    <aside class="panel detail" id="detail" aria-live="polite"></aside>
+  </div>
+
+  <div class="bottom">
+    <section class="panel" aria-labelledby="h-strip">
+      <div class="panel-head"><h2 id="h-strip">Position im Soll-Intervall</h2><p class="sub">○ IST → ● PLAN 2030 · sortiert nach gewähltem Stand · rechts: ÄAVE-Abstand</p></div>
+      <div id="strip"></div>
+    </section>
+    <section class="panel" aria-labelledby="h-map">
+      <div class="panel-head"><h2 id="h-map">Kachelkarte</h2><p class="sub">jede Region gleich groß, grob nach Lage angeordnet · Linien: Landesgrenzen</p></div>
+      <div id="map"></div>
+      <p class="sub" style="margin-top:10px">Bewusst keine Flächenkarte: Dort würden große, dünn besiedelte Regionen das Bild bestimmen, die bevölkerungsreichen Wiener Regionen wären kaum zu sehen.</p>
+    </section>
+  </div>
+
+  <footer id="footer"></footer>
+</div>
+<div class="tip" id="tip" hidden></div>
+<noscript><p style="padding:16px">Diese Seite braucht JavaScript. Die Daten gibt es auch als CSV-Datei beim Release des Repositorys.</p></noscript>
+<script src="app.js"></script>
+</body>
+</html>

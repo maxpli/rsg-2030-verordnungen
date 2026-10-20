@@ -1,0 +1,168 @@
+/* Webseite zur Tabelle Versorgungsdichte – Aufbau und Regeln: docs/WEB.md */
+html { color-scheme: light; -webkit-text-size-adjust: 100% }
+body { margin: 0 }
+[hidden] { display: none !important }
+
+/* Layout: Werkzeugleiste oben, darunter Matrix + Detailspalte, darunter Fachansicht (Positions-Plot + Kachelkarte) */
+:root {
+  --bg: #f4f6f7; --surface: #ffffff; --ink: #14191d; --ink-2: #48525b; --muted: #7a848d;
+  --line: #dce1e5; --line-2: #c5ccd2; --accent: #1d5e6e; --accent-soft: #e2eef1;
+  /* Farbstufen u1–u3 (unter), in, o1–o3 (über): Nachbarstufen müssen sich deutlich unterscheiden, auch bei
+     Farbsehschwäche (docs/WEB.md, «Darstellungsregeln»; nachgerechnet in tests/test_web.py) */
+  --u1: #f9b8ab; --u2: #e57d6c; --u3: #c23a2f;
+  --o1: #b2d0f7; --o2: #71a5ea; --o3: #2a64bd;
+  --in: #e9ebee; --band: #e4e7ea; --hatch: rgba(255,255,255,.75); --on-2: #14191d; --on-3: #ffffff;
+  --f-display: "IBM Plex Sans", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, sans-serif;
+  --f-cond: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1316; --surface: #171c20; --ink: #e8ecef; --ink-2: #b3bcc4; --muted: #808a93;
+  --line: #283037; --line-2: #3a434b; --accent: #74b6c6; --accent-soft: #1b2d33;
+  --u1: #94442f; --u2: #d0604f; --u3: #f59a8d;
+  --o1: #28508a; --o2: #4079c4; --o3: #86b9f2;
+  --in: #283036; --band: #283036; --hatch: rgba(15,19,22,.7); --on-2: #14191d; --on-3: #14191d; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1316; --surface: #171c20; --ink: #e8ecef; --ink-2: #b3bcc4; --muted: #808a93;
+  --line: #283037; --line-2: #3a434b; --accent: #74b6c6; --accent-soft: #1b2d33;
+  --u1: #94442f; --u2: #d0604f; --u3: #f59a8d;
+  --o1: #28508a; --o2: #4079c4; --o3: #86b9f2;
+  --in: #283036; --band: #283036; --hatch: rgba(15,19,22,.7); --on-2: #14191d; --on-3: #14191d; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 14px; line-height: 1.5 }
+.wrap { max-width: 1280px; margin: 0 auto; padding-block: 28px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 22px }
+.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums }
+
+header { display: grid; gap: 6px }
+.eyebrow { font-family: var(--f-cond); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 600 }
+h1 { font-family: var(--f-display); font-size: clamp(24px, 3.2vw, 32px); line-height: 1.15; margin: 0; font-weight: 700; text-wrap: balance; letter-spacing: -.01em }
+.lede { margin: 0; color: var(--ink-2); max-width: 70ch }
+h2 { font-size: 16px; margin: 0; font-weight: 600 }
+.sub { color: var(--muted); font-size: 12.5px; margin: 0 }
+
+.notice { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 10px 14px; border-radius: 0 6px 6px 0; max-width: 100ch; font-size: 13.5px; color: var(--ink) }
+.notice b { font-weight: 600 }
+
+.toolbar { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: end; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: var(--bg); padding-block: 10px; border-bottom: 1px solid var(--line) }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg) }
+.ctl { display: grid; gap: 4px }
+.ctl > span { font-family: var(--f-cond); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted) }
+.seg { display: inline-flex; border: 1px solid var(--line-2); border-radius: 6px; overflow: hidden; background: var(--surface) }
+.seg button { font: inherit; font-size: 13px; border: 0; background: transparent; color: var(--ink-2); padding: 6px 12px; cursor: pointer }
+.seg button + button { border-left: 1px solid var(--line-2) }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); font-weight: 500 }
+select { font: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid var(--line-2); border-radius: 6px; background: var(--surface); color: var(--ink); max-width: 100% }
+label.chk { display: flex; gap: 6px; align-items: center; font-size: 13px; color: var(--ink-2); cursor: pointer; padding-bottom: 6px }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; font-size: 12.5px; color: var(--ink-2) }
+.legend .grp { display: flex; gap: 6px; align-items: center }
+.sw { width: 16px; height: 12px; border-radius: 2px; display: inline-block; position: relative }
+.ramp { display: inline-flex; gap: 2px }
+/* das sehr helle Grau braucht in Legende und Pille eine Kontur */
+.sw.k-in, .pill i.k-in { box-shadow: inset 0 0 0 1px var(--line-2) }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px; min-width: 0 }
+.panel-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; align-items: baseline; margin-bottom: 12px }
+
+.top { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 18px; align-items: start }
+@media (max-width: 1020px) { .top { grid-template-columns: minmax(0, 1fr) } }
+.detail { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 78px) }
+@media (max-width: 1020px) { .detail { position: static } }
+/* Am Handy würde die umgebrochene Werkzeugleiste ein Drittel des Bildschirms belegen */
+@media (max-width: 720px) { .toolbar { position: static } }
+.d-back { display: none; font: inherit; font-size: 12.5px; color: var(--accent); background: none; border: 0; padding: 0 0 10px; cursor: pointer }
+@media (max-width: 1020px) { .d-back { display: inline-block } }
+
+/* Matrix */
+.mx-scroll { overflow-x: auto }
+/* Anteilsbalken über der Matrix */
+.share { display: grid; gap: 6px; margin-bottom: 14px }
+.sbar { display: flex; gap: 2px; height: 10px }
+.sbar span { position: relative; border-radius: 2px; min-width: 2px }
+.sbar span.k-in { box-shadow: inset 0 0 0 1px var(--line) }
+.slab { display: flex; flex-wrap: wrap; gap: 2px 16px; font-size: 12.5px; color: var(--ink-2) }
+.slab b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums }
+.slab .t2 { color: var(--muted) }
+table.mx { border-collapse: separate; border-spacing: 2px; font-size: 12.5px }
+.mx th { font-family: var(--f-cond); font-weight: 500; color: var(--ink-2) }
+.mx thead th { font-size: 11.5px; padding: 0 0 4px; text-align: center; vertical-align: bottom; cursor: pointer; min-width: 30px }
+.mx thead th.part { color: var(--muted); font-style: italic }
+.mx thead th.sel { color: var(--accent); font-weight: 600 }
+.mx thead th.sel::after { content: ""; display: block; height: 2px; background: var(--accent); margin-top: 3px }
+.mx th.rh { text-align: left; font-weight: 400; padding-right: 10px; white-space: nowrap; color: var(--ink); cursor: pointer; max-width: 210px; overflow: hidden; text-overflow: ellipsis }
+/* Namensspalte bleibt beim seitlichen Scrollen stehen */
+.mx th.rh, .mx thead th:first-child, .mx tr.land th { position: sticky; left: 0; z-index: 2; background: var(--surface) }
+.mx tr.land th { padding-right: 10px }
+@media (max-width: 560px) { .mx th.rh { max-width: 132px } }
+.mx th.rh .vr { font-family: var(--f-mono); color: var(--muted); font-size: 11px; margin-right: 6px }
+.mx th.rh.sel { color: var(--accent); font-weight: 600 }
+.mx tr.land th { text-align: left; padding: 10px 0 2px; font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600 }
+.mx td { padding: 0 }
+.cell { display: block; width: 30px; height: 22px; border: 0; border-radius: 3px; padding: 0; cursor: pointer; position: relative; background: var(--in) }
+.cell.sel { outline: 2px solid var(--ink); outline-offset: 1px; z-index: 1 }
+.cell.colsel:not(.sel) { box-shadow: inset 0 0 0 1px var(--accent) }
+
+.k-in { background: var(--in) } .k-u1 { background: var(--u1) } .k-u2 { background: var(--u2) } .k-u3 { background: var(--u3) }
+.k-o1 { background: var(--o1) } .k-o2 { background: var(--o2) } .k-o3 { background: var(--o3) }
+.k-na { background: transparent; box-shadow: inset 0 0 0 1px var(--line-2) }
+.k-na::before { content: "–"; color: var(--muted); font-size: 11px; position: absolute; inset: 0; display: grid; place-items: center }
+.hatched::after { content: ""; position: absolute; inset: 0; border-radius: inherit;
+  background: repeating-linear-gradient(135deg, var(--hatch) 0 2px, transparent 2px 5px) }
+
+/* Detail */
+.d-title { font-size: 18px; font-weight: 600; margin: 0; line-height: 1.25 }
+.d-meta { color: var(--muted); font-size: 12.5px; margin: 2px 0 14px }
+.d-grid { display: grid; grid-template-columns: auto 1fr 1fr; gap: 6px 12px; font-size: 13px; align-items: baseline }
+.d-grid .h { font-family: var(--f-cond); font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted) }
+.d-grid .l { color: var(--ink-2) }
+.d-grid .v { text-align: right }
+.pill { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; padding: 1px 8px 1px 6px; border-radius: 999px; border: 1px solid var(--line-2); white-space: nowrap }
+.pill i { width: 9px; height: 9px; border-radius: 50%; display: inline-block }
+.say { margin: 14px 0 0; padding: 10px 12px; background: var(--bg); border-radius: 6px; font-size: 13.5px }
+.say p { margin: 0 } .say p + p { margin-top: 6px }
+.cav { margin: 14px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 12.5px; color: var(--ink-2) }
+.cav li { padding-left: 14px; position: relative }
+.cav li::before { content: ""; position: absolute; left: 2px; top: .6em; width: 5px; height: 5px; border-radius: 50%; background: var(--muted) }
+.cav b { color: var(--ink); font-weight: 600 }
+.cav a { color: var(--muted); white-space: nowrap }
+.minibar { margin-top: 12px }
+
+/* Fachansicht */
+.bottom { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 18px; align-items: start }
+@media (max-width: 1020px) { .bottom { grid-template-columns: minmax(0, 1fr) } }
+svg text { fill: var(--ink-2); font-family: var(--f-body) }
+svg .mono { font-family: var(--f-mono) }
+svg .muted { fill: var(--muted) }
+svg .band { fill: var(--band) }
+svg .grid { stroke: var(--line); stroke-width: 1 }
+svg .axis { stroke: var(--line-2); stroke-width: 1 }
+svg .row:hover .rowbg, svg .row.sel .rowbg { fill: var(--accent-soft) }
+svg .rowbg { fill: transparent }
+svg .row { cursor: pointer }
+svg .row.sel text.lab { fill: var(--accent); font-weight: 600 }
+svg .tile { cursor: pointer }
+svg .tile text { font-family: var(--f-mono); font-size: 11px; fill: var(--ink) }
+svg .tile.sel rect.t { stroke: var(--ink); stroke-width: 2.5 }
+svg .tile text.on2 { fill: var(--on-2) } svg .tile text.on3 { fill: var(--on-3) }
+svg .blb { fill: none; stroke: var(--line-2); stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round }
+.f-u1 { fill: var(--u1) } .f-u2 { fill: var(--u2) } .f-u3 { fill: var(--u3) } .f-in { fill: var(--in) }
+.f-o1 { fill: var(--o1) } .f-o2 { fill: var(--o2) } .f-o3 { fill: var(--o3) } .f-na { fill: var(--surface); stroke: var(--line-2) }
+.s-ring { fill: var(--surface); stroke: var(--muted); stroke-width: 1.5 }
+.s-link { stroke: var(--muted); stroke-width: 1.5 }
+.dot-ring { stroke: var(--surface); stroke-width: 2 }
+
+.tip { position: fixed; z-index: 20; pointer-events: none; background: var(--surface); color: var(--ink); border: 1px solid var(--line-2);
+  border-radius: 6px; padding: 8px 10px; font-size: 12.5px; box-shadow: 0 4px 14px rgba(0,0,0,.12); max-width: 280px; line-height: 1.45 }
+.tip b { font-weight: 600 }
+.tip .t2 { color: var(--muted) }
+
+footer { color: var(--muted); font-size: 12px; display: grid; gap: 4px; border-top: 1px solid var(--line); padding-top: 14px }
+footer a { color: var(--accent) }
+.nb { white-space: nowrap }
+@media (prefers-reduced-motion: no-preference) { .cell, .tile rect { transition: background-color .15s, fill .15s } }

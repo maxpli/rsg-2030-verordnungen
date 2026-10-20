@@ -88,14 +88,18 @@ Jede Entscheidung mit Grund, damit sie sich später nachvollziehen oder bewusst 
 ## Aufbau (geplant)
 
 ```
-web/                  die Seite: index.html, app.js, style.css; kacheln.csv (VR → Spalte, Zeile)
+web/                  die Seite: index.html, app.js, style.css
+  kacheln.csv           je Region Spalte und Zeile der Kachelkarte und die Beschriftung der Kachel (VR und BL)
+  faecher.csv           Fächer in der Reihenfolge der Spalten, Name, «Teil von» (PUL → IM, KFO → ZMK)
 rsg2030/web.py        «python -m rsg2030 web»: Tabelle Versorgungsdichte → data.json, Seite nach daten_ergebnis/web/
 tests/test_web.py     Tests ohne Quelldateien
 .github/workflows/webseite.yml   bauen und auf GitHub Pages veröffentlichen
 ```
 
-Die fertige Seite liegt wie alle Ergebnisse nicht in git. Namen kommen aus einer Quelle: Regionen aus
-`oesg_regionen.csv`, Fächer und Soll-Intervalle aus `oesg_planungsrichtwerte.csv`, Werte aus der Tabelle.
+Die fertige Seite liegt wie alle Ergebnisse nicht in git. Die Seite lädt `data.json` und rechnet nichts nach; jede
+Angabe hat eine Quelle: Werte und Soll-Intervalle aus der Tabelle Versorgungsdichte, Namen der Regionen und Länder aus
+`oesg_regionen.csv`, Namen der Fächer aus `web/faecher.csv`, Lage der Kacheln aus `web/kacheln.csv`. Kopf und
+Fußzeile nennen Release, Prüfsumme und Commit aus `data.json`.
 
 ## Wer prüft was (geplant)
 
