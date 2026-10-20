@@ -8,8 +8,8 @@ begründet («Darstellungsregeln», «Entscheidungen»). Die Vorbehalte kommen a
 urteilen nicht über sie hinaus. Anders als die Excel-Mappe, die die Matrizen so zeigt, wie sie gedruckt sind, liest die
 Seite die Zahlen also vor.
 
-**Stand:** Seite, Befehl, Tests und Workflow sind im Repo; veröffentlicht ist sie noch nicht. Offene Punkte stehen in
-[offene_punkte.md](offene_punkte.md#webseite).
+**Veröffentlicht unter <https://maxpli.github.io/rsg-2030-verordnungen/>**, mit den Daten des aktuellen Release.
+Offene Punkte stehen in [offene_punkte.md](offene_punkte.md#webseite).
 
 ---
 

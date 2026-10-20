@@ -94,12 +94,11 @@ eigene, gekennzeichnete Größe, nicht als Wert der Verordnungen. Eine solche Qu
 
 Was an der Webseite ([WEB.md](WEB.md)) noch offen ist.
 
-1. **Veröffentlichen:** GitHub Pages im Repo einschalten (Settings → Pages → Quelle «GitHub Actions»); danach baut
-   `webseite.yml` die Seite. Vorher sieht sich ein Mensch die Seite im Browser an, auch am Handy.
-2. **Vorbehaltstexte gegenlesen:** Die Texte der Detailspalte sind aus den Fallstricken abgeleitet, aber nicht wörtlich
-   übernommen. Jeder muss seinen Fallstrick nennen; die Formulierung bestätigt der Herausgeber.
-3. **Weitere Zeilen der Tabelle Versorgungsdichte zeigen?** Heute nur `insgesamt`. Möglich wären `spitalsambulant` und
+1. **Weitere Zeilen der Tabelle Versorgungsdichte zeigen?** Heute nur `insgesamt`. Möglich wären `spitalsambulant` und
    `extramural` (Aufteilung, ohne Soll-Intervall; Fallstrick 10), `pve` (nur AM und KIJU, im PLAN Mindestwert) und die
    Veränderung IST → PLAN. Offen ist, was davon die Seite tragen soll, ohne unübersichtlich zu werden.
-4. **Test im Browser:** Seite lädt ohne Fehler, keine seitliche Verschiebung bei Handy-Breite. Bis dahin prüft das ein
+2. **Herkunft je Wert zeigen?** In der Detailspalte «Woher kommen diese ÄAVE?»: PDF, Seite, Originaltext und, wo
+   korrigiert wurde, die Regel – aus der Tabelle Planungsmatrizen. Das zeigte, was den Datensatz ausmacht, braucht aber
+   die zweite, große Tabelle in der Seite, mit eigenen Tests. Ebenso denkbar: eine Ansicht der Matrizen selbst.
+3. **Test im Browser:** Seite lädt ohne Fehler, keine seitliche Verschiebung bei Handy-Breite. Bis dahin prüft das ein
    Mensch.
