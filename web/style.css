@@ -116,7 +116,9 @@ table.mx { border-collapse: separate; border-spacing: 2px; font-size: 12.5px }
 .mx tr.land th { text-align: left; padding: 10px 0 2px; font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600 }
 .mx td { padding: 0 }
 .cell { display: block; width: 30px; height: 22px; border: 0; border-radius: 3px; padding: 0; cursor: pointer; position: relative; background: var(--in) }
-.cell.sel { outline: 2px solid var(--ink); outline-offset: 1px; z-index: 1 }
+/* Rahmen innen und ohne eigene Ebene (z-index): Safari setzt sonst die Zelle über die klebende Namensspalte */
+.cell.sel { box-shadow: inset 0 0 0 2px var(--ink), inset 0 0 0 3px var(--surface) }
+.cell.sel.hatched::after { inset: 3px; border-radius: 1px }
 .cell.colsel:not(.sel) { box-shadow: inset 0 0 0 1px var(--accent) }
 
 .k-in { background: var(--in) } .k-u1 { background: var(--u1) } .k-u2 { background: var(--u2) } .k-u3 { background: var(--u3) }
