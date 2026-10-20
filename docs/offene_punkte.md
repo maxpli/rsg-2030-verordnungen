@@ -94,17 +94,15 @@ eigene, gekennzeichnete Größe, nicht als Wert der Verordnungen. Eine solche Qu
 
 Was an der Webseite ([WEB.md](WEB.md)) noch offen ist.
 
-1. **Code ins Repo:** den Prototyp nach `web/` übernehmen, `python -m rsg2030 web` und die Tests aus WEB.md, «Wer prüft
-   was».
-2. **Veröffentlichen:** Workflow `webseite.yml`. GitHub Pages muss im Repo eingeschaltet werden (Settings → Pages →
+1. **Veröffentlichen:** Workflow `webseite.yml`. GitHub Pages muss im Repo eingeschaltet werden (Settings → Pages →
    Quelle «GitHub Actions»). Vorher sieht sich ein Mensch die Seite im Browser an, auch am Handy.
-3. **Vorbehaltstexte gegenlesen:** Die Texte der Detailspalte sind aus den Fallstricken abgeleitet, aber nicht wörtlich
+2. **Vorbehaltstexte gegenlesen:** Die Texte der Detailspalte sind aus den Fallstricken abgeleitet, aber nicht wörtlich
    übernommen. Jeder muss seinen Fallstrick nennen; die Formulierung bestätigt der Herausgeber.
-4. **Weitere Zeilen der Tabelle Versorgungsdichte zeigen?** Heute nur `insgesamt`. Möglich wären `spitalsambulant` und
+3. **Weitere Zeilen der Tabelle Versorgungsdichte zeigen?** Heute nur `insgesamt`. Möglich wären `spitalsambulant` und
    `extramural` (Aufteilung, ohne Soll-Intervall; Fallstrick 10), `pve` (nur AM und KIJU, im PLAN Mindestwert) und die
    Veränderung IST → PLAN. Offen ist, was davon die Seite tragen soll, ohne unübersichtlich zu werden.
-5. **Test im Browser:** Seite lädt ohne Fehler, keine seitliche Verschiebung bei Handy-Breite. Bis dahin prüft das ein
+4. **Test im Browser:** Seite lädt ohne Fehler, keine seitliche Verschiebung bei Handy-Breite. Bis dahin prüft das ein
    Mensch.
-6. **Schriften:** Die Seite lädt IBM Plex von Google Fonts. Dabei geht die IP-Adresse jeder Besucherin an Google; für
+5. **Schriften:** Die Seite lädt IBM Plex von Google Fonts. Dabei geht die IP-Adresse jeder Besucherin an Google; für
    eine öffentliche Seite datenschutzrechtlich heikel. Vor der Veröffentlichung die Schriften selbst ausliefern (IBM
    Plex steht unter der SIL Open Font License) oder Systemschriften verwenden.

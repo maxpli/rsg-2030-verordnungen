@@ -6,6 +6,7 @@ python -m rsg2030 download           Quellen laden, Prüfsummen prüfen (--neu =
 python -m rsg2030 daten              auslesen, korrigieren, prüfen → Planungsmatrizen (CSV + Excel-Mappe)
 python -m rsg2030 versorgungsdichte  ÄAVE im ÖSG-Zuschnitt, Versorgungsdichte, Lage zum Soll-Intervall je BL und VR
 python -m rsg2030 waechter           neue Verordnungen im RIS oder neue Fassungen der Quellen?
+python -m rsg2030 web                Webseite zur Tabelle Versorgungsdichte nach daten_ergebnis/web/ (docs/WEB.md)
 
 Nur zum Pflegen der Eingaben im Paket (neue Verordnung, siehe docs/PIPELINE.md):
 
@@ -44,6 +45,7 @@ BEFEHLE: dict[str, tuple[str, str]] = {
         "rsg2030.waechter",
         "Neue Verordnungen im RIS oder neue Fassungen der Quellen? (Hinweis, ändert nichts)",
     ),
+    "web": ("rsg2030.web", "Webseite zur Tabelle Versorgungsdichte bauen (nicht Teil von «alles»; docs/WEB.md)"),
     "seiten": ("rsg2030.scripts.seiten", "Seitenregister seiten.csv aus den PDFs erzeugen (fragt nach Bildseiten)"),
     "manuell": ("rsg2030.scripts.manual_template", "Blätter für Bildseiten in manuell.xlsx anlegen bzw. ergänzen"),
     "fussnoten": ("rsg2030.fussnoten", "neue Fußnoten der Matrixseiten als Entwurf ins Verzeichnis fussnoten.csv"),

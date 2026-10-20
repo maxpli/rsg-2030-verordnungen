@@ -5,9 +5,8 @@ Versorgungsregion und Fach, ob die Sachleistung unter, im oder über dem Versorg
 Wie die Excel-Mappe ist sie eine **Ansicht des Datensatzes**: Sie zeigt nur, was in den veröffentlichten Dateien steht,
 und übernimmt die Vorbehalte aus [DATEN.md](DATEN.md#fallstricke).
 
-**Stand: Plan.** Die Seite gibt es bisher als Prototyp außerhalb des Repos. Dieses Dokument hält fest, was sie zeigen
-soll, welche Entscheidungen dahinter stehen und wer was prüft. Code, Tests und Veröffentlichung folgen in eigenen
-Commits; offene Punkte stehen in [offene_punkte.md](offene_punkte.md#webseite).
+**Stand:** Seite, Befehl und Tests sind im Repo; veröffentlicht ist sie noch nicht. Offene Punkte stehen in
+[offene_punkte.md](offene_punkte.md#webseite).
 
 ---
 
@@ -85,15 +84,15 @@ Jede Entscheidung mit Grund, damit sie sich später nachvollziehen oder bewusst 
     ab, und die bisherige Seite bleibt. Die Fußzeile nennt Datenstand (Release, Prüfsumme) und Stand der Seite
     (Commit). Für Änderungen an der Seite braucht es kein neues Release.
 
-## Aufbau (geplant)
+## Aufbau
 
 ```
 web/                  die Seite: index.html, app.js, style.css
   kacheln.csv           je Region Spalte und Zeile der Kachelkarte und die Beschriftung der Kachel (VR und BL)
   faecher.csv           Fächer in der Reihenfolge der Spalten, Name, «Teil von» (PUL → IM, KFO → ZMK)
 rsg2030/web.py        «python -m rsg2030 web»: Tabelle Versorgungsdichte → data.json, Seite nach daten_ergebnis/web/
-tests/test_web.py     Tests ohne Quelldateien
-.github/workflows/webseite.yml   bauen und auf GitHub Pages veröffentlichen
+tests/test_web.py     Kacheln, Fächer, Vorbehalte, Farben, data.json (siehe «Wer prüft was»)
+.github/workflows/webseite.yml   bauen und auf GitHub Pages veröffentlichen (folgt)
 ```
 
 Die fertige Seite liegt wie alle Ergebnisse nicht in git. Die Seite lädt `data.json` und rechnet nichts nach; jede
@@ -101,14 +100,28 @@ Angabe hat eine Quelle: Werte und Soll-Intervalle aus der Tabelle Versorgungsdic
 `oesg_regionen.csv`, Namen der Fächer aus `web/faecher.csv`, Lage der Kacheln aus `web/kacheln.csv`. Kopf und
 Fußzeile nennen Release, Prüfsumme und Commit aus `data.json`.
 
-## Wer prüft was (geplant)
+## Selbst bauen und ansehen
+
+```bash
+.venv/bin/python -m rsg2030 web                          # braucht daten_ergebnis/RSG_2030_Versorgungsdichte.csv
+.venv/bin/python -m http.server -d daten_ergebnis/web    # dann http://localhost:8000 im Browser
+```
+
+Die Tabelle entsteht mit `python -m rsg2030 alles`; es reicht auch die Datei des Release in `daten_ergebnis/`.
+Gebaut wird nur, wenn sie Byte für Byte der Version des Pakets entspricht (`rsg2030/erwartete_ausgaben.csv`): Nur
+dann stimmt «Release …» auf der Seite. Die Seite direkt als Datei zu öffnen geht nicht, weil der Browser `data.json`
+dann nicht laden darf; dafür der kleine Server.
+
+## Wer prüft was
 
 | Was schiefgehen kann | Wer es findet |
 |---|---|
-| falsche oder veränderte Tabelle | Prüfsumme gegen das Release; sonst wird nicht gebaut |
-| Region fehlt in der Kachelkarte oder zwei Regionen auf einem Feld | Test: `kacheln.csv` enthält genau die 32 VR aus `oesg_regionen.csv`, jedes Feld einmal |
+| falsche oder veränderte Tabelle | `python -m rsg2030 web`: Prüfsumme gegen `erwartete_ausgaben.csv`; sonst wird nicht gebaut |
+| Region fehlt in der Kachelkarte oder zwei Regionen auf einem Feld | Test: `kacheln.csv` enthält genau die VR und Länder aus `oesg_regionen.csv`, jedes Feld einmal |
+| Fach fehlt, falscher Name oder falsches «Teil von» | Test: `faecher.csv` enthält genau die Richtwertzeilen mit Soll-Intervall; «Teil von» wie `ZUSCHNITT` in `oesg_methodik/faecher.py` |
+| Seite passt nicht mehr zur Tabelle (Spalte, Fach oder Region neu oder weg) | `python -m rsg2030 web` bricht mit Meldung ab; Tests dafür |
 | Zahl auf der Seite weicht von der Tabelle ab | Test (ganze Suite): `data.json` gegen die Tabelle |
 | ein Vorbehalt verweist auf einen Fallstrick, den es nicht mehr gibt | Test: jeder Vorbehalt nennt seinen Fallstrick, und den gibt es in DATEN.md |
-| Farbstufen nicht unterscheidbar | Test: Abstände aus den Farben in `style.css` nachgerechnet |
+| Farbstufen nicht unterscheidbar | Test: Abstände benachbarter Stufen aus `style.css` nachgerechnet, normal und bei Protanopie und Deuteranopie, hell und dunkel; dunkle Farben gleich, ob über die Systemeinstellung oder den Schalter |
 | Seite lädt nicht, Fehler im Skript, Seite am Handy breiter als der Bildschirm | ein Mensch vor der Veröffentlichung; später ein Test im Browser |
 | ein Vorbehalt ist fachlich falsch oder missverständlich formuliert | der Herausgeber |
