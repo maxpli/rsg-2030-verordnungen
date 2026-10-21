@@ -244,20 +244,19 @@ function renderStrip() {
   const key = (o) => { const w = S.abschnitt === "IST" ? o.i : o.p; return w ? w.pos : Infinity; };
   regs.sort((a, b) => key(a) - key(b));
   const W = Math.max(320, stripEl.clientWidth), narrow = W < 560;
-  const LW = narrow ? 120 : 190, RW = 58, top = 34, rh = 21, H = top + regs.length * rh + 30;
+  const LW = narrow ? 120 : 190, RW = 58, top = 48, rh = 21, bot = top + regs.length * rh, H = bot + 30;
   const X0 = LW + 8, X1 = W - RW - 8, LO = -1.5, HI = 3;
   const x = (p) => X0 + (Math.max(LO, Math.min(HI, p)) - LO) / (HI - LO) * (X1 - X0);
   let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" role="img" aria-label="Position im Soll-Intervall je Region, ${f}">`;
   s += `<rect class="band" x="${x(0)}" y="${top - 6}" width="${x(1) - x(0)}" height="${regs.length * rh + 6}"/>`;
-  /* VDmin links und VDmax rechts vom Band ausrichten; die Zahlen −1, 2, 3 nur, wenn daneben Platz ist */
-  const unit = x(1) - x(0);
+  /* Zwei Zeilen über dem Band: oben die VD (VDmin links, VDmax rechts), darunter die Position – je Zeile ein Maßstab */
+  s += `<text class="mono" x="${x(0) - 3}" y="${top - 26}" font-size="10.5" text-anchor="end">VDmin ${fmt(fi.min, dg)}</text>`;
+  s += `<text class="mono" x="${x(1) + 3}" y="${top - 26}" font-size="10.5" text-anchor="start">VDmax ${fmt(fi.max, dg)}</text>`;
   for (const t of [-1, 0, 1, 2, 3]) {
-    s += `<line class="grid" x1="${x(t)}" x2="${x(t)}" y1="${top - 6}" y2="${top + regs.length * rh}"/>`;
-    if (t === 0) s += `<text class="mono" x="${x(0) - 3}" y="${top - 12}" font-size="10.5" text-anchor="end">VDmin ${fmt(fi.min, dg)}</text>`;
-    else if (t === 1) s += `<text class="mono" x="${x(1) + 3}" y="${top - 12}" font-size="10.5" text-anchor="start">VDmax ${fmt(fi.max, dg)}</text>`;
-    else if (unit >= 95) s += `<text class="muted mono" x="${x(t)}" y="${top - 12}" font-size="10.5" text-anchor="middle">${fmt(t, 0)}</text>`;
+    s += `<line class="grid" x1="${x(t)}" x2="${x(t)}" y1="${top - 6}" y2="${bot}"/>`;
+    s += `<text class="muted mono" x="${x(t)}" y="${top - 11}" font-size="10.5" text-anchor="middle">${fmt(t, 0)}</text>`;
   }
-  s += `<text class="muted" x="${X1 + RW}" y="${top - 12}" font-size="10.5" text-anchor="end">ÄAVE</text>`;
+  s += `<text class="muted" x="${X1 + RW}" y="${top - 11}" font-size="10.5" text-anchor="end">ÄAVE</text>`;
   regs.forEach((o, k) => {
     const y = top + k * rh + rh / 2, sel = o.r.id === S.region, w = S.abschnitt === "IST" ? o.i : o.p;
     const name = S.ebene === "VR" ? `${o.r.id} ${o.r.name}` : o.r.land_name;
@@ -269,7 +268,7 @@ function renderStrip() {
     for (const ww of [o.i, o.p]) if (ww && ww.pos > HI) s += `<text class="muted" x="${x(HI) + 8}" y="${y + 4}" font-size="11">›</text>`;
     s += `<text class="mono ${w && w.lage === "im" ? "muted" : ""}" x="${X1 + RW}" y="${y + 4}" font-size="11.5" text-anchor="end">${w ? (w.lage === "im" ? "0" : sgn(w.abst)) : "–"}</text></g>`;
   });
-  s += `<text class="muted" x="${(X0 + X1) / 2}" y="${H - 6}" font-size="11" text-anchor="middle">Position: 0 = VDmin, 1 = VDmax${regs.some((o) => (o.i && o.i.pos > HI) || (o.p && o.p.pos > HI)) ? " · › Wert über 3, abgeschnitten" : ""}</text>`;
+  s += `<text class="muted" x="${(X0 + X1) / 2}" y="${H - 6}" font-size="11" text-anchor="middle">Position im Intervall: 0 = VDmin, 1 = VDmax, Schritt = eine Intervallbreite${regs.some((o) => (o.i && o.i.pos > HI) || (o.p && o.p.pos > HI)) ? " · › Wert über 3, abgeschnitten" : ""}</text>`;
   stripEl.innerHTML = s + "</svg>";
 }
 stripEl.addEventListener("click", (e) => { const g = e.target.closest(".row"); if (g) pick(g.dataset.r, null, "#strip .row.sel"); });
