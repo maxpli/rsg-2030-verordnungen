@@ -24,7 +24,7 @@ sie später auch für andere Datensätze dienen kann.
 
 | Begriff | Bedeutung | Quelle |
 |---|---|---|
-| **ÄAVE** | ärztliche ambulante Versorgungseinheit: durchschnittliches ärztliches Leistungsvolumen je Fach im Regiomed-System der Sozialversicherung. Eine ÄAVE entspricht grundsätzlich einer durchschnittlich arbeitenden Kassenärztin bzw. einem Kassenarzt. Keine Kopfzahl. Bei Spitalsambulanzen über ärztliche VZÄ in nicht bettenführenden Kostenstellen | Textband S.216; Methodenband S.26 |
+| **ÄAVE** | ärztliche ambulante Versorgungseinheit: durchschnittliches ärztliches Leistungsvolumen je Fach im Regiomed-System der Sozialversicherung. Eine ÄAVE entspricht grundsätzlich einer durchschnittlich arbeitenden Kassenärztin bzw. einem Kassenarzt. Keine Kopfzahl. Bei Spitalsambulanzen über ärztliche VZÄ in nicht bettenführenden Kostenstellen. Regelwerk je Sektor: R2a | Tabellenband S.12–13; Textband S.216; Methodenband S.26 |
 | **Regiomed** | Datensystem des Dachverbands der Sozialversicherungsträger (DVSV), aus dem die ÄAVE stammen | Textband S.36 |
 | **DAA** | «durchschnittlich arbeitende Ärztin/Arzt», Bezugsgröße der ÄAVE-Berechnung im Kassenbereich | Methodenband S.17 |
 | **Sachleistung** | ambulanter Bereich mit Kassenvertrag: niedergelassene Ärzt:innen und Gruppenpraxen mit Kassenvertrag, selbständige Ambulatorien mit Kassenvertrag, Kassenambulatorien **und Spitalsambulanzen**. Nicht zu verwechseln mit den *Sachleistungsstellen*: Die planen nur den extramuralen Teil (Planstellen und Ambulatorien, Tabellenband S.252; Tirol, Anlage S.1, Fußnote (8): «Sachleistungsstellen sollen die Versorgung im niedergelassenen Bereich sowie in selbständigen Ambulatorien … abbilden») | Textband S.15 |
@@ -82,6 +82,31 @@ Kassenambulatorien (Tabellenband S.251).
 
 Einschränkung laut ÖSG: Den spitalsambulanten ÄAVE «kommt nur eine eingeschränkte Aussagekraft zu», weil
 Spitalsambulanz und extramuraler Bereich unterschiedlich arbeiten (Textband S.36, Fußnote 39).
+
+### R2a – Woraus eine ÄAVE entsteht
+
+Das maßgebliche Regelwerk steht im **Tabellenband, Anhang 5 – PM, S.12–13** («Regelwerk zur Berechnung ärztlicher
+ambulanter Versorgungseinheiten für den gesamten ambulanten Bereich pro Fachrichtung 2021»). Es zählt je
+Versorgungssektor **verschieden**:
+
+| Sektor | Grundlage | Fundstelle |
+|---|---|---|
+| **niedergelassene Vertragspartner** | **Quartalserstpatient:innen** aus e-card-Konsultationen, geteilt durch den österreichweiten Durchschnitt eines ganzjährigen Durchschnittsarztes | S.12, A1–A3 |
+| Wahlärzt:innen | Ärztekostenstatistik und gemeldete Kostenerstattungen; dazu Vertragspartner mit reinem GU/VU-Vertrag | S.12–13, B1–B2 |
+| **Spitalsambulanzen** | **ärztliche Vollzeitäquivalente** der nicht bettenführenden Kostenstellen × Anteil der ambulanten an allen Frequenzen; UC inkl. UKH | S.13, C1–C3 |
+| eigene Einrichtungen der KV-Träger | jährliche Erhebung der ÄAVE durch die Träger | S.13, D1 |
+| Institute (selbständige Ambulatorien mit Kassenvertrag) | abgerechnete Beträge je Fach und Bezirk, geteilt durch den «abgerechneten Betrag pro Arzt»; bei Allergieambulatorien stattdessen die tatsächlichen VZÄ | S.13, E1 |
+
+**Quartalserstpatient:in** = «der erste Kontakt eines Patienten/einer Patientin bei einem Vertragspartner eines
+Fachgebietes pro Quartal» (S.12, A1). Weitere Kontakte desselben Menschen im selben Quartal zählen nicht mit;
+Konsultationshäufigkeit und Betreuungsaufwand gehen also nicht ein. Der Durchschnittsarzt aus A2 ist eine Einzelpraxis
+mit ganzjährigem ÖGK-Vertrag, statistische Ausreißer ausgenommen (S.12, A2; Auswahlkriterien auch Methodenband S.17).
+
+**Die Einheit ist in sich nicht einheitlich.** Extramural misst sie Patientenköpfe je Quartal, spitalsambulant
+ärztliche Vollzeitäquivalente, bei Instituten abgerechnete Beträge. Der ÖSG hält dazu selbst fest, den
+spitalsambulanten ÄAVE komme «nur eine eingeschränkte Aussagekraft» zu (Textband S.36, Fußnote 39, siehe R2);
+S.13, C1–C3 zeigt, warum. Eine Zeile «insgesamt» addiert damit drei verschieden konstruierte Größen. Für den
+Vergleich mit dem Soll-Intervall verlangt der ÖSG trotzdem die Summe (R3).
 
 ### R3 – So entstehen die Soll-Intervalle
 
