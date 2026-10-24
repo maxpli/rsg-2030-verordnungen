@@ -90,6 +90,22 @@ Wahlärzt:innen im IST-Jahr übernehmen und für 2030 als Szenario fortschreiben
 eigene, gekennzeichnete Größe, nicht als Wert der Verordnungen. Eine solche Quelle ist das RSG-Monitoring der GÖG
 (Zeile «ÄAVE WahlärztInnen», je Land und Jahr; PRUEFUNG.md, «Abgleich mit dem RSG-Monitoring»).
 
+## Mögliche Erweiterung: Sachleistungsstellen im ÖSG-Zuschnitt
+
+Die Tabelle Versorgungsdichte liefert die ÄAVE im ÖSG-Zuschnitt (IM inkl. PUL, ZMK inkl. KFO, CH inkl. KJC/PCH),
+die Stellen aber nur in der Tabelle Planungsmatrizen und dort je **Matrixspalte**. Wer ÄAVE und Stellen
+gegenüberstellt – etwa «wie viel ÄAVE bildet eine geplante Sachleistungsstelle ab» –, muss die Stellen also selbst
+über die Spalten des Zuschnitts summieren; sonst vergleicht er verschiedene Fächer. Der ÖSG schneidet nur die
+ÄAVE-Richtwerte zu (Textband S.37), für die Stellen gibt es keine Regel – die Übertragung ist eine Festlegung der
+auswertenden Seite und steht deshalb heute dort (Analyse-Repo, METHODIK_ANALYSE.md «Stellen im ÖSG-Zuschnitt»).
+
+Offen ist, ob der Datensatz die Stellen im ÖSG-Zuschnitt selbst ausweisen soll. Dagegen spricht, dass es keine
+ÖSG-Regel dafür gibt; dafür, dass jede Auswertung sie sonst gleich neu erfindet (CLAUDE.md: «Muss ein Projekt etwas
+nach ÖSG-Methode selbst rechnen, fehlt es in den Dateien»). Zu klären wäre dabei auch, wie mit Ländern umzugehen ist,
+denen eine Spalte des Zuschnitts fehlt (KFO in Oberösterreich, Vorarlberg und Wien – METHODIK.md, R4), und dass
+Stellen nie über Träger addiert werden dürfen (DATEN.md, «Stellen lesen»).
+*Frage an den Herausgeber: aufnehmen oder bei der Auswertung lassen?*
+
 ## Webseite
 
 Was an der Webseite ([WEB.md](WEB.md)) noch offen ist.
