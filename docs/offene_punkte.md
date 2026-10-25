@@ -39,8 +39,10 @@ zusammengezählt: KFO 12,1, gesamt 951,3.
 
 1. **KFO:** KFO hat keine eigene Spalte, sie steht nur in der Fußnote zu ZMK: «zusätzlich KFO: IST 2022 und Plan 2030:
    38,2 ÄAVE bzw. 32 vertragskieferorthopädische Planstellen SV» (S.10; je Region eigene Zahlen auf S.12–27). Wir
-   zählen die 38,2 ÄAVE im IST und im PLAN zu den Niedergelassenen mit Kassenvertrag und zu «insgesamt».
-   *Frage: Sind die 38,2 ÄAVE niedergelassen mit Kassenvertrag, und gelten sie für IST und PLAN gleichermaßen?*
+   zählen die 38,2 ÄAVE im IST und im PLAN zu den Niedergelassenen mit Kassenvertrag und zu «insgesamt». Die 32
+   Planstellen übernehmen wir nicht, weil die Fußnote keinen Träger nennt.
+   *Frage: Sind die 38,2 ÄAVE niedergelassen mit Kassenvertrag, und gelten sie für IST und PLAN gleichermaßen? Sind
+   die 32 Planstellen gemeinsame Sachleistungsstellen aller Träger?*
 2. **Zusätzliche SVS-Sachleistungsstellen URO (S.9 Bundesland, S.11 VR 41):** Dort stehen 1,5 Stellen, das Feld für den
    Maximalanteil vertragsärztlicher Planstellen (in Prozent) ist leer. Wir lassen es leer.
    *Frage: Welcher Maximalanteil gilt?*
@@ -93,18 +95,26 @@ eigene, gekennzeichnete Größe, nicht als Wert der Verordnungen. Eine solche Qu
 ## Mögliche Erweiterung: Sachleistungsstellen im ÖSG-Zuschnitt
 
 Die Tabelle Versorgungsdichte liefert die ÄAVE im ÖSG-Zuschnitt (IM inkl. PUL, ZMK inkl. KFO, CH inkl. KJC/PCH),
-die Stellen aber nur in der Tabelle Planungsmatrizen und dort je **Matrixspalte**. Wer ÄAVE und Stellen
-gegenüberstellt – etwa «wie viel ÄAVE bildet eine geplante Sachleistungsstelle ab» –, muss die Stellen also selbst
-über die Spalten des Zuschnitts summieren; sonst vergleicht er verschiedene Fächer. Der ÖSG schneidet nur die
-ÄAVE-Richtwerte zu (Textband S.37), für die Stellen gibt es keine Regel – die Übertragung ist eine Festlegung der
-auswertenden Seite und steht deshalb heute dort (Analyse-Repo, METHODIK_ANALYSE.md «Stellen im ÖSG-Zuschnitt»).
+die Stellen stehen nur in der Tabelle Planungsmatrizen und dort je **Matrixspalte**. Wer ÄAVE und Stellen
+gegenüberstellt, muss die Stellen deshalb selbst über dieselben Spalten summieren; sonst vergleicht er verschiedene
+Fächer. Der Zuschnitt wäre derselbe wie bei den ÄAVE: Er legt fest, welche Matrixspalten ein Fach bilden (Textband
+S.37), unabhängig von der Einheit. Summiert würde je Stellen-Zeile, gemeinsame und trägerspezifische getrennt, nie
+über Träger (DATEN.md, «Stellen lesen»). Für die Aufnahme spricht, dass sonst jede Auswertung diesen Zuschnitt selbst
+nachbauen muss.
 
-Offen ist, ob der Datensatz die Stellen im ÖSG-Zuschnitt selbst ausweisen soll. Dagegen spricht, dass es keine
-ÖSG-Regel dafür gibt; dafür, dass jede Auswertung sie sonst gleich neu erfindet (CLAUDE.md: «Muss ein Projekt etwas
-nach ÖSG-Methode selbst rechnen, fehlt es in den Dateien»). Zu klären wäre dabei auch, wie mit Ländern umzugehen ist,
-denen eine Spalte des Zuschnitts fehlt (KFO in Oberösterreich, Vorarlberg und Wien – METHODIK.md, R4), und dass
-Stellen nie über Träger addiert werden dürfen (DATEN.md, «Stellen lesen»).
-*Frage an den Herausgeber: aufnehmen oder bei der Auswertung lassen?*
+Offen sind zwei Dinge:
+
+1. **Wo die Stellen hingehören.** Die Tabelle Versorgungsdichte enthält bewusst keine Stellen (METHODIK.md, «Stellen
+   – nicht in der Tabelle Versorgungsdichte»). Stellen im Zuschnitt bräuchten eigene Zeilen oder eine eigene Tabelle.
+2. **KFO in Oberösterreich.** Vorarlberg und Wien führen KFO in der Spalte ZMK (Vorarlberg laut Textteil für die
+   ganze Spalte, Wien laut Fußnote (5) ausdrücklich für die Stellen: «einschließlich 54 SLS KFO»). Oberösterreich
+   nennt KFO nur in einer Fußnote zu ZMK; der Datensatz übernimmt daraus die ÄAVE, die 32 Planstellen nicht, weil die
+   Fußnote keinen Träger nennt. ZMK enthielte dort KFO bei den ÄAVE, aber nicht bei den Stellen. Für eine Lesart als
+   gemeinsame Stellen spricht das Muster der sechs Länder mit eigener KFO-Spalte (Tabelle Planungsmatrizen): Dort
+   stehen die KFO-Stellen ganz in `slst_gemeinsam`, die Zusatzzeilen je Träger sind bei KFO 0, und im IST hat jeder
+   Träger gleich viele KFO-Planstellen. Bestätigt ist die Lesart nicht (Frage an Oberösterreich oben). Die 32
+   Planstellen wie die ÄAVE per Korrekturregel aus der Fußnote zu übernehmen, wäre eine Datenänderung (neue
+   Prüfsumme der Tabelle Planungsmatrizen).
 
 ## Webseite
 
