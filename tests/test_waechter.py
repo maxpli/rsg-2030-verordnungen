@@ -55,6 +55,21 @@ def test_oesg_neu_und_weg(monkeypatch):
     assert len(h) == 2 and "neuer ÖSG SPG_AT_OSG_G_2" in h[0] and "SPG_AT_OSG_G_1 gilt nicht mehr" in h[1]
 
 
+def test_ris_nicht_erreichbar_ist_hinweis(monkeypatch):
+    """Ein RIS, das nicht antwortet (z. B. HTTP 503), ist ein Hinweis – der Lauf bricht nicht mit Traceback ab."""
+    import urllib.error
+
+    import pandas as pd
+
+    def abrufen(url: str) -> bytes:
+        raise urllib.error.HTTPError(url, 503, "Service Unavailable", {}, None)  # type: ignore[arg-type]
+
+    monkeypatch.setattr(w, "abrufen", abrufen)
+    q = pd.DataFrame({"Herkunft": ["RIS"], "Kennung": ["SPG_A_RSG_V_1"], "Bundesland": ["A"]})
+    for hinweise in (w.pruefe_ris(q), w.pruefe_oesg(q)):
+        assert len(hinweise) == 1 and "nicht erreichbar" in hinweise[0] and "503" in hinweise[0]
+
+
 def test_originale(monkeypatch):
     import hashlib
 

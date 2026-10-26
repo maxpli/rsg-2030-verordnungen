@@ -86,7 +86,9 @@ ausgerichtet.
    `--quellen` lädt er zusätzlich jede URL-Quelle und vergleicht ihre Prüfsumme (erkennt jeden Austausch unter derselben
    Adresse); mit `--archiv` lädt er jede Archivkopie und prüft, ob sie die geprüfte Fassung ist. In GitHub Actions läuft
    der RIS-Teil jeden Montag, die Prüfung der Originale und Archivkopien am 1. jedes Monats; bei einem Hinweis schlägt
-   der Lauf fehl und GitHub schickt eine Mail. Meldet er eine Archivkopie, die nicht die geprüfte Fassung ist: das
+   der Lauf fehl und GitHub schickt eine Mail. Antwortet ein Server nicht (das RIS schickt gelegentlich «HTTP 503» und
+   bittet um Pause), meldet der Wächter das als Hinweis «nicht erreichbar – kein Abgleich in diesem Lauf»: Dieser
+   Abgleich hat dann nicht stattgefunden. Bleibt es dabei, von Hand nachsehen. Meldet er eine Archivkopie, die nicht die geprüfte Fassung ist: das
    Original bei web.archive.org/save neu einreichen (solange es noch die geprüfte Fassung ist) und den neuen Zeitstempel
    in die Spalte «Archiv» eintragen (`https://web.archive.org/web/<Zeitstempel>id_/<Adresse>`). Gibt es zum Zeitstempel
    keine Aufnahme, leitet die Wayback Machine still auf die nächste um; das zeigt erst die Prüfsumme. Der Download lädt

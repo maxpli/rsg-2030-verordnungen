@@ -16,6 +16,8 @@ wird, entscheidet ein Mensch (docs/PIPELINE.md).
   Machine leitet einen Zeitstempel ohne Aufnahme still auf die nächste Aufnahme um; das findet nur die Prüfsumme.
 
 Exit 1 bei einem Hinweis, damit GitHub eine Mail schickt (RIS wöchentlich, Originale und Archivkopien monatlich).
+Ein Server, der nicht antwortet, ist auch ein Hinweis (kein Abbruch): Dass ein Abgleich ausgefallen ist, soll in der
+Mail stehen und nicht übersehen werden.
 
     python -m rsg2030 waechter [--quellen] [--archiv]
 """
@@ -84,10 +86,19 @@ def ris_dokumente(stichtag: date | None = None, suche: dict[str, str] = SUCHE_RS
     return treffer
 
 
+def _nicht_erreichbar(was: str, fehler: OSError) -> str:
+    """Antwortet das RIS nicht (auch: HTTP 503 trotz der Pausen im Download), ist das ein Hinweis, kein Abbruch:
+    Der Abgleich hat diesmal nicht stattgefunden – das soll in der Mail stehen, nicht als Traceback erscheinen."""
+    return f"RIS: Suche nach {was} nicht erreichbar ({fehler}) – kein Abgleich in diesem Lauf"
+
+
 def pruefe_ris(q: pd.DataFrame) -> list[str]:
     ris = q[ist_rsg_verordnung(q)].drop_duplicates("Kennung")
     register, land = set(ris["Kennung"]), dict(zip(ris["Kennung"], ris["Bundesland"]))
-    treffer = ris_dokumente()
+    try:
+        treffer = ris_dokumente()
+    except OSError as e:
+        return [_nicht_erreichbar("Verordnungen", e)]
     hinweise = [
         f"RIS: neue Verordnung/Änderung {k} – {RIS_URL}/Dokument.wxe?Abfrage=Spg&Dokumentnummer={k}"
         for k in sorted(treffer - register)
@@ -103,7 +114,10 @@ def pruefe_ris(q: pd.DataFrame) -> list[str]:
 def pruefe_oesg(q: pd.DataFrame) -> list[str]:
     """Das geltende ÖSG-Gutachten im RIS gegen das Register."""
     register = set(q.loc[(q["Herkunft"] == "RIS") & ~ist_rsg_verordnung(q), "Kennung"])
-    treffer = ris_dokumente(suche=SUCHE_OESG)
+    try:
+        treffer = ris_dokumente(suche=SUCHE_OESG)
+    except OSError as e:
+        return [_nicht_erreichbar("ÖSG", e)]
     hinweise = [
         f"RIS: neuer ÖSG {k} – Richtwerte, Regionen und Vorlage der Matrix prüfen (docs/PIPELINE.md) – "
         f"{RIS_URL}/Dokument.wxe?Abfrage=Spg&Dokumentnummer={k}"

@@ -3,6 +3,14 @@
 Hier steht, was sich zwischen Versionen an den **Daten** ändert – jede Änderung einer Prüfsumme in
 `rsg2030/erwartete_ausgaben.csv`, mit Grund – und an den Befehlen. Versionen: `<Verordnungsstand>.<Nummer>`.
 
+## in Arbeit
+
+**Befehle:**
+
+- `waechter`: Antwortet das RIS nicht (es schickt gelegentlich «HTTP 503» und bittet um Pause), ist das ein Hinweis
+  «nicht erreichbar – kein Abgleich in diesem Lauf» statt eines Abbruchs mit Traceback. Der Lauf endet weiter mit
+  Exit 1, damit in der Mail steht, dass dieser Abgleich ausgefallen ist.
+
 ## 2026.1 – erste veröffentlichte Version
 
 **Daten** (Verordnungsstand 2026, alle neun RSG 2030 laut RIS):
