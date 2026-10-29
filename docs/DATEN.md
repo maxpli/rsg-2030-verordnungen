@@ -23,7 +23,8 @@ Komma als Trenner, Punkt als Dezimalzeichen.
 | ÄAVE spitalsambulant / extramural / insgesamt, IST → PLAN, absolut oder je 100.000 | Tabelle Versorgungsdichte |
 | ÄAVE in Primärversorgungseinheiten (AM, KIJU) | Tabelle Versorgungsdichte, Zeile `pve` |
 | Fächer ohne Richtwert (NCH, AN, STR, RAD, NUK, PMR, PAT, LAB, SON/IDB) und die Spalte `gesamt` | Tabelle Planungsmatrizen |
-| Planstellen, Sachleistungsstellen, Wahlärzt:innen, VGF, IST-Teilzeilen (niedergelassen, Ambulatorien), Faktoren | Tabelle Planungsmatrizen – meist nur je Land sinnvoll, Spalte «Auswerten» der [Zeilen](#zeilen); Stellen: [Stellen lesen](#stellen-lesen) |
+| Planstellen und Sachleistungsstellen **im selben Fach-Zuschnitt wie die ÄAVE** (ZMK inkl. KFO, IM inkl. PUL …) | Tabelle Stellen |
+| Wahlärzt:innen, VGF, IST-Teilzeilen (niedergelassen, Ambulatorien), Faktoren, Stellen je **Matrixspalte** | Tabelle Planungsmatrizen – meist nur je Land sinnvoll, Spalte «Auswerten» der [Zeilen](#zeilen); Stellen: [Stellen lesen](#stellen-lesen) |
 | Woher eine Zahl kommt (PDF, Seite, Originaltext, Korrekturregel) | Tabelle Planungsmatrizen |
 
 Die Tabelle Versorgungsdichte nimmt Ihnen ab, was bei der Tabelle Planungsmatrizen leicht schiefgeht: Sie verwendet bei
@@ -427,6 +428,50 @@ Die letzten drei sind **unsere Kennzahlen**, nicht aus dem ÖSG; nur bei `insges
 
 Die Bevölkerung der Versorgungsregionen im PLAN ist eine Schätzung (Landesprognose × ÖROK-Anteil der Region), keine
 amtliche Zahl. Die Regionen eines Landes summieren sich genau zum Landeswert.
+
+## `RSG_2030_Stellen.csv`
+
+Dasselbe wie die Tabelle Versorgungsdichte, nur für die **Stellen**: vertragsärztliche Planstellen (IST) und
+Sachleistungsstellen (PLAN), zugeschnitten auf die Richtwert-Fächer des ÖSG – mit **derselben Funktion** wie die ÄAVE,
+damit ein Fach in beiden Tabellen dasselbe bedeutet. Eine Zeile je Region × Abschnitt × Stellen-Zeile × Fach;
+eindeutiger Schlüssel: `Ebene, Region_ID, Abschnitt, Zeile_ID, Fach`.
+
+Wofür sie da ist: Die Stellen stehen in der Tabelle Planungsmatrizen je **Matrixspalte**. Wer Stellen und ÄAVE
+gegenüberstellt, müsste den Zuschnitt sonst selbst nachbauen – und zwar genau so, sonst vergleicht er ZMK ohne KFO mit
+ZMK inklusive KFO.
+
+| Spalte | Bedeutung |
+|---|---|
+| `Datensatz`, `Land`, `Ebene`, `Region_ID`, `Abschnitt`, `Jahr` | wie in der Tabelle Versorgungsdichte |
+| `Zeile_ID` | IST: `planstellen_oegk`, `planstellen_svs`, `planstellen_bvaeb`, `planstellen_oegk_svs_bvaeb` (nur Wien). PLAN: `slst_gemeinsam`, `slst_eva`, `slst_zus_oegk`, `slst_zus_svs`, `slst_zus_bvaeb`, `slst_gesamt` (nur Wien). Bedeutung: [Stellen lesen](#stellen-lesen) |
+| `Fach` | dieselbe Richtwert-Zeile wie in der Tabelle Versorgungsdichte – **nicht** die gedruckte Matrixspalte |
+| `Stellen` | Stellen des Fachs im ÖSG-Zuschnitt: CH = CH + KJC + PCH, IM = IM + PUL, ZMK = ZMK + KFO. **AM ist hier nur die Spalte AM** – ohne ZAE, anders als bei den ÄAVE (siehe unten) |
+| `Zuschnitt` | welche Matrixspalten eingegangen sind, z. B. «ZMK + KFO»; genannt sind die Spalten mit einem Wert > 0 und die, die in der Matrix fehlen |
+| `Max_VAEP_Stellen` | davon höchstens vertragsärztliche Planstellen: Stellen × Maximalanteil **je Matrixspalte**, erst dann summiert. Leer, wo die Vorlage keinen Maximalanteil vorsieht (alle IST-Zeilen, `slst_eva`) |
+| `Max_VAEP_Prozent` | `Max_VAEP_Stellen / Stellen × 100` – ein gewichtetes Mittel, **nie** ein Mittel aus Prozentsätzen. Leer, wenn die Zeile 0 Stellen hat |
+
+**Drei Dinge, die beim Summieren schiefgehen:**
+
+- **IST nicht addieren, PLAN schon.** Dieselbe Planstelle hat meist Verträge mit mehreren Trägern und steht in
+  mehreren `planstellen_…`-Zeilen; «die Werte dürfen nicht addiert werden» (Tabellenband S.231). Die
+  PLAN-Sachleistungsstellen dagegen sind verschiedene Stellen – die Vorlage nennt sie «Gemeinsame
+  Sachleistungsstellen aller KV-Träger» und «**zusätzliche** ÖGK-/SVS-/BVAEB-Sachleistungsstellen», und Wiens
+  gedruckte Gesamtzeile ist in allen 27 Fachspalten genau ihre Summe.
+- **`slst_eva` ist eine Teilmenge** von `slst_gemeinsam` («- davon in EVA»), nicht dazuzählen.
+- **PUL und KFO nicht mitsummieren:** Sie stecken schon in IM bzw. ZMK (wie in der Tabelle Versorgungsdichte,
+  Fallstrick 4). Und: Die Fächer ohne Richtwert (NCH, AN, STR, RAD, NUK, PMR, PAT, LAB, SON/IDB) sind in dieser
+  Tabelle **nicht** enthalten; die Summe über alle Fächer ist deshalb kleiner als die gedruckte Spalte `gesamt`.
+  Dass dabei nichts still wegfällt, prüft `tests/test_stellen.py` gegen genau diese Spalte.
+
+**Warum AM hier anders zugeschnitten ist als bei den ÄAVE:** Der AM-Richtwert enthält die ZAE (Textband S.39,
+Legende **), und in der Tabelle Versorgungsdichte zählen sie deshalb zu AM – aber nur in den Zeilen `spitalsambulant`
+und `insgesamt`. Sachleistungsstellen bilden den extramuralen Bereich ab (Tabellenband S.232), ZAE sind
+spitalsambulant (Vorlage (Tabellenband S.239), Fußnote (5)). In einer Stellen-Zeile gehört SON/IDB daher nicht zu AM.
+Betroffen ist nur Tirol: 8,05 Stellen in SON/IDB (Anlage S.1), die dort bleiben.
+
+**Der `Zuschnitt`-Text kann sich zwischen den beiden Tabellen unterscheiden**, obwohl dieselben Spalten summiert
+werden: Genannt werden die Spalten mit einem Wert > 0. In Vorarlberg hat PCH im PLAN 0,0 ÄAVE, aber 1
+Sachleistungsstelle – dort steht bei den ÄAVE «CH», bei den Stellen «CH + PCH».
 
 ## Excel-Mappe `RSG_2030_Planungsmatrizen.xlsx`
 

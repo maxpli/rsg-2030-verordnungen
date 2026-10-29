@@ -41,6 +41,7 @@ aktuellen Release ([docs/WEB.md](docs/WEB.md)).
 |---|---|
 | `RSG_2030_Planungsmatrizen.csv` | jede Zelle jeder Planungsmatrix: Region, IST/PLAN, Zeile, Fach, Wert – und woher der Wert kommt (PDF-Seite, Originaltext, ggf. Korrekturregel) |
 | `RSG_2030_Versorgungsdichte.csv` | je Region × IST/PLAN × Zeile × Fach: ÄAVE im ÖSG-Zuschnitt, Bevölkerung, Versorgungsdichte; für «insgesamt» dazu das Soll-Intervall (ÖSG) und Lage, Position und ÄAVE-Abstand dazu |
+| `RSG_2030_Stellen.csv` | je Region × IST/PLAN × Stellen-Zeile × Fach: vertragsärztliche Planstellen und Sachleistungsstellen **im selben Fach-Zuschnitt wie die ÄAVE**, dazu der Maximalanteil vertragsärztlicher Planstellen |
 | `RSG_2030_Planungsmatrizen.xlsx` | zum Nachsehen: die Matrizen je Land, alle Prüfungen, Korrekturen, Österreich-Summe |
 | `Pruefbericht.md` | alle Zahlen des Laufs: Zellen nach Herkunft, Prüfungen, Korrekturen, Stand der Freigabe |
 | `Laufprotokoll_*.json` | wann und womit die Dateien entstanden sind, mit Prüfsummen |
@@ -91,6 +92,7 @@ aus, prüft sie und rechnet die Versorgungsdichte. Am Ende steht:
    ✓ RSG_2030_Planungsmatrizen.csv entspricht Version 2026.1 (SHA-256 …)
 FREIGEGEBEN
    ✓ RSG_2030_Versorgungsdichte.csv entspricht Version 2026.1 (SHA-256 …)
+   ✓ RSG_2030_Stellen.csv entspricht Version 2026.1 (SHA-256 …)
 ```
 
 Die Ergebnisse liegen dann in `daten_ergebnis/`, die Quellen in `daten_original/`. `alles` besteht aus drei

@@ -16,13 +16,15 @@ from oesg_methodik.pfade import ergebnis_dir, original_dir
 AUDIT_DATEI = "RSG_2030_Planungsmatrizen.xlsx"
 LONG_DATEI = "RSG_2030_Planungsmatrizen.csv"
 VERSORGUNGSDICHTE_DATEI = "RSG_2030_Versorgungsdichte.csv"
+STELLEN_DATEI = "RSG_2030_Stellen.csv"
 
 VERORDNUNGSSTAND = "2026"
 """Ordner der Eingaben unter `eingaben/` (ein neuer Stand: neuer Ordner, hier umstellen)."""
 
 
 def ausgabe_dir() -> Path:
-    """Ergebnisse (Planungsmatrizen als CSV und Excel-Mappe, Versorgungsdichte, Laufprotokolle) → «daten_ergebnis/»."""
+    """Ergebnisse (Planungsmatrizen als CSV und Excel-Mappe, Versorgungsdichte, Stellen, Laufprotokolle) →
+    «daten_ergebnis/»."""
     return Path(os.environ.get("RSG2030_AUSGABE_DIR") or ergebnis_dir())
 
 

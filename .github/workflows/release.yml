@@ -62,10 +62,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           cd daten_ergebnis
-          dateien="RSG_2030_Planungsmatrizen.csv RSG_2030_Versorgungsdichte.csv RSG_2030_Planungsmatrizen.xlsx Pruefbericht.md Laufprotokoll_daten.json Laufprotokoll_versorgungsdichte.json"
+          dateien="RSG_2030_Planungsmatrizen.csv RSG_2030_Versorgungsdichte.csv RSG_2030_Stellen.csv RSG_2030_Planungsmatrizen.xlsx Pruefbericht.md Laufprotokoll_daten.json Laufprotokoll_versorgungsdichte.json Laufprotokoll_stellen.json"
           sha256sum $dateien > SHA256SUMS.txt
           notizen="Erzeugt von GitHub Actions aus diesem Tag: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
-          Die beiden CSV-Dateien entsprechen Byte für Byte den Prüfsummen in rsg2030/erwartete_ausgaben.csv (SHA256SUMS.txt).
+          Die drei CSV-Dateien entsprechen Byte für Byte den Prüfsummen in rsg2030/erwartete_ausgaben.csv (SHA256SUMS.txt).
           Bitte vor der Verwendung lesen: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/blob/$GITHUB_REF_NAME/docs/DATEN.md#fallstricke
           Jede Spalte: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/blob/$GITHUB_REF_NAME/docs/DATEN.md
           Was sich geändert hat: CHANGELOG.md. Lizenz der Daten: CC BY 4.0 (LIZENZ_DATEN.md)."

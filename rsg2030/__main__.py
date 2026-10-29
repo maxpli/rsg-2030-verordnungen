@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """RSG 2030 – vom Download bis zur Versorgungsdichte.
 
-python -m rsg2030 alles              download → daten → versorgungsdichte (frischer Klon)
+python -m rsg2030 alles              download → daten → versorgungsdichte → stellen (frischer Klon)
 python -m rsg2030 download           Quellen laden, Prüfsummen prüfen (--neu = alle neu laden)
 python -m rsg2030 daten              auslesen, korrigieren, prüfen → Planungsmatrizen (CSV + Excel-Mappe)
 python -m rsg2030 versorgungsdichte  ÄAVE im ÖSG-Zuschnitt, Versorgungsdichte, Lage zum Soll-Intervall je BL und VR
+python -m rsg2030 stellen            Planstellen und Sachleistungsstellen im ÖSG-Zuschnitt je BL und VR
 python -m rsg2030 waechter           neue Verordnungen im RIS oder neue Fassungen der Quellen?
 python -m rsg2030 web                Webseite zur Tabelle Versorgungsdichte nach daten_ergebnis/web/ (docs/WEB.md)
 
@@ -41,6 +42,10 @@ BEFEHLE: dict[str, tuple[str, str]] = {
         "rsg2030.versorgungsdichte",
         "ÄAVE im ÖSG-Zuschnitt, Versorgungsdichte und Lage zum Soll-Intervall je BL und VR",
     ),
+    "stellen": (
+        "rsg2030.stellen",
+        "Planstellen und Sachleistungsstellen im ÖSG-Zuschnitt je BL und VR",
+    ),
     "waechter": (
         "rsg2030.waechter",
         "Neue Verordnungen im RIS oder neue Fassungen der Quellen? (Hinweis, ändert nichts)",
@@ -51,7 +56,7 @@ BEFEHLE: dict[str, tuple[str, str]] = {
     "fussnoten": ("rsg2030.fussnoten", "neue Fußnoten der Matrixseiten als Entwurf ins Verzeichnis fussnoten.csv"),
     "freigabe": ("rsg2030.freigabe", "Freigabe-Mappe freigabe.xlsx anlegen bzw. auf den Datenstand bringen"),
 }
-ALLES = ("download", "daten", "versorgungsdichte")
+ALLES = ("download", "daten", "versorgungsdichte", "stellen")
 
 
 def _fuehre_aus(module_name: str, label: str, argv: list[str]) -> int:

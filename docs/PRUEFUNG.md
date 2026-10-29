@@ -216,6 +216,22 @@ Mensch entscheiden muss – nicht mehr:
 | Fußnoten | 3 | jede Fußnote, die nicht wörtlich der ÖSG-Vorlage entspricht, mit ihrer Einordnung (DATEN.md, «Fußnoten») | ob eine Fußnote eine Zahl ändert, ist ein Urteil; auf Bildseiten ist auch der Text nur von Hand gelesen. Oben einzeln, was Werte betrifft, offen ist oder auf einer Bildseite steht (genau prüfen); darunter je Land eine Zeile mit allen Hinweisen und Teilmengen (überfliegen: versteckt sich eine Wertänderung?) |
 | Entscheidungen | 3 | jede Korrektur, bekannte Abweichung und Ableitung | ein Urteil, keine Lesung |
 
+**Tabelle Stellen** (`tests/test_stellen.py`), alles Regel 1 – kein Häkchen nötig:
+
+| Fehler | wer ihn findet |
+|---|---|
+| Stellen anders geschnitten als die ÄAVE | `teile()` je Stellen-Zeile und Fach gegen die ÄAVE-Zeile `extramural` – identische Spaltenmengen |
+| ZAE fälschlich in AM | eigener Test; dazu Tirols 8,05 Stellen in SON/IDB, die draußen bleiben müssen |
+| eine Matrixspalte fällt still weg | Summe der Fächer + die Spalten ohne Richtwert gegen die gedruckte Spalte `gesamt`, Toleranz aus der Rundung |
+| VR summieren sich nicht zum Bundesland | je Stellen-Zeile und Fach, Toleranz aus der Rundung |
+| Prozentsätze summiert statt gewichtet | Handrechnung OÖ ZMK: 480,3 × 79,1 % + 32 × 100 % = 411,9173 |
+| Stellen > 0 ohne Maximalanteil | der Lauf meldet es, der Anteil bleibt leer, und ein Test hält fest, dass es heute keine gibt |
+| PLAN-Zeilen fälschlich für nicht summierbar gehalten | Wiens gedruckte Gesamtzeile gegen die Summe ihrer Teile, 27 Fächer |
+| ein Wert ändert sich still | Prüfsumme in `erwartete_ausgaben.csv` |
+
+Nicht geprüft und darum in der Mappe: die **Lesart der Fußnoten**, aus denen Stellen stammen (OÖ KFO) – das ist
+Regel 3 und steht unter «Entscheidungen».
+
 **Nicht in der Mappe**, weil eine Maschine es unabhängig prüft (Regel 1): das Seitenregister der Textseiten, die
 Richtwerte und die Zuordnung Bezirk → Versorgungsregion, Fußnoten der Textseiten, die wörtlich der ÖSG-Vorlage
 entsprechen, jede Zelle, die beide Lesungen gleich lesen, und **jede Seitenangabe zum ÖSG**:

@@ -147,7 +147,7 @@ nachträglicher Eintrag fehlte in der Version.
 Ein Tag mit der Version (z. B. `2026.1`, muss der Version in `pyproject.toml` entsprechen) startet
 `.github/workflows/release.yml`: frischer Download ohne Zwischenspeicher, `alles`, Vergleich mit
 `erwartete_ausgaben.csv`, ganze Testsuite. Nur wenn alles grün ist, legt der Lauf das Release an und hängt die
-beiden CSV-Dateien, die Excel-Mappe, den Prüfbericht, die Laufprotokolle und `SHA256SUMS.txt` an. Ist etwas rot,
+drei CSV-Dateien, die Excel-Mappe, den Prüfbericht, die Laufprotokolle und `SHA256SUMS.txt` an. Ist etwas rot,
 entsteht kein Release; Tag löschen, Ursache beheben, neu taggen.
 
 Zum Ausprobieren: ein Tag `test-…` (z. B. `test-release-1`) tut dasselbe, legt das Release aber nur als Entwurf an.

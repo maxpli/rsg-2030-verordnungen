@@ -38,6 +38,26 @@ Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem
   steht und keine zitierte Seite ohne Anker bleibt (docs/PRUEFUNG.md, Regel 1). Die Dateinamen der drei ÖSG-Bände
   stehen nur noch an einer Stelle (`oesg_methodik.pfade.OESG_BAENDE`).
 
+**Neue Datei:**
+
+| Datei | SHA-256 | Zeilen (inkl. Kopf) |
+|---|---|---:|
+| `RSG_2030_Stellen.csv` | `06ad54ed4dc18b95a939fc25edccdee2e830b64be9f9703b5d0cfae571ffe04f` | 4.934 |
+
+- **`RSG_2030_Stellen.csv`** – vertragsärztliche Planstellen (IST) und Sachleistungsstellen (PLAN) im **selben
+  Fach-Zuschnitt wie die ÄAVE** (ZMK inkl. KFO, IM inkl. PUL, CH inkl. KJC/PCH), je Region, Abschnitt, Stellen-Zeile
+  und Fach. Bisher standen die Stellen nur je Matrixspalte in der Tabelle Planungsmatrizen; wer sie den ÄAVE
+  gegenüberstellte, musste den Zuschnitt selbst nachbauen – und zwar genau so, sonst verglich er ZMK ohne KFO mit ZMK
+  inklusive KFO. Geschnitten wird mit derselben Funktion wie die ÄAVE, nicht mit einer zweiten Umsetzung.
+  Neuer Befehl `python -m rsg2030 stellen`, Teil von `alles`; Spalten und Fallstricke: [docs/DATEN.md](docs/DATEN.md).
+- Dazu der Maximalanteil vertragsärztlicher Planstellen: Stellen × Prozent **je Matrixspalte**, erst danach summiert
+  (`Max_VAEP_Stellen`), und als gewichtetes Mittel (`Max_VAEP_Prozent`) – nie ein Mittel aus Prozentsätzen. Wo für
+  einen Teil der Stellen kein Prozentsatz gedruckt ist, bleibt der Anteil leer und der Lauf sagt es; heute kommt das
+  nirgends vor.
+- **AM ist in den Stellen-Zeilen ohne ZAE** – anders als bei den ÄAVE. Sachleistungsstellen bilden den extramuralen
+  Bereich ab (Tabellenband S.232), ZAE sind spitalsambulant (Vorlage, Fußnote (5)). Betroffen ist nur Tirol
+  (8,05 Stellen in SON/IDB).
+
 **Quellen:**
 
 - **ÖSG 2023 auf den Stand 09.10.2026** (RIS `SPG_AT_OSG_G_20261009_8_2026`); die Fassung vom 10.10.2025 gilt nicht

@@ -93,6 +93,7 @@ rsg2030/              der Datensatz; __main__.py ruft die main() der Module auf
   scripts/              von Hand aufgerufen, nicht Teil von «alles»: zweitlesung_ki, monitoring_abgleich, abdeckung, seiten, …
   analyse_eingang.py    öffentliche Schnittstelle zur Long-CSV; aave_eingang() = ÄAVE-Eingabe für oesg_methodik
   versorgungsdichte.py  Long-CSV → oesg_methodik → RSG_2030_Versorgungsdichte.csv
+  stellen.py            Long-CSV → oesg_methodik → RSG_2030_Stellen.csv (Stellen im selben Zuschnitt)
   abgleich.py           Ausgaben gegen erwartete_ausgaben.csv (✓/✗ am Ende eines Laufs)
   protokoll.py          Logging, Laufprotokoll_<schritt>.json
   web.py                «web»: Tabelle Versorgungsdichte → data.json + Seite aus web/ (nur bei passender Prüfsumme)
@@ -118,7 +119,7 @@ web/                  Webseite (kein Python): index.html, app.js, style.css, kac
   Stellen, VGF, Wahlärzt:innen oder IST-Teilzeilen (METHODIK, «Stellen»). Nicht ohne Rückfrage ergänzen.
 - **Bevölkerung** nur nach der Methode des ÖSG (IST = Bezirke am 1.1. des IST-Jahrs des Landes; PLAN BL = Prognose
   2025 zum 1.1.2030; PLAN VR = ÖROK-Anteil 2021 × BL). Keine anderen Varianten im Code.
-- **Andere Projekte lesen die veröffentlichten Dateien.** Was in `RSG_2030_Versorgungsdichte.csv` oder
+- **Andere Projekte lesen die veröffentlichten Dateien.** Was in `RSG_2030_Versorgungsdichte.csv`, `RSG_2030_Stellen.csv` oder
   `RSG_2030_Planungsmatrizen.csv` steht, wird dort gelesen, nicht mit Funktionen dieses Pakets nachgerechnet: Nur die
   Dateien haben Version und Prüfsumme, eine geänderte Funktion wirkt sonst still mit. Importieren dürfen andere
   Projekte Lese-Hilfen (`analyse_eingang.lade_matrix_long`, `schema.bl_long`/`matrix_long`, Dateinamen aus `config`,
