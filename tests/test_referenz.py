@@ -20,7 +20,8 @@ SEITE = 39  # Textband: Tabelle der Planungsrichtwerte
 SPALTEN = ["Err_Min", "VDmin", "VDmax", "VD2021", "BEVmin"]
 # Die 20 Zeilen der Richtwerttabelle in ihrer Reihenfolge, als Literal aus der Quelle (Textband S.39): So fällt auf,
 # wenn der Parser eine Zeile überspringt – sie bliebe sonst ungeprüft – oder der ÖSG eine aufnimmt, streicht oder
-# umstellt. Eine Zählung allein («mindestens 20») würde beides übersehen.
+# umstellt. Eine Zählung allein («mindestens 20») würde beides übersehen. Abgelesen an der gerenderten Seite, nicht
+# an der Textextraktion: Verschluckt die eine Zeile, fehlt sie dem Parser und der Kontrolle gleichermaßen.
 RICHTWERT_ZEILEN = ("AM", "KIJU", "KJC", "KJP", "CH", "NCH", "IM", "PUL", "GGH", "NEU",
                     "PSY", "DER", "AU", "HNO", "URO", "PCH", "ORTR", "MKG", "ZMK", "KFO")  # fmt: skip
 
