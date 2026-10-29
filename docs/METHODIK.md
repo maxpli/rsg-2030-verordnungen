@@ -647,8 +647,8 @@ Fehlt ein Wert, bleibt die Zeile weg und wird nicht geschätzt. Spalten:
    für IST 2022/2023 und PLAN 2030 einen eingefrorenen Wert fortzuschreiben, den die GÖG für diese Stichtage nirgends
    veröffentlicht, oder das Ex-Gebiet unterhalb der Gemeinde herauszulösen (eigene Datenquelle für eine einzige
    Region); die Steiermark-Verordnung nennt weder Bevölkerung noch Gemeindezuordnung, der Zähler wäre also nicht
-   kontrollierbar. Offen ist nur, ob die VR-Gliederung territorial (Stand 2019) gilt oder künftigen
-   Bezirksänderungen folgt ([offene_punkte.md](offene_punkte.md#gög-gliederung-territorial-oder-je-gebietsstand));
+   kontrollierbar. Offen ist nur, ob die VR-Gliederung die Landkarte von 2019 bleibt oder künftigen
+   Bezirksänderungen folgt ([offene_punkte.md](offene_punkte.md#gög-gliederung-landkarte-von-2019-oder-jeweils-aktuelle-bezirke));
    die VD der beiden Regionen trägt diese Unschärfe ([DATEN.md](DATEN.md#fallstricke), Fallstrick 12).
 
 ---

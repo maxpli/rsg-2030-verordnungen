@@ -137,14 +137,19 @@ den übrigen Ländern?*
 
 Niederösterreich, Salzburg, Wien: keine offene Frage zur eigenen Verordnung.
 
-## GÖG-Gliederung: territorial oder je Gebietsstand?
+## GÖG-Gliederung: Landkarte von 2019 oder jeweils aktuelle Bezirke?
 
-Dass die ÖSG-Zahlen auf dem Gebietsstand 2019 beruhen, ist geklärt – die GÖG dokumentiert es selbst doppelt (Kopf
-der «Regionalen Gliederung»; die VR-Bevölkerung 64/65 enthält Murfeld exakt mit dem Stand 1.1.2019; Belege in
-[METHODIK.md](METHODIK.md), «Bekannte Grenzen» 7). Offen ist nur die Lesart für die Zukunft: Gilt die
-VR-Gliederung **territorial** (Stand 2019 eingefroren) oder folgt sie **künftigen Bezirksänderungen**? Praktisch
-wird das erst bei der nächsten Gebietsänderung über eine Bezirks- und damit VR-Grenze; der Test
-`tests/test_bevoelkerung.py` schlägt dann an, und die Frage wäre bei der GÖG zu klären.
+Die ÖSG-Gliederung definiert jede Versorgungsregion als Liste ganzer Bezirke, auf dem Gebietsstand 2019. Solange
+sich keine Bezirksgrenze ändert, ist das eindeutig. Wechselt aber ein Gebiet den Bezirk – wie Murfeld mit 1.1.2020
+von der Südoststeiermark (VR 64) nach Leibnitz (VR 65) –, gibt es zwei Lesarten: Entweder ist die VR das Stück
+Landkarte, das ihre Bezirke 2019 abdeckten – dann bleibt das Gebiet in der VR 64, und so verhalten sich die
+ÖSG-Zahlen. Oder die VR ist, was ihre Bezirke jeweils aktuell umfassen – dann wanderte das Gebiet in die VR 65, und
+so rechnet dieser Datensatz (Entscheidung und Belege: [METHODIK.md](METHODIK.md), «Bekannte Grenzen» 7). Welche
+Lesart gilt, sagt der ÖSG nicht: Seine Datei sagt «Zuordnung ganzer Bezirke», seine Zahlen bleiben beim Stand 2019.
+Praktisch wird die Frage erst, wenn wieder ein Gebiet über eine Bezirks- und damit VR-Grenze wechselt: Dann gehören
+die betroffenen Einwohner:innen je nach Lesart zur einen oder zur anderen Region. Das fällt von selbst auf
+(Statistik Austria rechnet die Bevölkerungsdateien auf den neuen Gebietsstand um – Prüfsumme der Quelle und der
+Test `tests/test_bevoelkerung.py` schlagen an), und die Frage wäre dann bei der GÖG zu klären.
 
 ## Zweite Durchsicht (Beiträge willkommen)
 
