@@ -106,9 +106,12 @@ VR_EW_2021_TABELLENBAND = {
     "81": (56, 225_812), "82": (57, 173_425),
     "91": (58, 831_855), "92": (59, 716_372), "93": (60, 372_722),
 }  # fmt: skip
-# Bekannte Abweichung unserer Bezirks-Summe vom Tabellenband (METHODIK, «Bekannte Grenzen»; DATEN.md, Fallstricke):
-# vermutlich zählt der ÖSG die Gemeinde Sankt Josef (Weststeiermark) zur VR 64, der Bezirk Deutschlandsberg liegt
-# laut GÖG-Gliederung ganz in VR 65. Unbestätigt (docs/offene_punkte.md, Rückfrage an die GÖG).
+# Bekannte Abweichung unserer Bezirks-Summe vom Tabellenband (METHODIK «Bekannte Grenzen» 7; DATEN.md Fallstrick 12):
+# Die ÖSG-Gliederung trägt den Gebietsstand 2019. Dort liegt die Gemeinde Murfeld (62347) im Bezirk Südoststeiermark
+# (VR 64); mit 1.1.2020 wurde sie zur Gänze auf Sankt Veit in der Südsteiermark (61060) und Straß in Steiermark
+# (61061) aufgeteilt, beide Bezirk Leibnitz (VR 65; Statistik Austria, Gemeindeverzeichnis Stand 1.1.2021, S.165).
+# Die Differenz ist exakt Murfelds Wohnbevölkerung am 1.1.2019: 1.671 (Land Steiermark, Steirische Statistiken,
+# Heft 9/2019, S.121). Welchen Stand die GÖG dem Gebiet zurechnet: docs/offene_punkte.md, Rückfrage an die GÖG.
 ABWEICHUNG_VR_64_65 = {"64": -1_671, "65": 1_671}
 
 
@@ -129,14 +132,24 @@ def test_vr_ew_2021_wie_tabellenband():
 def test_vr_bezirkssumme_wie_tabellenband(regionen):
     """Unsere VR-Bevölkerung 1.1.2021 (Summe der Bezirke laut GÖG-Gliederung) trifft das «EW insgesamt (2021)» des
     Tabellenbands in 30 von 32 VR exakt; VR 64/65 weichen um genau ±1.671 ab – als bekannte Abweichung
-    festgehalten, damit jede Änderung auffällt. Der zweite Teil hält die Vermutung dazu nachrechenbar: Sankt Josef
-    (Weststeiermark), GKZ 60326, ist die einzige Gemeinde des Bezirks Deutschlandsberg mit genau 1.671 EW."""
+    festgehalten, damit jede Änderung auffällt (Erklärung Murfeld: Kommentar an `ABWEICHUNG_VR_64_65`). Der zweite
+    Teil prüft die beiden Glieder der Erklärung, die in unseren Quellen stehen: Die GÖG-Gliederung sagt selbst
+    «Gebietsstand 2019», und am 1.1.2021 gibt es Murfeld nicht mehr, wohl aber die zwei Nachfolgegemeinden im
+    Bezirk Leibnitz – der laut Gliederung ganz in VR 65 liegt."""
     unser = pop._mit_region(pop.bevoelkerung_bezirke((2021,)), regionen).groupby("VR")["Bevoelkerung"].sum()
     unser.index = unser.index.astype(str)
     for vr, (seite, ew) in VR_EW_2021_TABELLENBAND.items():
         soll = ew + ABWEICHUNG_VR_64_65.get(vr, 0)
         assert unser.loc[vr] == soll, f"VR {vr}: {int(unser.loc[vr])} statt {soll} (Tabellenband S.{seite}: {ew})"
+    import openpyxl
+
+    from oesg_methodik.pfade import original_dir
+    from oesg_methodik.regionen_erzeugen import QUELLE
+
+    ws = openpyxl.load_workbook(original_dir() / QUELLE, read_only=True)["ÖSG Regionale Gliederung"]
+    assert next(ws.iter_rows(min_row=2, max_row=2, values_only=True))[0] == "Gebietsstand 2019"
     roh = pd.read_csv(pop._bevstand_csv(2021), sep=";")
-    im_bezirk = roh[roh["C-GRGEMAKT-0"].astype(str).str.startswith("GRGEMAKT-603")]
-    je_gemeinde = im_bezirk.groupby("C-GRGEMAKT-0")["F-ISIS-1"].sum()
-    assert je_gemeinde["GRGEMAKT-60326"] == 1_671 and (je_gemeinde == 1_671).sum() == 1
+    gemeinden = set(roh["C-GRGEMAKT-0"].astype(str).str.removeprefix("GRGEMAKT-"))
+    assert "62347" not in gemeinden, "Murfeld müsste am 1.1.2021 aufgelöst sein"
+    assert {"61060", "61061"} <= gemeinden, "Sankt Veit in der Südsteiermark und Straß in Steiermark fehlen"
+    assert set(regionen.loc[regionen["Bezirk"] == 610, "VR"].astype(str)) == {"65"}, "Bezirk Leibnitz gehört zu VR 65"

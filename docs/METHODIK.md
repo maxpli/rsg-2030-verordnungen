@@ -637,9 +637,13 @@ Fehlt ein Wert, bleibt die Zeile weg und wird nicht geschätzt. Spalten:
 7. **Bevölkerung der VR 64 und 65:** Der Tabellenband druckt je VR das «EW insgesamt (2021)» (Anhang 5, S.29–60);
    unsere Summe der Bezirke laut GÖG-Gliederung trifft 30 von 32 VR exakt. Die Oststeiermark (VR 64) liegt um 1.671
    darunter, die West-/Südsteiermark (VR 65) um 1.671 darüber (Tabellenband S.49, S.50; Test
-   `tests/test_bevoelkerung.py`). Naheliegend, aber unbestätigt: Sankt Josef (Weststeiermark) – die einzige Gemeinde
-   des Bezirks Deutschlandsberg (laut GÖG ganz in VR 65) mit genau 1.671 Einwohnern am 1.1.2021 – zählt im ÖSG zur
-   VR 64. Wie der ÖSG die VR unterhalb der Bezirke zuschneidet, ist nicht veröffentlicht
+   `tests/test_bevoelkerung.py`). Erklärung: Die GÖG-Datei «Regionale Gliederung» trägt laut ihrem Kopf den
+   **Gebietsstand 2019** – dort liegt die Gemeinde Murfeld im Bezirk Südoststeiermark (VR 64). Mit 1.1.2020 wurde
+   Murfeld zur Gänze auf Sankt Veit in der Südsteiermark und Straß in Steiermark aufgeteilt, beide Bezirk Leibnitz
+   (VR 65; LGBl. Stm. Nr. 46/2019; Statistik Austria, Gemeindeverzeichnis Stand 1.1.2021, S.165). Unsere Bevölkerung
+   (1.1.2021) zählt das Gebiet deshalb zur VR 65, der ÖSG offenbar zur VR 64 – die Differenz ist exakt Murfelds
+   Wohnbevölkerung am 1.1.2019: 1.671 (Land Steiermark, Steirische Statistiken, Heft 9/2019, S.121). Welchen
+   Bevölkerungsstand die GÖG dem Gebiet zurechnet, kann nur sie bestätigen
    ([offene_punkte.md](offene_punkte.md#rückfrage-an-die-gög-vr-zuschnitt-unterhalb-der-bezirke)); die VD der beiden
    Regionen trägt diese Unschärfe ([DATEN.md](DATEN.md#fallstricke), Fallstrick 12).
 

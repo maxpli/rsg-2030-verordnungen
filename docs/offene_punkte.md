@@ -141,9 +141,11 @@ Niederösterreich, Salzburg, Wien: keine offene Frage zur eigenen Verordnung.
 
 Der Tabellenband nennt für die Oststeiermark (VR 64) 1.671 Einwohner mehr und für die West-/Südsteiermark (VR 65)
 genauso viele weniger als die Summe der Bezirke laut GÖG-«Regionaler Gliederung» (1.1.2021; die anderen 30 VR sind
-exakt gleich; Tabellenband S.49, S.50; Test `tests/test_bevoelkerung.py`). Die einzige Gemeinde des Bezirks
-Deutschlandsberg mit genau 1.671 Einwohnern ist Sankt Josef (Weststeiermark). Zu fragen wäre: Schneidet der ÖSG die
-VR 64/65 auf Gemeindeebene anders zu als die Bezirksliste, und wo ist dieser Zuschnitt veröffentlicht?
+exakt gleich; Tabellenband S.49, S.50; Test `tests/test_bevoelkerung.py`). Erklärbar über den Gebietsstand: Die
+Gliederung trägt den Stand 2019, und die Gemeinde Murfeld (1.671 Einwohner am 1.1.2019) wechselte mit 1.1.2020 vom
+Bezirk Südoststeiermark (VR 64) in den Bezirk Leibnitz (VR 65) – Belege in [METHODIK.md](METHODIK.md), «Bekannte
+Grenzen» 7. Zu fragen wäre: Rechnet die GÖG die VR-Bevölkerung des Anhangs 5 auf dem Gebietsstand 2019 (Murfeld mit
+dem Stand 1.1.2019 in der VR 64), und bleibt das bei künftigen Gebietsänderungen so?
 
 ## Zweite Durchsicht (Beiträge willkommen)
 

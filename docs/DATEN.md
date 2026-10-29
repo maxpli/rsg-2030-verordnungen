@@ -229,8 +229,10 @@ Bitte vor jeder Auswertung lesen.
       zur Norm 2030, nicht eine Verletzung im IST-Jahr.
 12. **Bevölkerung der VR 64/65 weicht vom ÖSG ab.** Die VR-Bevölkerung ist die Summe der Bezirke laut
     GÖG-Gliederung; der ÖSG-Tabellenband nennt für die Oststeiermark (VR 64) 1.671 Einwohner mehr und für die
-    West-/Südsteiermark (VR 65) 1.671 weniger (1.1.2021) – alle anderen 30 VR sind exakt gleich. Vermutlich eine
-    Gemeinde an der Regionsgrenze ([METHODIK.md](METHODIK.md#bekannte-grenzen-und-offene-fragen), Punkt 7); die VD
+    West-/Südsteiermark (VR 65) 1.671 weniger (1.1.2021) – alle anderen 30 VR sind exakt gleich. Ursache ist der
+    eingefrorene Gebietsstand 2019 der ÖSG-Gliederung: Die Gemeinde Murfeld wechselte mit 1.1.2020 vom Bezirk
+    Südoststeiermark (VR 64) in den Bezirk Leibnitz (VR 65)
+    ([METHODIK.md](METHODIK.md#bekannte-grenzen-und-offene-fragen), Punkt 7); die VD
     und die Position im Soll-Intervall dieser beiden Regionen tragen diese Unschärfe.
 
 ---
