@@ -18,6 +18,11 @@ pytestmark = pytest.mark.slow  # liest Quelldateien aus daten_original/
 # Welche Dateien die beiden Bände sind, steht in `oesg_methodik.pfade.OESG_BAENDE` (ein Ort je ÖSG-Stand).
 SEITE = 39  # Textband: Tabelle der Planungsrichtwerte
 SPALTEN = ["Err_Min", "VDmin", "VDmax", "VD2021", "BEVmin"]
+# Die 20 Zeilen der Richtwerttabelle in ihrer Reihenfolge, als Literal aus der Quelle (Textband S.39): So fällt auf,
+# wenn der Parser eine Zeile überspringt – sie bliebe sonst ungeprüft – oder der ÖSG eine aufnimmt, streicht oder
+# umstellt. Eine Zählung allein («mindestens 20») würde beides übersehen.
+RICHTWERT_ZEILEN = ("AM", "KIJU", "KJC", "KJP", "CH", "NCH", "IM", "PUL", "GGH", "NEU",
+                    "PSY", "DER", "AU", "HNO", "URO", "PCH", "ORTR", "MKG", "ZMK", "KFO")  # fmt: skip
 
 
 def _zahl(t: str) -> float:
@@ -74,7 +79,9 @@ def _tabelle_textband() -> dict[str, list[float]]:
 def test_richtwerte_wie_textband():
     """Jede Zeile der ÖSG-Tabelle steht mit denselben fünf Werten in oesg_planungsrichtwerte.csv («*» = leer)."""
     pdf = _tabelle_textband()
-    assert len(pdf) >= 20, f"Tabelle auf S.{SEITE} nicht gefunden – andere Fassung des Textbands?"
+    assert tuple(pdf) == RICHTWERT_ZEILEN, (
+        f"andere Zeilen auf S.{SEITE} als erwartet – neue Fassung des Textbands? gelesen: {list(pdf)}"
+    )
     csv = pd.read_csv(OESG_PLANUNGSRICHTWERTE_CSV, sep=";", decimal=",")
     csv.index = list(csv["OESG_Code"])
     for kuerzel, werte in pdf.items():
