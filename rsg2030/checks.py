@@ -389,9 +389,10 @@ def pruefe_davon(long: pd.DataFrame) -> list[dict]:
 
 
 IN_CH: tuple[str, ...] = ("KJC", "PCH")
-"""Fächer, deren ÄAVE in CH enthalten sind: Vorlage (Tabellenband S.239) Fußnote (2) «zugeordnet zu CH»; Tabellenband
-S.252: «ÄAVE für PCH sind unter der CH subsummiert und werden nur in Bezug auf die vertragsärztlichen Planstellen der
-KV-Träger im IST-Stand ausgewiesen». Die Kennzahlen zählen sie zu CH (`oesg_methodik.faecher.ZUSCHNITT`)."""
+"""Fächer, deren ÄAVE in CH enthalten sind: Vorlage (Tabellenband S.239) Fußnote (2) «zugeordnet zu CH»;
+Tabellenband S.232: «ÄAVE für PCH sind unter der CH subsummiert und werden nur in Bezug auf die
+vertragsärztlichen Planstellen der KV-Träger im IST-Stand ausgewiesen». Die Kennzahlen zählen sie zu CH
+(`oesg_methodik.faecher.ZUSCHNITT`)."""
 
 
 def pruefe_in_ch(long: pd.DataFrame) -> list[dict]:

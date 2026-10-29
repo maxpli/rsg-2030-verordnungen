@@ -62,15 +62,23 @@ def dateien() -> list[Path]:
 
 def fundstellen() -> dict[tuple[str, int], list[str]]:
     """Alle Seitenangaben im Repo: (Band, Seite) → Fundstellen «datei:zeile». Ein kurzer Bereich («S.12–13») zählt
-    mit jeder Seite, ein langer («Anhang 5, S.15–60») nur mit der ersten: Dort beginnt, was zitiert wird."""
+    mit jeder Seite, ein langer («Anhang 5, S.15–60») nur mit der ersten: Dort beginnt, was zitiert wird.
+
+    Gesucht wird auch über je zwei Nachbarzeilen, gezählt dort nur, was die Zeilengrenze überquert (sonst doppelt):
+    Der Umbruch umgebrochener Docstrings und Markdown-Absätze fiele sonst zwischen Bandname und «S.», und die Angabe
+    bliebe ungeprüft – so stand ein falscher Verweis (Tabellenband S.252 statt S.232) unbemerkt in checks.py."""
     gefunden: dict[tuple[str, int], list[str]] = {}
     for p in dateien():
         try:
-            text = p.read_text(encoding="utf-8")
+            zeilen = p.read_text(encoding="utf-8").split("\n")
         except (UnicodeDecodeError, OSError):
             continue
-        for nr, zeile in enumerate(text.split("\n"), 1):
-            for m in ZITAT.finditer(zeile):
+        for nr, zeile in enumerate(zeilen, 1):
+            treffer = list(ZITAT.finditer(zeile))
+            if nr < len(zeilen):
+                paar = zeile + " " + zeilen[nr]
+                treffer += [m for m in ZITAT.finditer(paar) if m.start() < len(zeile) < m.end()]
+            for m in treffer:
                 band, ausdruck = m.group(1), m.group(2)
                 seiten = [int(s) for s in SEITE.findall(ausdruck)]  # «S.36, S.76» → beide
                 if b := BEREICH.search(ausdruck):

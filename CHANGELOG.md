@@ -117,7 +117,7 @@ Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem
 - **Tabelle Planungsmatrizen:** jede Zelle der 41 Planungsmatrizen (9 Bundesländer, 32
   Versorgungsregionen), 39 aus dem PDF ausgelesen, 2 Bildseiten von Hand abgetippt. Je Zelle Originaltext (`Roh`),
   Seite und Herkunft (`Quelle`, `Regel`). Zeilen und Fächer heißen wie in der ÖSG-Vorlage (Tabellenband Anhang 9,
-  S.259); Spalten: docs/DATEN.md.
+  S.239); Spalten: docs/DATEN.md.
 - **Abgeleitete Zeilen,** wo die Vorlage ein Feld vorsieht, ein Land es aber nicht ausfüllt: IST «extramural» (acht
   Länder) und gesamt-% der Sachleistungsstellen (gewichtetes Mittel der Fach-%). `Quelle = abgeleitet`, `Roh` leer.
 - **Tabelle Versorgungsdichte:** je Region, IST/PLAN, Zeile und Fach die ÄAVE im Zuschnitt der ÖSG-Richtwerte,

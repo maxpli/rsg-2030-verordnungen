@@ -24,6 +24,10 @@ Textband;39;"9.347.316 (ohne Wien: 7.282.458); Ermittlung der Richtwerte in den 
 Textband;39;Err. (Min.) VDmin VDmax VD2021 BEVmin Allgemeinmedizin (AM)** 10 34,9 64,8 48,7 2.000 Kinderund Jugendheilkunde;Legende der Richtwerte-Spalten
 Textband;39;"Leistungsmengenrahmenplanung vorgesehen ist: RAD, LAB, NUK, PAT, PMR Quelle: DVSV – Regiomed 2021; Statistik";technische Fächer ohne Richtwert (R4)
 Textband;39;Planungsrichtwerte für den gesamten ambulanten Bereich (Planungshorizont 2030) Fachrichtung/Fachbereich ** Err.;Tabelle der Planungsrichtwerte (R3, Richtwerte-CSV)
+Textband;39;Im Bereich der AM inkl. ZAE (in RSG-PM: SON/IDB) und EVA in der Funktion von Akutordinationen;AM = AM + ZAE: Legende ** der Richtwerttabelle (R4, R5)
+Textband;39;Summe aus UC, OR und den im spitalsambulanten Bereich dem Fachbereich ORTR zugeordneten ÄAVE;ORTR deckt UC und OR ab: Fußnote 2 der Richtwerttabelle (R4)
+Textband;39;davon Pulmologie (PUL);PUL als Unterzeile («- davon») von IM: IM = IM + PUL (R4)
+Textband;39;davon mit kieferorthopädischem Schwerpunkt;KFO als Unterzeile («- davon») von ZMK: ZMK = ZMK + KFO (R4)
 Textband;67;unterschiedlichen Bezeichnungen unter dem Begriff „Erstversorgung-Allgemeinmedizin (EVA)“ subsummiert. Unter;EVA: Definition (slst_eva)
 Textband;76;Erstversorgung-Allgemeinmedizin (EVA) opt opt opt Akut-Krankenanstalten Betriebsformen von Spitalsambulanzen je;EVA als Teilmenge der Sachleistungsstellen
 Textband;76;ist die RSG-Planungsmatrix (RSG-PM). In dieser sind die Versorgungssituation im ambulanten und akutstationären;RSG-PM als Kern des RSG

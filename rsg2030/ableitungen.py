@@ -48,7 +48,7 @@ PROZENT_GESAMT_BEGRUENDUNG = (
     "Das gesamt-% einer Zeile «- davon maximal als vertragsärztliche Planstellen in %» ist der Anteil aller Stellen der "
     "Zeile, der höchstens als Kassenpraxis besetzt werden darf: das mit den Stellen gewichtete Mittel der Fach-% "
     "(jedes gedruckte gesamt-% rechnet so, Prüfung prozent_gesamt). Die ÖSG-Vorlage sieht das Feld vor (Tabellenband "
-    "S.259), viele Länder füllen es nicht aus. Abgeleitet nur, wo jedes Fach mit Stellen ein % hat."
+    "S.239), viele Länder füllen es nicht aus. Abgeleitet nur, wo jedes Fach mit Stellen ein % hat."
 )
 """Erscheint so in der Freigabe-Mappe (Blatt «Entscheidungen»)."""
 

@@ -417,7 +417,7 @@ Sachleistungsstellen; beides steht nirgends. Bestätigen kann das nur das Land (
 stützen sich nur auf spitalsambulant, und dort sind beide Quellen Fach für Fach gleich – sie verwenden also dieselben
 Zahlen, welche Methode auch immer dahinter steht. (Auch die spitalsambulanten ÄAVE stammen aus Regiomed, «unter
 Berücksichtigung der ärztlichen VZÄ in den nicht bettenführenden Hauptkostenstellen gemäß KA-Statistik», Textband
-S.216; die Methodenänderungen, die der ÖSG nennt, betreffen den «vertragsärztlichen Bereich», Methodenband S.17–18,
+S.227; die Methodenänderungen, die der ÖSG nennt, betreffen den «vertragsärztlichen Bereich», Methodenband S.17–18,
 METHODIK R8.)
 
 **Belegt:** Das IST spitalsambulant, in den Ambulatorien und bei den Wahlärzt:innen passt zu einer unabhängigen Quelle,
