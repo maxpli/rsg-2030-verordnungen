@@ -22,6 +22,8 @@ SPALTEN = ["Err_Min", "VDmin", "VDmax", "VD2021", "BEVmin"]
 # wenn der Parser eine Zeile überspringt – sie bliebe sonst ungeprüft – oder der ÖSG eine aufnimmt, streicht oder
 # umstellt. Eine Zählung allein («mindestens 20») würde beides übersehen. Abgelesen an der gerenderten Seite, nicht
 # an der Textextraktion: Verschluckt die eine Zeile, fehlt sie dem Parser und der Kontrolle gleichermaßen.
+# Rendern wie die Zweitlesung, `rsg2030/scripts/zweitlesung_ki.py` (`bild()`, pdfium) – derselbe zweite Weg neben
+# der Textzerlegung (pdfminer), auf dem auch Ebene 3 des Prüfkonzepts beruht.
 RICHTWERT_ZEILEN = ("AM", "KIJU", "KJC", "KJP", "CH", "NCH", "IM", "PUL", "GGH", "NEU",
                     "PSY", "DER", "AU", "HNO", "URO", "PCH", "ORTR", "MKG", "ZMK", "KFO")  # fmt: skip
 
