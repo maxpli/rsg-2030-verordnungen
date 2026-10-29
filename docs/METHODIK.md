@@ -211,9 +211,12 @@ Die RSG-Verordnungen selbst sagen nichts zu Summen über Fächer; ihre Spalte «
 Matrixspalten, in der jede ÄAVE einmal vorkommt (KFO als eigene Spalte neben ZMK, wo es sie gibt).
 
 **KJC und PCH ohne eigene ÄAVE.** In allen Ländern stehen bei KJC und PCH in jeder ÄAVE-Zeile 0 bzw. «-»; Werte gibt es
-nur bei Planstellen und Sachleistungsstellen, wie im Tabellenband S.232 beschrieben. Die Summe CH + KJC + PCH ändert
-heute also nichts. Sie sichert den Vergleich, falls ein Land KJC oder PCH doch getrennt ausweist; die Prüfung
-`kjc_pch_in_ch` meldet dann eine Abweichung, und es ist zu klären, ob der Wert in CH schon enthalten ist.
+nur bei Planstellen und Sachleistungsstellen, wie im Tabellenband S.232 beschrieben. An den ÄAVE ändert die Summe
+CH + KJC + PCH heute also nichts; sie sichert den Vergleich, falls ein Land KJC oder PCH doch getrennt ausweist – die
+Prüfung `kjc_pch_in_ch` meldet dann eine Abweichung, und es ist zu klären, ob der Wert in CH schon enthalten ist. In
+der Tabelle Stellen zählt die Summe dagegen schon heute: Vorarlberg weist im IST je Träger eine vertragsärztliche
+PCH-Planstelle aus und im PLAN eine gemeinsame Sachleistungsstelle (Anlage S.1 (BL) und S.3 (VR 81)); die CH-Stellen
+im ÖSG-Zuschnitt enthalten sie (`Zuschnitt` dort «CH + PCH»).
 
 **ZMK und KFO je Land.** Die Länder weisen KFO unterschiedlich aus; für ZMK nach ÖSG (ZMK inkl. KFO) muss KFO überall
 genau einmal enthalten sein:

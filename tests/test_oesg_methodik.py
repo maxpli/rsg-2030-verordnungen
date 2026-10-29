@@ -135,8 +135,10 @@ def test_zuschnitt_nach_oesg():
     """R4/R5: AM + ZAE, CH + KJC + PCH, IM + PUL, ZMK + KFO; KFO nur, wo es eine eigene Spalte hat."""
     from oesg_methodik.faecher import ZAE, summe_im_zuschnitt, zuschnitt
 
+    # KJC und PCH mit Werten > 0, obwohl die Verordnungen dort 0 bzw. «-» drucken: Mit 0 hielte der Test die Summe
+    # CH + KJC + PCH nicht (10 + 0 + 0 = 10 = CH allein), und die Regel hinge nur an der Prüfsumme der Ausgaben.
     z = pd.Series(
-        {"AM": 100.0, ZAE: 8.3, "CH": 10.0, "KJC": 0.0, "PCH": 0.0, "IM": 20.0, "PUL": 2.0, "ZMK": 30.0, "KFO": 4.0}
+        {"AM": 100.0, ZAE: 8.3, "CH": 10.0, "KJC": 0.5, "PCH": 1.5, "IM": 20.0, "PUL": 2.0, "ZMK": 30.0, "KFO": 4.0}
     )
     assert (
         summe_im_zuschnitt(z, "AM"),
@@ -145,18 +147,35 @@ def test_zuschnitt_nach_oesg():
         summe_im_zuschnitt(z, "ZMK"),
     ) == (
         108.3,
-        10.0,
+        12.0,
         22.0,
         34.0,
     )
     assert summe_im_zuschnitt(z, "KFO") == 4.0
-    assert (zuschnitt(z, "AM"), zuschnitt(z, "CH"), zuschnitt(z, "ZMK")) == ("AM + ZAE", "CH", "ZMK + KFO")
+    assert (zuschnitt(z, "AM"), zuschnitt(z, "CH"), zuschnitt(z, "ZMK")) == ("AM + ZAE", "CH + KJC + PCH", "ZMK + KFO")
+    # Der Regelfall der Verordnungen: KJC/PCH mit 0 zählen nicht und werden im Zuschnitt-Text nicht genannt
+    null = pd.Series({"CH": 10.0, "KJC": 0.0, "PCH": 0.0})
+    assert summe_im_zuschnitt(null, "CH") == 10.0 and zuschnitt(null, "CH") == "CH"
     ohne = pd.Series({"AM": 100.0, ZAE: float("nan"), "ZMK": 30.0})  # Wien, Vorarlberg: KFO in ZMK
     assert summe_im_zuschnitt(ohne, "KFO") is None and summe_im_zuschnitt(ohne, "ZMK") == 30.0
     assert zuschnitt(ohne, "ZMK") == "ZMK (KFO nicht getrennt ausgewiesen)"
     assert zuschnitt(ohne, "AM") == "AM (ZAE nicht getrennt ausgewiesen)"
     # ZAE «-» bzw. 0 (Wien): nicht getrennt ausgewiesen – ob in einer Fachspalte oder gar nicht, sagt die Matrix nicht
     assert zuschnitt(pd.Series({"AM": 100.0, ZAE: 0.0}), "AM") == "AM (ZAE nicht getrennt ausgewiesen)"
+
+
+def test_zuschnitt_deckt_genau_die_richtwertzeilen_mit_soll_intervall():
+    """R4: Kennzahlen für genau die Richtwertzeilen mit Soll-Intervall (Textband S.39), in deren Reihenfolge.
+
+    `richtwerte_fuer_vd` filtert die Richtwerte mit `OESG_ANALYSEKERN` (= Schlüssel von ZUSCHNITT): Fiele ein Fach aus
+    ZUSCHNITT, verschwände es stillschweigend aus den Kennzahlen; käme mit einem neuen ÖSG-Stand eine Richtwertzeile
+    dazu (sie fiele in test_referenz auf), sagt erst dieser Test, dass der Zuschnitt sie noch nicht kennt."""
+    from oesg_methodik.faecher import ZUSCHNITT
+    from oesg_methodik.richtwerte import lade_richtwerte
+
+    rw = lade_richtwerte()
+    mit_intervall = rw.loc[rw["VDmin"].notna() & rw["VDmax"].notna(), "Fachrichtung"]
+    assert list(ZUSCHNITT) == list(mit_intervall)
 
 
 def test_zae_nur_spitalsambulant():
