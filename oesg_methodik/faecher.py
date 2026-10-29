@@ -4,6 +4,10 @@ Die Richtwerttabelle (ÖSG 2023 Textband S.39) schneidet manche Fächer anders z
 (Vorlage: ÖSG 2023 Tabellenband, Anhang 9, S.239). Für den Vergleich mit einem Richtwert werden die Spalten so
 zusammengezählt, wie der Richtwert sie enthält – `ZUSCHNITT`, je Eintrag mit Beleg. Die Spalten heißen wie in der
 Vorlage, ohne Fußnotenzeichen.
+
+Der Zuschnitt gilt **einheitenneutral**: Er sagt, welche Matrixspalten ein Fach bilden, nicht was darin steht. Dieselbe
+Funktion schneidet deshalb ÄAVE und Stellen zu (`summe_im_zuschnitt`); die einzige Ausnahme regelt `teile` selbst,
+indem es die ZAE nur in `ZAE_ZEILEN` mitnimmt. So bedeutet ein Fach in beiden Tabellen dasselbe.
 """
 
 from __future__ import annotations
@@ -67,13 +71,20 @@ def _wert(row: pd.Series, spalte: str) -> float | None:
 
 
 def teile(fach: str, zeile: str = "insgesamt") -> tuple[str, ...]:
-    """Spalten, aus denen `fach` in der ÄAVE-Zeile `zeile` entsteht: `ZUSCHNITT`, ZAE nur in `ZAE_ZEILEN`."""
+    """Spalten, aus denen `fach` in der Zeile `zeile` entsteht: `ZUSCHNITT`, ZAE nur in `ZAE_ZEILEN`.
+
+    Gilt für jede Einheit, nicht nur für ÄAVE: Der Zuschnitt sagt, welche Matrixspalten ein Fach bilden, unabhängig
+    davon, was in den Spalten steht. Für eine Stellen-Zeile (`planstellen_…`, `slst_…`) fällt die ZAE von selbst weg,
+    weil die Zeile nicht in `ZAE_ZEILEN` steht – und das ist richtig: Sachleistungsstellen bilden den extramuralen
+    Bereich ab (Tabellenband S.232), ZAE sind spitalsambulant (Vorlage (Tabellenband S.239), Fußnote (5))."""
     return tuple(s for s in ZUSCHNITT[fach] if s != ZAE or zeile in ZAE_ZEILEN)
 
 
-def aave_fach(row: pd.Series, fach: str, zeile: str = "insgesamt") -> float | None:
-    """ÄAVE einer Richtwert-Zeile aus einer Matrixzeile (Spalten = Fachspalten, dazu `ZAE`): Summe der Spalten laut
-    `teile`. Fehlt die Hauptspalte, gibt es keinen Wert (z. B. KFO, wo es keine eigene Spalte hat) – außer ein anderer
+def summe_im_zuschnitt(row: pd.Series, fach: str, zeile: str = "insgesamt") -> float | None:
+    """Wert eines Fachs im ÖSG-Zuschnitt aus einer Matrixzeile (Spalten = Fachspalten, dazu `ZAE`): Summe der Spalten
+    laut `teile`. Einheitenneutral – ÄAVE, Stellen oder anderes, je nachdem, was in `row` steht.
+
+    Fehlt die Hauptspalte, gibt es keinen Wert (z. B. KFO, wo es keine eigene Spalte hat) – außer ein anderer
     Teil ist > 0: Burgenland VR 11/12 drucken AM spitalsambulant leer, die ZAE aber in SON/IDB (AM = 0 + ZAE)."""
     haupt, *weitere = teile(fach, zeile)
     h = _wert(row, haupt)

@@ -169,8 +169,8 @@ Entschieden ist:
 - **Der Zuschnitt gilt einheitenneutral.** Er legt fest, welche Matrixspalten ein Fach bilden (Textband S.39),
   unabhängig von der Einheit; dieselbe Funktion schneidet ÄAVE und Stellen zu.
 - **Ausnahme ZAE.** Bei den ÄAVE enthält AM die ZAE aus SON/IDB, aber nur in den Zeilen `spitalsambulant` und
-  `insgesamt` ([METHODIK.md](METHODIK.md), R5). Sachleistungsstellen bilden den extramuralen Bereich ab (Tabellenband
-  Tabellenband S.232; Tirol, Anlage S.1, Fußnote (8)), ZAE sind spitalsambulant (Vorlage (Tabellenband S.239), Fußnote (5)) – in einer
+  `insgesamt` ([METHODIK.md](METHODIK.md), R5). Sachleistungsstellen bilden den extramuralen Bereich ab
+  (Tabellenband S.232; Tirol, Anlage S.1, Fußnote (8)), ZAE sind spitalsambulant (Vorlage (Tabellenband S.239), Fußnote (5)) – in einer
   Stellen-Zeile gehört SON/IDB daher nicht zu AM. Tirol ist das einzige Land mit Stellen in SON/IDB: 8,05 im
   Bundesland, genau die 4,8 AM + 1 KIJU + 2,25 ORTR seiner Fußnote (7). Merkwürdig ist, dass dort im PLAN keine
   extramuralen ÄAVE stehen («n.v.»), aber Sachleistungsstellen; Tirol gibt für sie 0 % Maximalanteil

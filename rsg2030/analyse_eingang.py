@@ -2,7 +2,7 @@
 
 Die Analyse liest nur `RSG_2030_Planungsmatrizen.csv`, nicht die Excel-Mappe. Je Bundesland gibt
 `bl_tabellen` die BL-Matrix in breiter Form (eine Zeile je Abschnitt × Zeile, Spalten = Fächer), dazu die Spalte
-`ZAE` (SON/IDB spitalsambulant, in den Zeilen spitalsambulant und insgesamt), damit `oesg_methodik.faecher.aave_fach`
+`ZAE` (SON/IDB spitalsambulant, in den Zeilen spitalsambulant und insgesamt), damit `oesg_methodik.faecher.summe_im_zuschnitt`
 jede ÄAVE-Zeile nach ÖSG zuschneidet (AM = AM + ZAE nur, wo ZAE hingehören; docs/METHODIK.md R4, R5, R10).
 
 Maßgeblicher Block (SVE-Planung → ÄAVE-Äquivalente): `schema.bl_long`, dieselbe Regel wie in der
@@ -17,7 +17,7 @@ import pandas as pd
 
 from oesg_methodik import BUNDESLAENDER
 from oesg_methodik.eingang import PVE_FAECHER, SACHLEISTUNG, ZEILEN, pruefe
-from oesg_methodik.faecher import OESG_ANALYSEKERN, ZAE, ZAE_QUELLE, ZAE_ZEILEN, aave_fach, teile, zuschnitt
+from oesg_methodik.faecher import OESG_ANALYSEKERN, ZAE, ZAE_QUELLE, ZAE_ZEILEN, summe_im_zuschnitt, teile, zuschnitt
 from rsg2030.config import LONG_DATEI, ausgabe_dir
 from rsg2030.schema import BLOCK_AEQ, bl_long, matrix_long
 
@@ -37,7 +37,7 @@ def _breit(sub: pd.DataFrame) -> pd.DataFrame:
     """Long-Ausschnitt einer Matrix → breite Tabelle (Spalten Abschnitt, Jahr, Zeile_ID, <Fächer>, ZAE).
 
     `ZAE` = SON/IDB der Zeile spitalsambulant desselben Abschnitts, in den Zeilen spitalsambulant und insgesamt
-    (Vorlage Fußnote (5) «spitalsambulant = ZAE»). So schneidet `oesg_methodik.faecher.aave_fach` AM für jede dieser
+    (Vorlage Fußnote (5) «spitalsambulant = ZAE»). So schneidet `oesg_methodik.faecher.summe_im_zuschnitt` AM für jede dieser
     Zeilen nach ÖSG zu (AM + ZAE, METHODIK R5); die Fachspalten bleiben, wie gedruckt."""
     anders = sub[sub["Zeile_ID"].isin(ZEILEN) & (sub["Einheit"] != "ÄAVE")]
     if len(anders):
@@ -93,7 +93,7 @@ def _aave_zeilen(df: pd.DataFrame, ist_jahr: int, nur_regel: frozenset[str] = fr
         abschnitt, zeile = str(block["Abschnitt"]), str(block["Zeile_ID"])
         jahr = ist_jahr if abschnitt == "IST" else PLAN_JAHR
         for fach in PVE_FAECHER if zeile == "pve" else OESG_ANALYSEKERN:
-            aave = aave_fach(block, fach, zeile)
+            aave = summe_im_zuschnitt(block, fach, zeile)
             if aave is None:
                 continue
             text = zuschnitt(block, fach, zeile)

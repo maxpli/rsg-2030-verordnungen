@@ -70,11 +70,12 @@ def _tabelle_textband() -> dict[str, list[float]]:
             vorne = list(KUERZEL.finditer(davor))
             hinten = KUERZEL.search(danach)
             abstand_v = len(davor) - vorne[-1].end() if vorne else None
-            abstand_h = hinten.start() if hinten else None
-            if abstand_v is None and abstand_h is None:
+            if hinten is not None and (abstand_v is None or hinten.start() < abstand_v):
+                kuerzel = hinten.group(1)  # Kürzel steht hinter den Werten (PCH)
+            elif vorne:
+                kuerzel = vorne[-1].group(1)
+            else:
                 continue  # Kopfzeile «Err. (Min.) VDmin …»
-            nach_hinten = abstand_v is None or (abstand_h is not None and abstand_h < abstand_v)
-            kuerzel = (hinten if nach_hinten else vorne[-1]).group(1)
         zeilen[kuerzel] = [_zahl(w) for w in werte]
     return zeilen
 

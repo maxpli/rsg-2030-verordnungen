@@ -133,21 +133,26 @@ def test_eingang_schluessel_doppelt():
 
 def test_zuschnitt_nach_oesg():
     """R4/R5: AM + ZAE, CH + KJC + PCH, IM + PUL, ZMK + KFO; KFO nur, wo es eine eigene Spalte hat."""
-    from oesg_methodik.faecher import ZAE, aave_fach, zuschnitt
+    from oesg_methodik.faecher import ZAE, summe_im_zuschnitt, zuschnitt
 
     z = pd.Series(
         {"AM": 100.0, ZAE: 8.3, "CH": 10.0, "KJC": 0.0, "PCH": 0.0, "IM": 20.0, "PUL": 2.0, "ZMK": 30.0, "KFO": 4.0}
     )
-    assert (aave_fach(z, "AM"), aave_fach(z, "CH"), aave_fach(z, "IM"), aave_fach(z, "ZMK")) == (
+    assert (
+        summe_im_zuschnitt(z, "AM"),
+        summe_im_zuschnitt(z, "CH"),
+        summe_im_zuschnitt(z, "IM"),
+        summe_im_zuschnitt(z, "ZMK"),
+    ) == (
         108.3,
         10.0,
         22.0,
         34.0,
     )
-    assert aave_fach(z, "KFO") == 4.0
+    assert summe_im_zuschnitt(z, "KFO") == 4.0
     assert (zuschnitt(z, "AM"), zuschnitt(z, "CH"), zuschnitt(z, "ZMK")) == ("AM + ZAE", "CH", "ZMK + KFO")
     ohne = pd.Series({"AM": 100.0, ZAE: float("nan"), "ZMK": 30.0})  # Wien, Vorarlberg: KFO in ZMK
-    assert aave_fach(ohne, "KFO") is None and aave_fach(ohne, "ZMK") == 30.0
+    assert summe_im_zuschnitt(ohne, "KFO") is None and summe_im_zuschnitt(ohne, "ZMK") == 30.0
     assert zuschnitt(ohne, "ZMK") == "ZMK (KFO nicht getrennt ausgewiesen)"
     assert zuschnitt(ohne, "AM") == "AM (ZAE nicht getrennt ausgewiesen)"
     # ZAE «-» bzw. 0 (Wien): nicht getrennt ausgewiesen – ob in einer Fachspalte oder gar nicht, sagt die Matrix nicht
@@ -156,13 +161,15 @@ def test_zuschnitt_nach_oesg():
 
 def test_zae_nur_spitalsambulant():
     """R10: ZAE sind spitalsambulant (Vorlage (Tabellenband S.239), Fußnote (5)) – in extramural und pve ist AM nur die Spalte AM."""
-    from oesg_methodik.faecher import ZAE, aave_fach, zuschnitt
+    from oesg_methodik.faecher import ZAE, summe_im_zuschnitt, zuschnitt
 
     z = pd.Series({"AM": 100.0, ZAE: 8.3})
-    assert aave_fach(z, "AM", "spitalsambulant") == 108.3 and zuschnitt(z, "AM", "spitalsambulant") == "AM + ZAE"
+    assert (
+        summe_im_zuschnitt(z, "AM", "spitalsambulant") == 108.3 and zuschnitt(z, "AM", "spitalsambulant") == "AM + ZAE"
+    )
     for zeile in ("extramural", "pve"):
-        assert aave_fach(z, "AM", zeile) == 100.0 and zuschnitt(z, "AM", zeile) == "AM"
+        assert summe_im_zuschnitt(z, "AM", zeile) == 100.0 and zuschnitt(z, "AM", zeile) == "AM"
     # Burgenland VR 11/12: AM spitalsambulant leer gedruckt, ZAE in SON/IDB → AM = 0 + ZAE
     leer = pd.Series({"AM": float("nan"), ZAE: 2.35})
-    assert aave_fach(leer, "AM", "spitalsambulant") == 2.35
-    assert aave_fach(pd.Series({"AM": float("nan"), ZAE: 0.0}), "AM", "spitalsambulant") is None
+    assert summe_im_zuschnitt(leer, "AM", "spitalsambulant") == 2.35
+    assert summe_im_zuschnitt(pd.Series({"AM": float("nan"), ZAE: 0.0}), "AM", "spitalsambulant") is None

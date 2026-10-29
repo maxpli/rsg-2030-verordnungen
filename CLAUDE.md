@@ -75,7 +75,7 @@ ungenutzte Importe, auch Re-Exporte; Namen von dort importieren, wo sie definier
 oesg_methodik/        ÖSG-Regeln, unabhängig von einem Datensatz (importiert nichts aus rsg2030 – tests/test_pakete.py)
   pfade.py              Datenordner als Funktionen (Arbeitsordner / RSG2030_DATEN) und Referenzdateien des Pakets
   eingang.py            Vertrag der ÄAVE-Eingabe (Basis Sachleistung, Ebene BL/VR) + pruefe()
-  faecher.py            ZUSCHNITT: Matrixspalten → Richtwertzeilen des ÖSG (AM+ZAE, CH+KJC+PCH, IM+PUL, ZMK+KFO), aave_fach
+  faecher.py            ZUSCHNITT: Matrixspalten → Richtwertzeilen des ÖSG (AM+ZAE, CH+KJC+PCH, IM+PUL, ZMK+KFO), summe_im_zuschnitt
   richtwerte.py         ÖSG-Richtwerte (referenz/oesg_planungsrichtwerte.csv, Textband S.39)
   bevoelkerung.py       Bevölkerung von Statistik Austria / ÖROK (Stichtag 1.1.), bevoelkerung_fuer()
   dichte.py             kennzahlen(): ÄAVE-Eingabe + Bevölkerung + Richtwerte → VD; Lage, Position, ÄAVE-Abstand

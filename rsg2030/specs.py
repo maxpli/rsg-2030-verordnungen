@@ -1,7 +1,7 @@
 """Fachspalten- und Zeilennamen der RSG-2030-Planungsmatrizen.
 
 Die Fachspaltennamen im Output (z. B. «AM», «KJC», «ZMK», «KFO», «SON/IDB») sind `schema.FACHSPALTEN`;
-`oesg_methodik.faecher.aave_fach` fasst sie zum ÖSG-Zuschnitt zusammen (docs/METHODIK.md, R4).
+`oesg_methodik.faecher.summe_im_zuschnitt` fasst sie zum ÖSG-Zuschnitt zusammen (docs/METHODIK.md, R4).
 """
 
 from __future__ import annotations

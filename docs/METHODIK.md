@@ -191,7 +191,7 @@ Spalten der Matrix. Für den Vergleich zählen die Kennzahlen die Spalten so zus
 | AN, STR, SON/IDB | – | keine Richtwertzeile; SON/IDB spitalsambulant geht als ZAE in AM ein (R5) |
 
 Damit gibt es Kennzahlen für **17 Fächer**: die 16 Fächer mit eigener Spalte und Richtwert und KFO als Unterzeile von
-ZMK (wie PUL bei IM). Umsetzung: `oesg_methodik/faecher.py` (`ZUSCHNITT`, `aave_fach`, `zuschnitt`). Die Spalte
+ZMK (wie PUL bei IM). Umsetzung: `oesg_methodik/faecher.py` (`ZUSCHNITT`, `summe_im_zuschnitt`, `zuschnitt`). Die Spalte
 `Zuschnitt` der Kennzahlen sagt je Zeile, welche Spalten eingegangen sind (z. B. «AM + ZAE», «ZMK (KFO nicht getrennt
 ausgewiesen)»).
 
