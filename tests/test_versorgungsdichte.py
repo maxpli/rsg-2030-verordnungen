@@ -1,6 +1,6 @@
 """Tabelle Versorgungsdichte: Handrechnungen, Vollständigkeit, Teilzeilen und erwartete Prüfsumme.
 
-Die Sollwerte sind bewusst als Literale aus den Quellen notiert (PDF-Seite, Statistik Austria, ÖSG-Textband S.37),
+Die Sollwerte sind bewusst als Literale aus den Quellen notiert (PDF-Seite, Statistik Austria, ÖSG-Textband S.39),
 nicht aus dem Code abgeleitet:
     VD = ÄAVE / Bevölkerung × 100.000
     Position im Soll-Intervall = (VD − VDmin) / (VDmax − VDmin)
@@ -17,13 +17,13 @@ from conftest import pruefe_ausgabe
 
 pytestmark = pytest.mark.slow  # liest Planungsmatrizen und Bevölkerungsdateien (~20 s)
 
-# Versorgungsdichte-Soll-Intervalle des ÖSG (VDmin, VDmax), Textband S.37
+# Versorgungsdichte-Soll-Intervalle des ÖSG (VDmin, VDmax), Textband S.39
 AM, IM, KIJU, CH, ZMK, KFO = (34.9, 64.8), (14.4, 26.8), (4.2, 7.9), (4.5, 8.4), (28.3, 52.6), (2.8, 5.1)
 
 # (Ebene, Region, Abschnitt, Fach, ÄAVE laut PDF, Bevölkerung, Intervall, Herkunft)
 FAELLE = [
     ("BL", "NÖ", "IST", "AM", 808.8, 1_718_373, AM, "NÖ Anlage S.1, IST ÄAVE insgesamt 2023; Bev. 1.1.2023"),
-    # AM laut ÖSG inkl. ZAE (Textband S.37, Legende **): AM 827,7 + SON/IDB spitalsambulant 44,6 (Fußnote (5)
+    # AM laut ÖSG inkl. ZAE (Textband S.39, Legende **): AM 827,7 + SON/IDB spitalsambulant 44,6 (Fußnote (5)
     # «spitalsambulant = ZAE»); im IST stehen die spitalsambulanten AM-ÄAVE noch in AM, SON/IDB = 0,0
     ("BL", "NÖ", "PLAN", "AM", 827.7 + 44.6, 1_742_943, AM, "NÖ Anlage S.1, PLAN 2030 AM + ZAE; Prognose 2025 HS"),
     # IM laut ÖSG inkl. Pulmologie: IM 192,6 + PUL 32,4
@@ -49,7 +49,7 @@ FAELLE = [
     ),
     # OÖ: ZMK ohne KFO; KFO 38,2 nur in der Fußnote zu «ZMK*» (S.10) → ZMK nach ÖSG = ZMK + KFO (METHODIK R4)
     ("BL", "OÖ", "IST", "ZMK", 534.6 + 38.2, 1_505_140, ZMK, "OÖ Anlage S.9, ZMK* 534,6 + KFO 38,2 (Fußnote S.10)"),
-    # KFO gegen die Unterzeile «- davon mit kieferorthopädischem Schwerpunkt» (Textband S.37)
+    # KFO gegen die Unterzeile «- davon mit kieferorthopädischem Schwerpunkt» (Textband S.39)
     ("BL", "OÖ", "IST", "KFO", 38.2, 1_505_140, KFO, "OÖ Fußnote S.10: «zusätzlich KFO: IST 2022 und Plan 2030: 38,2»"),
     # Salzburg: ZAE stehen in SON/IDB spitalsambulant (Fußnote (7) «spitalsambulant = ZAE») → AM 277,8 + 17,4
     (

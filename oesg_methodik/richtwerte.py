@@ -1,4 +1,4 @@
-"""ÖSG-Planungsrichtwerte ambulant (ÖSG 2023 Textband S. 37), Planungshorizont 2030.
+"""ÖSG-Planungsrichtwerte ambulant (ÖSG 2023 Textband S. 39), Planungshorizont 2030.
 
 Quelle: `referenz/oesg_planungsrichtwerte.csv` (von Hand aus dem Textband abgeschrieben, in git).
 """

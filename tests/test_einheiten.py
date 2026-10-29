@@ -632,7 +632,7 @@ def test_faktor_bl_ist_summe_der_regionen():
 
 @pytest.mark.parametrize("bl_faktor, status", [(2.67, "ok"), (2.80, "abweichung")])
 def test_faktor_bl_in_seinem_abschnitt(bl_faktor, status):
-    """Im Abschnitt, in dem der BL-Faktor steht, ist er das Verhältnis der Landeswerte (Tabellenband S.254) – dort wird
+    """Im Abschnitt, in dem der BL-Faktor steht, ist er das Verhältnis der Landeswerte (Tabellenband S.234) – dort wird
     das BL auch dann mit ihm geprüft, wenn alle Regionen eigene Faktoren haben (13,0 × 2,67 = 34,71)."""
     from rsg2030.checks import pruefe_faktor
 

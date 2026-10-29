@@ -53,7 +53,7 @@ ZUORDNEN: dict[str, str] = {
 }
 # Einheiten, die sich nicht summieren lassen
 NICHT_ADDITIV = {"Prozent", "Faktor"}
-# Zeilen, deren Angabe laut ÖSG optional ist (Tabellenband S.251: Wahlärzt:innen «Angabe optional»;
+# Zeilen, deren Angabe laut ÖSG optional ist (Tabellenband S.231: Wahlärzt:innen «Angabe optional»;
 # im PDF meist grün als «optionale Angabe» markiert). Steht darin in keinem Fach eine Zahl > 0, ist die
 # Zeile nicht ausgefüllt – «-»/«0» heißen dort nicht «keine», sondern «nicht angegeben».
 OPTIONALE_ZEILEN = ("wahl",)
@@ -180,15 +180,15 @@ OHNE_EIGENEN_FAKTOR: dict[str, tuple[str, ...]] = {
 def pruefe_faktor(long: pd.DataFrame) -> list[dict]:
     """ÄAVE-Äquivalente = Wert im Block «haupt» × Umrechnungsfaktor seines Sektors, je Fach, in IST und PLAN.
 
-    Tabellenband S.254: Faktoren «je Sektor und je Fachrichtung für die IST-Werte»; «unter Anwendung dieser
+    Tabellenband S.234: Faktoren «je Sektor und je Fachrichtung für die IST-Werte»; «unter Anwendung dieser
     Umrechnungsfaktoren sind für die PLAN-Werte ÄAVE-Äquivalente … auszuweisen». Gerechnet wird mit dem Faktor der
     Matrix selbst (BL bzw. VR), gleich in welchem Abschnitt er steht. Zeilen in ÄAVE (niedergelassen, Ambulatorien …)
     haben keinen Faktor («-»): Faktor 1, also in beiden Blöcken gleich, auch «gesamt». SVE ohne Faktor lassen sich nicht
-    umrechnen und bleiben ungeprüft (laut Vorlage S.259 kein Faktor für RAD, NUK, PMR, PAT, LAB; die ZAE stehen direkt in
+    umrechnen und bleiben ungeprüft (laut Vorlage (Tabellenband S.239) kein Faktor für RAD, NUK, PMR, PAT, LAB; die ZAE stehen direkt in
     ÄAVE). Ein Wert > 0 in einem Block und keiner im anderen ist ebenso eine Abweichung. Hat jede Region mit Wert ihren
     eigenen Faktor, ist das BL die Summe der umgerechneten Regionen (Kärnten Anhang S.30: «je Versorgungsregion ein
     Umrechnungsfaktor»), und das prüft `vr_summe_gleich_bl`. Mit dem BL-Faktor gerechnet wird das BL dann nur in dem
-    Abschnitt, in dem der BL-Faktor steht: Dort ist er das Verhältnis der Landeswerte (Tabellenband S.254: «auf Ebene des
+    Abschnitt, in dem der BL-Faktor steht: Dort ist er das Verhältnis der Landeswerte (Tabellenband S.234: «auf Ebene des
     Bundeslandes … für die IST-Werte»; die Steiermark druckt ihn unter PLAN, METHODIK R6). Toleranz aus der Rundung
     aller drei Werte: ½ULP(haupt)·Faktor + haupt·½ULP(Faktor) + ½ULP(ÄAVE-Ä).
     """
@@ -389,7 +389,7 @@ def pruefe_davon(long: pd.DataFrame) -> list[dict]:
 
 
 IN_CH: tuple[str, ...] = ("KJC", "PCH")
-"""Fächer, deren ÄAVE in CH enthalten sind: Vorlage (Tabellenband S.259) Fußnote (2) «zugeordnet zu CH»; Tabellenband
+"""Fächer, deren ÄAVE in CH enthalten sind: Vorlage (Tabellenband S.239) Fußnote (2) «zugeordnet zu CH»; Tabellenband
 S.252: «ÄAVE für PCH sind unter der CH subsummiert und werden nur in Bezug auf die vertragsärztlichen Planstellen der
 KV-Träger im IST-Stand ausgewiesen». Die Kennzahlen zählen sie zu CH (`oesg_methodik.faecher.ZUSCHNITT`)."""
 
@@ -431,7 +431,7 @@ def _gewichtet(w: pd.Series, p: pd.Series, w_roh: pd.Series, p_roh: pd.Series, r
 def pruefe_prozent_gewichtet(long: pd.DataFrame, *, vollstaendig: set[str]) -> list[dict]:
     """BL-% = Mittel der VR-% gewichtet mit den VR-Sachleistungsstellen (je Stellen-Zeile × Fachspalte).
 
-    Geht von den Stellen aus: Zu jeder Stellenzahl > 0 gehört ein % («ist auszuweisen», Tabellenband S.252). Fehlt es
+    Geht von den Stellen aus: Zu jeder Stellenzahl > 0 gehört ein % («ist auszuweisen», Tabellenband S.232). Fehlt es
     im BL oder in einer VR, ist die Zelle «nicht_pruefbar» – auch wenn in diesem Fach gar kein % steht. Die Spalte
     «gesamt» rechnet `pruefe_prozent_gesamt` waagrecht nach; senkrecht folgt sie dann aus den Fachspalten.
     """

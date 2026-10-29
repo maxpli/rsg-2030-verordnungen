@@ -32,8 +32,10 @@ ENDUNGEN = {".md", ".py", ".csv", ".cff", ".toml", ".html", ".js"}
 # «Textband S.37», «Tabellenband, Anhang 9, S.259», «Textband S.36–37», «Textband S.66, S.75».
 # Nicht über «;» oder «|»: Das sind Feldgrenzen in CSV und Markdown-Tabellen – sonst bindet ein Bandname
 # die Seitenzahl der Nachbarspalte (oesg_planungsrichtwerte.csv: Quelle «ÖSG 2023 Textband», Anmerkung «S.252»).
+# Beugung muss mitgehen («des Tabellenbands»). Kein Kürzel für «Vorlage»: Dort steht der Band dabei, denn
+# «Text der Vorlage (Anlage 1 S.1)» meint eine Verordnungsseite – raten wäre dort ein Fehlalarm.
 ZITAT = re.compile(
-    r"\b(Textband|Tabellenband|Methodenband)\b[^\n;|]{0,60}?"
+    r"\b(Textband|Tabellenband|Methodenband)(?:s|es)?\b[^\n;|]{0,60}?"
     r"(S\.\s?\d{1,3}(?:\s*[–-]\s*\d{1,3})?(?:,\s*S\.\s?\d{1,3})*)"
 )
 SEITE = re.compile(r"S\.\s?(\d{1,3})")

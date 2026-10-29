@@ -39,13 +39,13 @@ in 6 von 9 BL. Die Spalte `Basis` bleibt, damit Tabellen verschiedener Datensät
 INSGESAMT = "insgesamt"
 """Die Zeile, für die es ein Versorgungsdichte-Soll-Intervall (ÖSG) gibt: Die Richtwerte beziehen sich auf alle ÄAVE eines Fachs (R1, R10)."""
 ZEILEN = ("spitalsambulant", "extramural", INSGESAMT, "pve")
-"""ÄAVE-Zeilen der RSG-Planungsmatrix, die es in IST und PLAN gibt (Tabellenband S.251–252), in der Reihenfolge der
-Vorlage (S.259): spitalsambulant + extramural = insgesamt; pve ist eine Teilmenge von insgesamt (R10)."""
+"""ÄAVE-Zeilen der RSG-Planungsmatrix, die es in IST und PLAN gibt (Tabellenband S.231–232), in der Reihenfolge der
+Vorlage (Tabellenband S.239): spitalsambulant + extramural = insgesamt; pve ist eine Teilmenge von insgesamt (R10)."""
 PVE_FAECHER = ("AM", "KIJU")
 """PVE-ÄAVE weist die Matrix nur «in der Allgemeinmedizin (AM) und der Kinder- und Jugendheilkunde (KIJU)» aus,
-PLAN als «Mindestanzahl» (Tabellenband S.251)."""
+PLAN als «Mindestanzahl» (Tabellenband S.231)."""
 
-EBENEN = {"BL", "VR"}  # keine Österreich-Ebene: der ÖSG misst je Versorgungsregion (Textband S.36)
+EBENEN = {"BL", "VR"}  # keine Österreich-Ebene: der ÖSG misst je Versorgungsregion (Textband S.38)
 ABSCHNITTE = {"IST", "PLAN"}
 
 

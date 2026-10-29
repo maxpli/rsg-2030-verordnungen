@@ -595,7 +595,7 @@ BLAETTER: tuple[Blatt, ...] = (
         "Zeilen",
         "Zeilenbeschriftung im PDF, die nicht die der ÖSG-Vorlage ist, und die Zeile, der sie zugeordnet ist",
         "Passt die Beschriftung (wie im PDF, ohne Fußnotenzeichen, Jahr als 20xx) zur Bedeutung der Zeile_ID? "
-        "Beschriftungen wie in der ÖSG-Vorlage (Tabellenband S.259; «ÄAVE (ggf. SVE)» auch als «ÄAVE» oder «SVE») "
+        "Beschriftungen wie in der ÖSG-Vorlage (Tabellenband S.239; «ÄAVE (ggf. SVE)» auch als «ÄAVE» oder «SVE») "
         "stehen nicht hier. Block «haupt» der SVE-Länder: Zählung des Landes (z. B. SVE spitalsambulant), vergleichbare "
         "ÄAVE erst im Block «aequivalent» – die Zeile_ID nennt die Zeile, nicht die Einheit. Beschreibung aller Zeilen: "
         "docs/DATEN.md, «Zeilen».",

@@ -1,6 +1,6 @@
 """Bevölkerung (Statistik Austria) je BL und Versorgungsregion – gegen veröffentlichte Werte.
 
-Sollwerte als Literale aus den Quellen: ÖSG 2023 Textband S.38 (Wohnbevölkerung 1.1.2021),
+Sollwerte als Literale aus den Quellen: ÖSG 2023 Textband S.39 (Wohnbevölkerung 1.1.2021),
 Statistik Austria Open Data (Bevölkerung 1.1. je Gemeinde; Bevölkerungsprognose 2025, Hauptszenario).
 """
 
@@ -42,7 +42,7 @@ def ist_jahre_():
 
 
 def test_ist_wie_oesg_2021(regionen):
-    """ÖSG-Wohnbevölkerung 2021: 8.932.664, ohne Wien 7.011.715 (Textband S.38)."""
+    """ÖSG-Wohnbevölkerung 2021: 8.932.664, ohne Wien 7.011.715 (Textband S.39)."""
     bl = pop.bevoelkerung_bl_ist((2021,), regionen).set_index("Land")["Bevoelkerung"]
     assert bl.sum() == 8_932_664
     assert bl.drop("Wien").sum() == 7_011_715

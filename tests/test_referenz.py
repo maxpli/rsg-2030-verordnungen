@@ -16,7 +16,7 @@ from oesg_methodik.pfade import OESG_PLANUNGSRICHTWERTE_CSV, OESG_REGIONEN_CSV, 
 pytestmark = pytest.mark.slow  # liest Quelldateien aus daten_original/
 
 # Welche Dateien die beiden Bände sind, steht in `oesg_methodik.pfade.OESG_BAENDE` (ein Ort je ÖSG-Stand).
-SEITE = 37  # Textband: Tabelle der Planungsrichtwerte
+SEITE = 39  # Textband: Tabelle der Planungsrichtwerte
 SPALTEN = ["Err_Min", "VDmin", "VDmax", "VD2021", "BEVmin"]
 
 
@@ -25,17 +25,48 @@ def _zahl(t: str) -> float:
     return math.nan if t == "*" else float(t.replace(".", "").replace(",", "."))
 
 
+# Lauf aus Werten («*» oder Zahl). Gelesen werden die **letzten fünf** eines Laufs: Vor dem ersten Wert steht oft
+# ein Fußnotenzeichen, das wie eine Zahl aussieht («Kinder- und Jugendpsychiatrie (KJP)1 30 0,8 1,4 1,0 100.000»).
+WERTELAUF = re.compile(r"(?:\*|[\d.,]+)(?: (?:\*|[\d.,]+))*")
+# Form der fünf Spalten: Err. (Min.) ganzzahlig, VDmin/VDmax/VD2021 mit einer Nachkommastelle, BEVmin mit
+# Tausenderpunkt; «*» heißt «kein Richtwert» und ist überall erlaubt.
+SPALTENFORM = [re.compile(r"\*|\d+"), *[re.compile(r"\*|\d+,\d") for _ in range(3)], re.compile(r"\*|[\d.]+")]
+KUERZEL = re.compile(r"\(([A-Z]+)\)")
+
+
 def _tabelle_textband() -> dict[str, list[float]]:
-    """Tabelle «Planungsrichtwerte für den gesamten ambulanten Bereich» (Textband S.37): Kürzel → die fünf Werte."""
+    """Tabelle «Planungsrichtwerte für den gesamten ambulanten Bereich» (Textband S.39): Kürzel → die fünf Werte.
+
+    Nicht zeilenweise: Der ÖSG bricht manche Zeilen um, und zwar verschieden – bei PUL stehen die Werte nach dem
+    ersten Teil der Beschriftung, bei PCH **vor** dem Kürzel («Plastische, … Ästhetische * * * * * Chirurgie
+    (PCH)»). Darum: jede Folge von fünf Werten suchen und ihr das nächstgelegene Kürzel zuordnen."""
     with pdfplumber.open(oesg_pdf("Textband")) as pdf:
         text = pdf.pages[SEITE - 1].extract_text()
     teil = text[text.index("Planungsrichtwerte für den gesamten ambulanten Bereich") : text.index("Legende:")]
+    teil = " ".join(teil.split())
     zeilen: dict[str, list[float]] = {}
-    for z in teil.splitlines():
-        werte = z.split()[-5:]
-        if len(z.split()) < 6 or not all(re.fullmatch(r"\*|[\d.,]+", w) for w in werte):
-            continue  # Kopfzeile, Fußnoten
-        kuerzel = "KFO" if "kieferorthopädisch" in z else re.findall(r"\(([A-Z]+)\)", z)[0]
+    for lauf in WERTELAUF.finditer(teil):
+        tokens = lauf.group(0).split()
+        # von rechts das erste Fünfer-Fenster mit der Form der Tabellenspalten: So fallen Fußnotenzeichen weg,
+        # die vorne («(KJP)1 30 …») wie hinten («… 3,9 * 1 vorrangig …») an die Werte stoßen.
+        fenster = ((i, tokens[i : i + 5]) for i in range(len(tokens) - 5, -1, -1))
+        passend = [(i, f) for i, f in fenster if all(m.fullmatch(w) for m, w in zip(SPALTENFORM, f))]
+        if not passend:
+            continue
+        i, werte = passend[0]
+        anfang = lauf.end() - len(" ".join(tokens[i:]))
+        davor, danach = teil[:anfang], teil[lauf.end() :]
+        if "kieferorthopädisch" in davor[-90:]:
+            kuerzel = "KFO"  # Unterzeile ohne Kürzel: «- davon mit kieferorthopädischem Schwerpunkt»
+        else:
+            vorne = list(KUERZEL.finditer(davor))
+            hinten = KUERZEL.search(danach)
+            abstand_v = len(davor) - vorne[-1].end() if vorne else None
+            abstand_h = hinten.start() if hinten else None
+            if abstand_v is None and abstand_h is None:
+                continue  # Kopfzeile «Err. (Min.) VDmin …»
+            nach_hinten = abstand_v is None or (abstand_h is not None and abstand_h < abstand_v)
+            kuerzel = (hinten if nach_hinten else vorne[-1]).group(1)
         zeilen[kuerzel] = [_zahl(w) for w in werte]
     return zeilen
 
@@ -59,19 +90,19 @@ def test_regionen_wie_goeg_datei():
 
 
 def test_fussnoten_vorlage_wie_tabellenband():
-    """Jede Fußnote der ÖSG-Vorlage steht so in der RSG-Planungsmatrix des Tabellenbands (Anhang 9, S.259)."""
+    """Jede Fußnote der ÖSG-Vorlage steht so in der RSG-Planungsmatrix des Tabellenbands (Anhang 9, S.239)."""
     from rsg2030.fussnoten import norm, vorlage
     from rsg2030.matrix_extract import kompakt
 
     with pdfplumber.open(oesg_pdf("Tabellenband")) as pdf:
-        seite = kompakt(norm(pdf.pages[259 - 1].extract_text()))
+        seite = kompakt(norm(pdf.pages[239 - 1].extract_text()))
     for z, t in zip(vorlage()["Zeichen"], vorlage()["Text"]):
         assert kompakt(norm(z + t)) in seite, f"{z} {t}"
 
 
 def test_zeilen_vorlage_wie_tabellenband():
     """Jede Zeilenbeschriftung der ÖSG-Vorlage (oesg_rsgpm_zeilen.csv) steht so in der RSG-Planungsmatrix des
-    Tabellenbands (Anhang 9, S.259). Die Platzhalter der Zellen («x», «-», «n.v.») stehen dort mitten in umbrochenen
+    Tabellenbands (Anhang 9, S.239). Die Platzhalter der Zellen («x», «-», «n.v.») stehen dort mitten in umbrochenen
     Beschriftungen; sie fallen auf beiden Seiten weg (auch «-» in «ÖGK - Planstellen»)."""
     from rsg2030.matrix_extract import kompakt
     from rsg2030.vorlage import zeilen
@@ -80,18 +111,18 @@ def test_zeilen_vorlage_wie_tabellenband():
         return kompakt(" ".join(w for w in t.split() if w not in {"x", "-", "n.v."}))
 
     with pdfplumber.open(oesg_pdf("Tabellenband")) as pdf:
-        seite = ohne_platzhalter(pdf.pages[259 - 1].extract_text())
+        seite = ohne_platzhalter(pdf.pages[239 - 1].extract_text())
     for t in zeilen()["Beschriftung"]:
         assert ohne_platzhalter(t) in seite, t
 
 
 def test_spalten_vorlage_wie_tabellenband():
     """Die Fachspalten der Vorlage (vorlage.SPALTEN_VORLAGE) sind die erste Kopfzeile der RSG-Planungsmatrix im
-    Tabellenband (Anhang 9, S.259), ohne Fußnotenzeichen und in derselben Reihenfolge."""
+    Tabellenband (Anhang 9, S.239), ohne Fußnotenzeichen und in derselben Reihenfolge."""
     from rsg2030.vorlage import SPALTEN_VORLAGE
 
     with pdfplumber.open(oesg_pdf("Tabellenband")) as pdf:
-        text = pdf.pages[259 - 1].extract_text()
+        text = pdf.pages[239 - 1].extract_text()
     kopf = next(z for z in text.splitlines() if z.startswith("AM(4)"))
     gelesen = re.sub(r"\(\d\)", " ", kopf).split()
     assert tuple(gelesen) == SPALTEN_VORLAGE, gelesen

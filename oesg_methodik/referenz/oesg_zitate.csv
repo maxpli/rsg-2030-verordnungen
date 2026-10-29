@@ -8,26 +8,27 @@ Methodenband;26;Nulltagesaufenthalte, deren Entlassungsart „Entlassung normal�
 Tabellenband;12;Regelwerk zur Berechnung ärztlicher ambulanter Versorgungseinheiten für den gesamten ambulanten Bereich pro;Regelwerk, woraus eine ÄAVE entsteht (R2a)
 Tabellenband;13;abgerechneten Betrag pro Arzt“ des jeweiligen Faches aus der Ärztekostenstatistik dividiert (falls es keinen;Institute: abgerechnete Beträge (R2a, E1)
 Tabellenband;15;"Pflegedienstleistungsstatistik; Summen nur bedingt aussagekräftig, da nicht alle Angaben in allen Bundesländern";Anhang 5: Beginn der ambulanten Kennzahlen
-Tabellenband;251;Angabe optional) In der Allgemeinmedizin (AM) und der Kinderund Jugendheilkunde (KIJU) ist im IST-Stand im;Wahlärzt:innen: Angabe optional
-Tabellenband;251;vertragsärztlichen Planstellen je KV-Träger im Basis-Daten-Jahr im IST-Stand je Fachrichtung und gesamt. Anzahl;IST: Planstellen je Träger (Stellen-Zeilen)
-Tabellenband;252;Planstellen für niedergelassene VertragsärztInnen und der geplanten ärztlichen Vollzeitäquivalente in;PLAN: Sachleistungsstellen (Stellen-Zeilen)
-Tabellenband;254;je Sektor und je Fachrichtung für die IST-Werte ein Umrechnungsschlüssel von bundeslandspezifischen Planungsgrößen;SVE: Umrechnungsfaktoren je Sektor (R6)
-Tabellenband;259;AM(4) AN KIJU KJC(2) KJP CH NCH(1) IM GGH NEU PSY DER AU HNO URO PCH(2) PUL ORTR(3) MKG ZMK STR RAD NUK PMR PAT;Vorlage der RSG-Planungsmatrix, Anhang 9 (R4, vorlage.py)
-Tabellenband;269;Für die Vergleichbarkeit von SVE mit ÄAVE ist die Angabe von Umrechnungsfaktoren vorgesehen. Da die Berechnung der;SVE: Umrechnungsfaktoren vorgesehen (R6)
+Tabellenband;231;Angabe optional) In der Allgemeinmedizin (AM) und der Kinderund Jugendheilkunde (KIJU) ist im IST-Stand im;Wahlärzt:innen: Angabe optional
+Tabellenband;231;vertragsärztlichen Planstellen je KV-Träger im Basis-Daten-Jahr im IST-Stand je Fachrichtung und gesamt. Anzahl;IST: Planstellen je Träger (Stellen-Zeilen)
+Tabellenband;232;Planstellen für niedergelassene VertragsärztInnen und der geplanten ärztlichen Vollzeitäquivalente in;PLAN: Sachleistungsstellen (Stellen-Zeilen)
+Tabellenband;234;je Sektor und je Fachrichtung für die IST-Werte ein Umrechnungsschlüssel von bundeslandspezifischen Planungsgrößen;SVE: Umrechnungsfaktoren je Sektor (R6)
+Tabellenband;239;AM(4) AN KIJU KJC(2) KJP CH NCH(1) IM GGH NEU PSY DER AU HNO URO PCH(2) PUL ORTR(3) MKG ZMK STR RAD NUK PMR PAT;Vorlage der RSG-Planungsmatrix, Anhang 9 (R4, vorlage.py)
+Tabellenband;249;Für die Vergleichbarkeit von SVE mit ÄAVE ist die Angabe von Umrechnungsfaktoren vorgesehen. Da die Berechnung der;SVE: Umrechnungsfaktoren vorgesehen (R6)
 Textband;15;Ambulanter Bereich (exkl. ambulanter Rehabilitationsbereich) der Sachleistung, d.h. niedergelassene ÄrztInnen und;Sachleistung: was dazugehört (R2)
 Textband;15;Versorgungswirksamkeit von WahlärztInnen, WahltherapeutInnen, Sanatorien und sonstigen Wahleinrichtungen, sofern;Wahlärzt:innen als Rahmenbedingung (R1)
-Textband;36;Auf Basis der errechneten Versorgungsdichte im Bundesdurchschnitt (ohne Wien) wurde durch Heranziehen einer;Soll-Intervall aus dem Bundesdurchschnitt ohne Wien (R3)
-Textband;36;Standardversorgungseinheiten (SVE) verwendet, so ist auf Ebene des Bundeslandes je Fachrichtung ein;SVE: Umrechnungsschlüssel anzugeben (R6)
-Textband;36;eingeschränkte Aussagekraft zu, was bei der Interpretation der PRW-Intervalle im Rahmen von regionalen;spitalsambulante ÄAVE eingeschränkt aussagekräftig (R2)
-Textband;37;Err. (Min.) VDmin VDmax VD2021 BEVmin Allgemeinmedizin (AM)** 10 34,9 64,8 48,7 2.000 Kinderund Jugendheilkunde;Legende der Richtwerte-Spalten
-Textband;37;Planungsrichtwerte für den gesamten ambulanten Bereich (Planungshorizont 2030) Fachrichtung/Fachbereich ** Err.;Tabelle der Planungsrichtwerte (R3, Richtwerte-CSV)
-Textband;38;"9.347.316 (ohne Wien: 7.282.458); Ermittlung der Richtwerte in den Spalten „VDmin“, „VDmax“ und „BEVmin“ auf Basis";Wohnbevölkerung 2030 (R7)
-Textband;38;"Leistungsmengenrahmenplanung vorgesehen ist: RAD, LAB, NUK, PAT, PMR Quelle: DVSV – Regiomed 2021; Statistik";technische Fächer ohne Richtwert (R4)
-Textband;66;unterschiedlichen Bezeichnungen unter dem Begriff „Erstversorgung-Allgemeinmedizin (EVA)“ subsummiert. Unter;EVA: Definition (slst_eva)
-Textband;75;Erstversorgung-Allgemeinmedizin (EVA) opt opt opt Akut-Krankenanstalten Betriebsformen von Spitalsambulanzen je;EVA als Teilmenge der Sachleistungsstellen
-Textband;75;ist die RSG-Planungsmatrix (RSG-PM). In dieser sind die Versorgungssituation im ambulanten und akutstationären;RSG-PM als Kern des RSG
-Textband;76;Standardversorgungseinheiten (SVE) verwendet, so ist auf Ebene des Bundeslandes je Fachrichtung und Sektor ein;SVE: Umrechnung je Fach (R6)
-Textband;77;Fonds-KA und UKH festgelegt werden, niedergelassene WahlärztInnen und selbstständige Ambulatorien ohne;spitalsambulant: Fonds-KA und UKH (R10)
-Textband;216;Ärztliche ambulante Versorgungseinheit (ÄAVE): Messgröße für das durchschnittliche ärztliche Leistungsvolumen;Glossar: ÄAVE (R2a)
-Textband;223;Standardversorgungseinheit (SVE): Messgröße für das durchschnittliche ärztliche Leistungsvolumen (differenziert;Glossar: SVE (R6)
-Textband;225;Privatordination führen. Die Fachrichtungszuordnung erfolgt über ein in der (Zahn-)Ärzteliste definiertes Erstfach;Glossar: Wahlärzt:innen (R1)
+Textband;37;Standardversorgungseinheiten (SVE) verwendet, so ist auf Ebene des Bundeslandes je Fachrichtung ein;SVE: Umrechnungsschlüssel anzugeben (R6)
+Textband;37;der versorgungswirksamen „ärztlichen ambulanten Versorgungseinheiten“ (ÄAVE) im Sinne des Regiomed-Systems der;Regiomed als Datenbasis der ÄAVE
+Textband;38;Auf Basis der errechneten Versorgungsdichte im Bundesdurchschnitt (ohne Wien) wurde durch Heranziehen einer;Soll-Intervall aus dem Bundesdurchschnitt ohne Wien (R3)
+Textband;38;eingeschränkte Aussagekraft zu, was bei der Interpretation der PRW-Intervalle im Rahmen von regionalen;spitalsambulante ÄAVE eingeschränkt aussagekräftig (R2)
+Textband;39;"9.347.316 (ohne Wien: 7.282.458); Ermittlung der Richtwerte in den Spalten „VDmin“, „VDmax“ und „BEVmin“ auf Basis";Wohnbevölkerung 2030 (R7)
+Textband;39;Err. (Min.) VDmin VDmax VD2021 BEVmin Allgemeinmedizin (AM)** 10 34,9 64,8 48,7 2.000 Kinderund Jugendheilkunde;Legende der Richtwerte-Spalten
+Textband;39;"Leistungsmengenrahmenplanung vorgesehen ist: RAD, LAB, NUK, PAT, PMR Quelle: DVSV – Regiomed 2021; Statistik";technische Fächer ohne Richtwert (R4)
+Textband;39;Planungsrichtwerte für den gesamten ambulanten Bereich (Planungshorizont 2030) Fachrichtung/Fachbereich ** Err.;Tabelle der Planungsrichtwerte (R3, Richtwerte-CSV)
+Textband;67;unterschiedlichen Bezeichnungen unter dem Begriff „Erstversorgung-Allgemeinmedizin (EVA)“ subsummiert. Unter;EVA: Definition (slst_eva)
+Textband;76;Erstversorgung-Allgemeinmedizin (EVA) opt opt opt Akut-Krankenanstalten Betriebsformen von Spitalsambulanzen je;EVA als Teilmenge der Sachleistungsstellen
+Textband;76;ist die RSG-Planungsmatrix (RSG-PM). In dieser sind die Versorgungssituation im ambulanten und akutstationären;RSG-PM als Kern des RSG
+Textband;78;Fonds-KA und UKH festgelegt werden, niedergelassene WahlärztInnen und selbstständige Ambulatorien ohne;spitalsambulant: Fonds-KA und UKH (R10)
+Textband;78;Standardversorgungseinheiten (SVE) verwendet, so ist auf Ebene des Bundeslandes je Fachrichtung und Sektor ein;SVE: Umrechnung je Fach (R6)
+Textband;227;Ärztliche ambulante Versorgungseinheit (ÄAVE): Messgröße für das durchschnittliche ärztliche Leistungsvolumen;Glossar: ÄAVE (R2a)
+Textband;235;Standardversorgungseinheit (SVE): Messgröße für das durchschnittliche ärztliche Leistungsvolumen (differenziert;Glossar: SVE (R6)
+Textband;236;Privatordination führen. Die Fachrichtungszuordnung erfolgt über ein in der (Zahn-)Ärzteliste definiertes Erstfach;Glossar: Wahlärzt:innen (R1)

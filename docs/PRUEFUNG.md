@@ -47,7 +47,7 @@ Wer was prüft, folgt aus drei Regeln:
 2. **Jede Zelle wird zweimal unabhängig gelesen.** Ein Mensch entscheidet nur, wo die beiden Lesungen nicht
    übereinstimmen.
 3. **Was keine Lesung ist, sondern ein Urteil, bestätigt ein Mensch Eintrag für Eintrag** – außer, es steht wörtlich so
-   in der ÖSG-Vorlage der Planungsmatrix (Tabellenband Anhang 9, S.259). Dann hat die Vorlage das Urteil schon
+   in der ÖSG-Vorlage der Planungsmatrix (Tabellenband Anhang 9, S.239). Dann hat die Vorlage das Urteil schon
    gefällt, und die Maschine prüft nur, dass es dieselbe Stelle ist (Regel 1).
 
 Damit hat jede Art von Fehler genau eine Stelle, die sie findet:
@@ -61,7 +61,7 @@ Damit hat jede Art von Fehler genau eine Stelle, die sie findet:
 | falsche Zuordnungstabelle, die beide Lesungen teilen | «SON» der falschen Fachspalte zugeordnet; Beschriftung der falschen `Zeile_ID` | Wie in der ÖSG-Vorlage: Test gegen die Vorlage (Regel 1). Sonst Mensch, je Eintrag einmal (Regel 3) |
 | Lücke oder Widerspruch im PDF selbst | Zeilensumme passt nicht | Ebene 4: Prüfungen → Korrektur mit Regel → Mensch (Regel 3) |
 | Fußnote, die die Bedeutung einer Zahl ändert | «ZMK einschließlich KFO», «PLAN = IST fortgeschrieben» | Verzeichnis aller Fußnoten: vollständig und wie gedruckt per Test (Regel 1), Einordnung durch einen Menschen (Regel 3) |
-| falsche Referenzdaten der Kennzahlen | Richtwert vertippt, Bezirk in der falschen Region | Test gegen ÖSG-Textband S.37 und GÖG «Regionale Gliederung» (Regel 1) |
+| falsche Referenzdaten der Kennzahlen | Richtwert vertippt, Bezirk in der falschen Region | Test gegen ÖSG-Textband S.39 und GÖG «Regionale Gliederung» (Regel 1) |
 | falsch gerechnete Versorgungsdichte | Bevölkerung der falschen Region | Handrechnungen je Land, Bevölkerung gegen die ÖSG-Zahlen (Tests, Regel 1) |
 | Teilzeile falsch zugeschnitten | ZAE bei extramural addiert; AM spitalsambulant ohne ZAE | Test: spitalsambulant + extramural = insgesamt je Region, Abschnitt und Fach (Toleranz = Rundung der gedruckten Zellen); Handrechnungen NÖ, Burgenland VR 12, OÖ, Wien, Tirol (Regel 1) |
 | Teilzeile in SVE statt ÄAVE | Steiermark spitalsambulant aus dem Block `haupt` | Abbruch, wenn eine Zeile der Tabelle Versorgungsdichte nicht in ÄAVE ist; Handrechnung Steiermark (Regel 1) |
@@ -153,9 +153,9 @@ ist jeweils die Rundung der Werte im PDF («12,1» → ±0,05).
 | `teile_extramural` | niedergelassen + selbst. Ambulatorien + Kassenambulatorien = extramural (wo die Zeile im PDF steht) |
 | `teile_extramural_wahl` | extramural + Wahlärzt:innen = «Summe extramural inkl. WahlärztInnen» (Wien) |
 | `teile_slst` | gemeinsame + zusätzliche Sachleistungsstellen je Träger = Sachleistungsstellen gesamt (Wien) |
-| `faktor_aequivalente` | ÄAVE-Äquivalente = Wert im Block `haupt` × Umrechnungsfaktor seines Sektors, in IST und PLAN (Tabellenband S.254); ohne Faktor (Zeilen schon in ÄAVE) in beiden Blöcken gleich; Wert nur in einem Block = Abweichung. Haben alle Regionen eigene Faktoren, prüft das Bundesland seinen BL-Faktor nur im Abschnitt, in dem er steht, sonst gilt Σ VR = BL (Burgenland, Kärnten, Steiermark; METHODIK R6) |
+| `faktor_aequivalente` | ÄAVE-Äquivalente = Wert im Block `haupt` × Umrechnungsfaktor seines Sektors, in IST und PLAN (Tabellenband S.234); ohne Faktor (Zeilen schon in ÄAVE) in beiden Blöcken gleich; Wert nur in einem Block = Abweichung. Haben alle Regionen eigene Faktoren, prüft das Bundesland seinen BL-Faktor nur im Abschnitt, in dem er steht, sonst gilt Σ VR = BL (Burgenland, Kärnten, Steiermark; METHODIK R6) |
 | `vr_summe_gleich_bl` | Summe der Versorgungsregionen = Bundesland, je Zelle |
-| `kjc_pch_in_ch` | KJC und PCH ohne eigene ÄAVE – sie sind in CH enthalten (Tabellenband S.252; METHODIK R4) |
+| `kjc_pch_in_ch` | KJC und PCH ohne eigene ÄAVE – sie sind in CH enthalten (Tabellenband S.232; METHODIK R4) |
 | `davon_le_obermenge` | «davon»-Zeilen ≤ ihre Obermenge (PVE ≤ VGF ≤ insgesamt; EVA ≤ gemeinsame Stellen) |
 | `prozent_0_100`, `prozent_gewichtet`, `prozent_gesamt`, `prozent_ohne_stellen` | Prozentwerte zwischen 0 und 100; BL-% = mit den Stellen gewichtetes Mittel der VR-%, je Fachspalte (fehlt ein VR- oder BL-% bei Stellen > 0, auch wenn im Fach gar kein % steht: «nicht prüfbar»); gedrucktes gesamt-% = mit den Stellen gewichtetes Mittel der Fach-% derselben Zeile; ohne Stellen nur 0 oder 100 % |
 | `leere_summenzelle` | Summenzelle leer, obwohl ihre Teile Werte haben (eine befüllte Teilzeile genügt) |

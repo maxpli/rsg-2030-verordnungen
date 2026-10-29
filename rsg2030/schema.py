@@ -53,7 +53,7 @@ GESAMT = "gesamt"
 BLOCK_HAUPT = "haupt"
 BLOCK_AEQ = "aequivalent"
 
-# Fachspalten der Long-CSV: die Kürzel der ÖSG-Vorlage der RSG-Planungsmatrix (Tabellenband Anhang 9, S.259), ohne
+# Fachspalten der Long-CSV: die Kürzel der ÖSG-Vorlage der RSG-Planungsmatrix (Tabellenband Anhang 9, S.239), ohne
 # Fußnotenzeichen; dazu KFO, das einige Länder als eigene Spalte führen (in der Vorlage nicht vorgesehen). Spaltenköpfe im
 # PDF bildet `specs.fachspalte` darauf ab. Den Zuschnitt für die Richtwerte (z. B. ZMK = ZMK + KFO) macht erst die
 # Analyse (`oesg_methodik.faecher`, docs/METHODIK.md R4).

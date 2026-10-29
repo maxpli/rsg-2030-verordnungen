@@ -89,7 +89,7 @@ def test_lage_und_abstand_an_den_grenzen():
 
 def test_soll_intervall_ist_mitte_plus_minus_30_prozent():
     """METHODIK R3: Der ÖSG legt ± 30 % um einen Mittelwert 2030 (Methodenband S.19, Schritt 5) und druckt nur die
-    gerundeten Grenzen (Textband S.37). Jedes Intervall passt dazu: Es gibt einen Mittelwert, aus dem beide Grenzen
+    gerundeten Grenzen (Textband S.39). Jedes Intervall passt dazu: Es gibt einen Mittelwert, aus dem beide Grenzen
     gerundet entstehen. Genau ± 30 % sind die gedruckten Grenzen aber nicht (KJP: rund ± 27 %) – deshalb setzen die
     Kennzahlen nur an VDmin und VDmax an. Schlägt an, wenn eine neue ÖSG-Fassung die Intervalle anders bildet."""
     r = richtwerte_fuer_vd(lade_richtwerte())
@@ -118,7 +118,7 @@ def test_kennzahlen_ohne_bevoelkerung_bricht_ab():
         (_zeile(Ebene="AT"), "unbekannte Werte in Ebene"),  # keine Österreich-Ebene (METHODIK, Österreich)
         (_zeile(AAVE=float("nan")), "leere ÄAVE"),
         (_zeile(Zeile_ID="wahl"), "unbekannte Werte in Zeile_ID"),  # Wahlärzt:innen nicht in der Dichte (R1)
-        (_zeile(Zeile_ID="pve", Fach="IM"), "pve nur für"),  # PVE nur AM und KIJU (Tabellenband S.251)
+        (_zeile(Zeile_ID="pve", Fach="IM"), "pve nur für"),  # PVE nur AM und KIJU (Tabellenband S.231)
     ],
 )
 def test_eingang_vertrag(zeile, meldung):
@@ -155,7 +155,7 @@ def test_zuschnitt_nach_oesg():
 
 
 def test_zae_nur_spitalsambulant():
-    """R10: ZAE sind spitalsambulant (Vorlage S.259, Fußnote (5)) – in extramural und pve ist AM nur die Spalte AM."""
+    """R10: ZAE sind spitalsambulant (Vorlage (Tabellenband S.239), Fußnote (5)) – in extramural und pve ist AM nur die Spalte AM."""
     from oesg_methodik.faecher import ZAE, aave_fach, zuschnitt
 
     z = pd.Series({"AM": 100.0, ZAE: 8.3})

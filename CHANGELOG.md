@@ -31,7 +31,27 @@ Hier steht, was sich zwischen Versionen an den **Daten** ändert – jede Änder
 - **Oberösterreich: Maximalanteil der zusätzlichen SVS-Stellen für URO = 0 %**, bisher leer und als bekannte
   Abweichung geführt. Der Wert folgt aus keiner anderen Zahl; 0 % ist in dieser Zeile der häufigste gedruckte Wert und
   steht als Lesart da, nicht als Herleitung. Folge: Das gesamt-% der Zeile wird jetzt abgeleitet.
-- Die 16 neuen Regeln sind noch **nicht freigegeben** (Blatt «Entscheidungen» in `freigabe.xlsx`).
+- **ÖSG-Zitate maschinell belegt:** Zu jeder zitierten ÖSG-Seite steht ein wörtlicher Anker in
+  [`oesg_zitate.csv`](oesg_methodik/referenz/oesg_zitate.csv); `tests/test_zitate.py` prüft, dass er auf dieser Seite
+  steht und keine zitierte Seite ohne Anker bleibt (docs/PRUEFUNG.md, Regel 1). Die Dateinamen der drei ÖSG-Bände
+  stehen nur noch an einer Stelle (`oesg_methodik.pfade.OESG_BAENDE`).
+
+**Quellen:**
+
+- **ÖSG 2023 auf den Stand 09.10.2026** (RIS `SPG_AT_OSG_G_20261009_8_2026`); die Fassung vom 10.10.2025 gilt nicht
+  mehr. **Keine Datenänderung:** Alle 20 Zeilen der Planungsrichtwerte sind Wert für Wert gleich (inkl. PUL und KFO),
+  die Vorlage der RSG-Planungsmatrix hat dieselben 28 Fachspalten, 6 Fußnoten und 39 Zeilenbeschriftungen, das
+  Regelwerk zur ÄAVE (Anhang 5) ist zeichengleich, und alle 32 Versorgungsregionen stehen unverändert da. Geändert
+  haben sich die **Seitenzahlen**: Textband 250 → 262 Seiten, Tabellenband 289 → 269. Die RSG-PM-Teile des
+  Tabellenbands verschieben sich um −20 (251 → 231, 252 → 232, 254 → 234, 259 → 239, 269 → 249), der Textband vorne
+  um +1 bis +2 und ab dem Glossar um +11 (37 → 39, 216 → 227, 223 → 235, 225 → 236). Die alte Seite 36 liegt jetzt
+  auf zwei Seiten: Regiomed und SVE auf 37, alles zur Versorgungsdichte auf 38.
+- Die ~200 Seitenangaben im Repo sind entsprechend nachgezogen, jede einzeln belegt durch `tests/test_zitate.py`
+  (siehe oben). Bloße Verweise («Vorlage S.259») nennen jetzt den Band, damit der Test sie sieht.
+- `tests/test_referenz.py` liest die Richtwerttabelle nicht mehr zeilenweise: Der ÖSG bricht PUL und PCH um, bei PCH
+  steht das Kürzel **nach** den Werten. Jetzt wird jede Folge von fünf Werten in der Form der Tabellenspalten gesucht
+  und ihr das nächstgelegene Kürzel zugeordnet – damit fallen auch Fußnotenzeichen weg, die vorne («(KJP)1 30 …»)
+  wie hinten («… 3,9 * 1 vorrangig …») an die Werte stoßen.
 
 **Befehle:**
 
@@ -90,8 +110,8 @@ Hier steht, was sich zwischen Versionen an den **Daten** ändert – jede Änder
   stimmt die erste Lesung.
 - **Fußnoten:** jede Fußnote jeder Matrix im Verzeichnis `fussnoten.csv`, Text wie gedruckt und eingeordnet; ein Test
   prüft am PDF, dass keine fehlt.
-- **Tests gegen die Quelle:** Richtwerte gegen ÖSG-Textband S.37, Zuordnung Bezirk → Versorgungsregion gegen die
-  GÖG-Datei «Regionale Gliederung», Zeilen und Spalten der Vorlage gegen Tabellenband S.259; Versorgungsdichte für
+- **Tests gegen die Quelle:** Richtwerte gegen ÖSG-Textband S.39, Zuordnung Bezirk → Versorgungsregion gegen die
+  GÖG-Datei «Regionale Gliederung», Zeilen und Spalten der Vorlage gegen Tabellenband S.239; Versorgungsdichte für
   jedes Land von Hand nachgerechnet, die Teilzeilen an Beispielen; spitalsambulant + extramural = insgesamt in jeder
   Region, jedem Abschnitt und Fach.
 - **Freigabe:** Was keine Maschine unabhängig prüfen kann (Abweichungen der Zweitlesung, Bildseiten, abweichende

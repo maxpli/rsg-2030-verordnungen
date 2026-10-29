@@ -1,7 +1,7 @@
 """Fach-Zuschnitt: Spalten der RSG-Planungsmatrix → Zeilen der ÖSG-Planungsrichtwerte (docs/METHODIK.md, R4 und R5).
 
-Die Richtwerttabelle (ÖSG 2023 Textband S.37) schneidet manche Fächer anders zu als die Spalten der RSG-Planungsmatrix
-(Vorlage: ÖSG 2023 Tabellenband, Anhang 9, S.259). Für den Vergleich mit einem Richtwert werden die Spalten so
+Die Richtwerttabelle (ÖSG 2023 Textband S.39) schneidet manche Fächer anders zu als die Spalten der RSG-Planungsmatrix
+(Vorlage: ÖSG 2023 Tabellenband, Anhang 9, S.239). Für den Vergleich mit einem Richtwert werden die Spalten so
 zusammengezählt, wie der Richtwert sie enthält – `ZUSCHNITT`, je Eintrag mit Beleg. Die Spalten heißen wie in der
 Vorlage, ohne Fußnotenzeichen.
 """
@@ -14,25 +14,25 @@ import pandas as pd
 
 ZAE = "ZAE"
 """ÄAVE der Zentralen Aufnahme- und Erstversorgungseinheiten, soweit getrennt von AM ausgewiesen. In der
-RSG-Planungsmatrix stehen sie in SON/IDB, Zeile spitalsambulant: Vorlage S.259, Fußnote (5) «spitalsambulant = ZAE».
+RSG-Planungsmatrix stehen sie in SON/IDB, Zeile spitalsambulant: Vorlage (Tabellenband S.239), Fußnote (5) «spitalsambulant = ZAE».
 Der Datensatz liefert sie unter diesem Namen (R5)."""
 ZAE_QUELLE = ("spitalsambulant", "SON/IDB")
-"""Zeile und Spalte der RSG-Planungsmatrix, in der die ZAE stehen (Vorlage S.259, Fußnote (5))."""
+"""Zeile und Spalte der RSG-Planungsmatrix, in der die ZAE stehen (Vorlage (Tabellenband S.239), Fußnote (5))."""
 ZAE_ZEILEN = ("spitalsambulant", "insgesamt")
 """ÄAVE-Zeilen, in denen die ZAE stecken: ZAE sind spitalsambulant (Fußnote (5)), «insgesamt» enthält spitalsambulant.
 In «extramural» und «pve» gibt es keine ZAE; dort ist AM nur die Spalte AM (R5)."""
 
 ZUSCHNITT: dict[str, tuple[str, ...]] = {
-    # ÖSG-Zeile: (Hauptspalte, weitere Spalten). Reihenfolge wie in der Richtwerttabelle, Textband S.37.
-    # Textband S.37, Legende **: «Im Bereich der AM inkl. ZAE (in RSG-PM: SON/IDB) und EVA in der Funktion von
+    # ÖSG-Zeile: (Hauptspalte, weitere Spalten). Reihenfolge wie in der Richtwerttabelle, Textband S.39.
+    # Textband S.39, Legende **: «Im Bereich der AM inkl. ZAE (in RSG-PM: SON/IDB) und EVA in der Funktion von
     # Akutordinationen». EVA steht in AM («davon in Akut-Ordinationen EVA», Vorlage Fußnote (4)).
     "AM": ("AM", ZAE),
     "KIJU": ("KIJU",),
     "KJP": ("KJP",),
-    # Vorlage S.259, Fußnote (2) an KJC und PCH: «zugeordnet zu CH»; Tabellenband S.252: «ÄAVE für PCH sind unter der
+    # Vorlage (Tabellenband S.239), Fußnote (2) an KJC und PCH: «zugeordnet zu CH»; Tabellenband S.232: «ÄAVE für PCH sind unter der
     # CH subsummiert». Die Richtwerttabelle hat für KJC und PCH keinen Richtwert («*»).
     "CH": ("CH", "KJC", "PCH"),
-    # Textband S.37: «Innere Medizin (IM)» mit Unterzeile «- davon Pulmologie (PUL)»; in der Matrix getrennte Spalten.
+    # Textband S.39: «Innere Medizin (IM)» mit Unterzeile «- davon Pulmologie (PUL)»; in der Matrix getrennte Spalten.
     "IM": ("IM", "PUL"),
     "PUL": ("PUL",),
     "GGH": ("GGH",),
@@ -42,11 +42,11 @@ ZUSCHNITT: dict[str, tuple[str, ...]] = {
     "AU": ("AU",),
     "HNO": ("HNO",),
     "URO": ("URO",),
-    # Textband S.37, Fußnote 2: «Summe aus UC, OR und den im spitalsambulanten Bereich dem Fachbereich ORTR zugeordneten
+    # Textband S.39, Fußnote 2: «Summe aus UC, OR und den im spitalsambulanten Bereich dem Fachbereich ORTR zugeordneten
     # ÄAVE» – in der RSG-2030-Matrix ist das die Spalte ORTR.
     "ORTR": ("ORTR",),
     "MKG": ("MKG",),
-    # Textband S.37: «Zahn-, Mund- und Kieferheilkunde (ZMK)» mit Unterzeile «- davon mit kieferorthopädischem
+    # Textband S.39: «Zahn-, Mund- und Kieferheilkunde (ZMK)» mit Unterzeile «- davon mit kieferorthopädischem
     # Schwerpunkt». Wo KFO eine eigene Spalte hat, gehört sie zu ZMK dazu; sonst ist sie in ZMK enthalten.
     "ZMK": ("ZMK", "KFO"),
     "KFO": ("KFO",),

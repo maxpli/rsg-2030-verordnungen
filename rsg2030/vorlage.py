@@ -1,4 +1,4 @@
-"""Was wörtlich der ÖSG-Vorlage der RSG-Planungsmatrix entspricht (Tabellenband Anhang 9, S.259), prüft die Maschine.
+"""Was wörtlich der ÖSG-Vorlage der RSG-Planungsmatrix entspricht (Tabellenband Anhang 9, S.239), prüft die Maschine.
 
 Die Freigabe (freigabe.py) fragt einen Menschen nur nach dem, was davon abweicht (docs/PRUEFUNG.md, «Wer prüft was»,
 Regel 1 und 3):
@@ -35,7 +35,7 @@ SPALTEN_VORLAGE = (
     *("AM", "AN", "KIJU", "KJC", "KJP", "CH", "NCH", "IM", "GGH", "NEU", "PSY", "DER", "AU", "HNO"),
     *("URO", "PCH", "PUL", "ORTR", "MKG", "ZMK", "STR", "RAD", "NUK", "PMR", "PAT", "LAB", "SON/IDB", "gesamt"),
 )
-"""Fachspalten der Vorlage in ihrer Reihenfolge, ohne Fußnotenzeichen (Tabellenband S.259; tests/test_referenz.py)."""
+"""Fachspalten der Vorlage in ihrer Reihenfolge, ohne Fußnotenzeichen (Tabellenband S.239; tests/test_referenz.py)."""
 
 
 def zeilen() -> pd.DataFrame:

@@ -43,9 +43,9 @@ Patientenströme, innerhalb des Intervalls kein Unterschied.
 |---|---|
 | Farbe | `Lage_im_Intervall`: unter = rot, im = grau, über = blau |
 | Stufe außerhalb | Abstand zur Grenze in Intervallbreiten, aus `Position_im_Intervall`: unter ¼, unter ½, ab ½. Für «unter» ist der Abstand −Position, für «über» Position − 1 |
-| Im Intervall | eine Farbe, keine Stufen: Der ÖSG macht innerhalb des Intervalls keinen Unterschied (Textband S.36; Fallstrick 11) |
+| Im Intervall | eine Farbe, keine Stufen: Der ÖSG macht innerhalb des Intervalls keinen Unterschied (Textband S.38; Fallstrick 11) |
 | Schraffur | `AAVE_Abstand_Intervall` kleiner als 1 ÄAVE (Fallstrick 6) |
-| PUL und KFO | eigene Spalten, kursiv, als Teil von IM bzw. ZMK gekennzeichnet; im Anteilsbalken mitgezählt, weil der ÖSG beide mit eigenem Soll-Intervall bewertet (Textband S.36–37). Nicht über Fächer addieren (Fallstrick 4) |
+| PUL und KFO | eigene Spalten, kursiv, als Teil von IM bzw. ZMK gekennzeichnet; im Anteilsbalken mitgezählt, weil der ÖSG beide mit eigenem Soll-Intervall bewertet (Textband S.38–39). Nicht über Fächer addieren (Fallstrick 4) |
 | Kein Wert | leere Zelle mit Strich (z. B. KFO in Wien und Vorarlberg, wo KFO in ZMK steckt) |
 | Positions-Plot | Achse von −1,5 bis 3; Werte darüber am Rand mit «›». Über dem Band zwei Zeilen: VDmin und VDmax als VD, darunter die Position −1 bis 3 (`Position_im_Intervall`). Je Zeile ein Maßstab, damit die Position nicht als VD gelesen wird; beide stehen oben, damit man sie auch bei 32 VR sieht |
 | Farben | Nachbarstufen müssen sich deutlich unterscheiden, auch bei Farbsehschwäche (Protanopie, Deuteranopie): Abstand ΔE (OKLab × 100) mindestens 8. Ein Test rechnet das aus den Farben der Seite nach |
@@ -67,7 +67,7 @@ Jede Entscheidung mit Grund, damit sie sich später nachvollziehen oder bewusst 
    Festlegung für die Darstellung.
 5. **Bundesländer mit Soll-Vergleich.** Der ÖSG misst je Versorgungsregion; die Tabelle enthält die Werte auch je
    Land, und die Seite zeigt sie wie die Tabelle.
-6. **PUL und KFO bleiben eigene Spalten.** Der ÖSG gibt beiden ein eigenes Soll-Intervall (Textband S.37). Bewusst
+6. **PUL und KFO bleiben eigene Spalten.** Der ÖSG gibt beiden ein eigenes Soll-Intervall (Textband S.39). Bewusst
    so, obwohl KFO uneinheitlich ausgewiesen ist (METHODIK.md, R4: in Wien und Vorarlberg in ZMK, in OÖ nur aus einer
    Fußnote).
 7. **Farben.** Heller Modus: helle Pastelltöne, sehr helles Grau für «im Intervall»; gewählt aus vier Varianten,

@@ -76,7 +76,7 @@ oesg_methodik/        ÖSG-Regeln, unabhängig von einem Datensatz (importiert n
   pfade.py              Datenordner als Funktionen (Arbeitsordner / RSG2030_DATEN) und Referenzdateien des Pakets
   eingang.py            Vertrag der ÄAVE-Eingabe (Basis Sachleistung, Ebene BL/VR) + pruefe()
   faecher.py            ZUSCHNITT: Matrixspalten → Richtwertzeilen des ÖSG (AM+ZAE, CH+KJC+PCH, IM+PUL, ZMK+KFO), aave_fach
-  richtwerte.py         ÖSG-Richtwerte (referenz/oesg_planungsrichtwerte.csv, Textband S.37)
+  richtwerte.py         ÖSG-Richtwerte (referenz/oesg_planungsrichtwerte.csv, Textband S.39)
   bevoelkerung.py       Bevölkerung von Statistik Austria / ÖROK (Stichtag 1.1.), bevoelkerung_fuer()
   dichte.py             kennzahlen(): ÄAVE-Eingabe + Bevölkerung + Richtwerte → VD; Lage, Position, ÄAVE-Abstand
   referenz/             oesg_planungsrichtwerte.csv, oesg_regionen.csv (32 VR / 116 Bezirke)
@@ -148,7 +148,7 @@ web/                  Webseite (kein Python): index.html, app.js, style.css, kac
 - **Erst planen, dann programmieren.** Bei allem, was über eine kleine Korrektur hinausgeht, zuerst aufschreiben,
   welche Fehler auftreten können und wer jeden findet (Vorbild: Tabelle «Wer prüft was» in docs/PRUEFUNG.md), mit dem
   Herausgeber abstimmen, dann umsetzen.
-- **Zuerst die ÖSG-Vorlage.** Die Vorlage der RSG-Planungsmatrix (Tabellenband Anhang 9, S.259) legt Zeilen, Spalten
+- **Zuerst die ÖSG-Vorlage.** Die Vorlage der RSG-Planungsmatrix (Tabellenband Anhang 9, S.239) legt Zeilen, Spalten
   und Fußnoten fest; Referenzen in `oesg_methodik/referenz/`, Vergleich in `rsg2030/vorlage.py`. Jede Abweichung eines
   Landes davon festhalten.
 - **Handrechnungen als Tests**, bevor auf neuen Zahlen aufgebaut wird (VD je Land, tests/test_versorgungsdichte.py).

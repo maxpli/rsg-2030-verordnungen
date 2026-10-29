@@ -172,7 +172,7 @@ def _nur_per_regel(long: pd.DataFrame) -> dict[tuple[str, str, str], frozenset[s
 def aave_eingang(long: pd.DataFrame | None = None) -> pd.DataFrame:
     """ÄAVE-Eingang für `oesg_methodik.eingang`: alle BL und VR, ÄAVE-Zeilen `eingang.ZEILEN`, nur Basis Sachleistung.
 
-    Keine Basis inkl. Wahlärzt:innen: PLAN-ÄAVE enthalten nach ÖSG keine Wahlärzt:innen (Tabellenband S.252), und im IST
+    Keine Basis inkl. Wahlärzt:innen: PLAN-ÄAVE enthalten nach ÖSG keine Wahlärzt:innen (Tabellenband S.232), und im IST
     weisen nur 6 von 9 BL und 14 von 32 VR sie aus – kein Vergleich zwischen Ländern und kein IST → PLAN möglich
     (docs/METHODIK.md, R1). Die Zeile `wahl` bleibt in der Long-CSV."""
     long = lade_matrix_long() if long is None else long

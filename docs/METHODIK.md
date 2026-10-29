@@ -24,16 +24,16 @@ sie später auch für andere Datensätze dienen kann.
 
 | Begriff | Bedeutung | Quelle |
 |---|---|---|
-| **ÄAVE** | ärztliche ambulante Versorgungseinheit: durchschnittliches ärztliches Leistungsvolumen je Fach im Regiomed-System der Sozialversicherung. Eine ÄAVE entspricht grundsätzlich einer durchschnittlich arbeitenden Kassenärztin bzw. einem Kassenarzt. Keine Kopfzahl. Bei Spitalsambulanzen über ärztliche VZÄ in nicht bettenführenden Kostenstellen. Regelwerk je Sektor: R2a | Tabellenband S.12–13; Textband S.216; Methodenband S.26 |
-| **Regiomed** | Datensystem des Dachverbands der Sozialversicherungsträger (DVSV), aus dem die ÄAVE stammen | Textband S.36 |
+| **ÄAVE** | ärztliche ambulante Versorgungseinheit: durchschnittliches ärztliches Leistungsvolumen je Fach im Regiomed-System der Sozialversicherung. Eine ÄAVE entspricht grundsätzlich einer durchschnittlich arbeitenden Kassenärztin bzw. einem Kassenarzt. Keine Kopfzahl. Bei Spitalsambulanzen über ärztliche VZÄ in nicht bettenführenden Kostenstellen. Regelwerk je Sektor: R2a | Tabellenband S.12–13; Textband S.227; Methodenband S.26 |
+| **Regiomed** | Datensystem des Dachverbands der Sozialversicherungsträger (DVSV), aus dem die ÄAVE stammen | Textband S.37 |
 | **DAA** | «durchschnittlich arbeitende Ärztin/Arzt», Bezugsgröße der ÄAVE-Berechnung im Kassenbereich | Methodenband S.17 |
-| **Sachleistung** | ambulanter Bereich mit Kassenvertrag: niedergelassene Ärzt:innen und Gruppenpraxen mit Kassenvertrag, selbständige Ambulatorien mit Kassenvertrag, Kassenambulatorien **und Spitalsambulanzen**. Nicht zu verwechseln mit den *Sachleistungsstellen*: Die planen nur den extramuralen Teil (Planstellen und Ambulatorien, Tabellenband S.252; Tirol, Anlage S.1, Fußnote (8): «Sachleistungsstellen sollen die Versorgung im niedergelassenen Bereich sowie in selbständigen Ambulatorien … abbilden») | Textband S.15 |
-| **Wahlärzt:innen** | niedergelassen, ohne Vertrag mit einer Krankenkasse (ausgenommen KFA/KUF), mit mindestens einer Privatordination; Fach = Erstfach laut Ärzteliste | Textband S.225 |
-| **SVE** | Standardversorgungseinheit: Planungsgröße einiger Länder statt ÄAVE; ein Umrechnungsschlüssel auf ÄAVE je Fach ist anzugeben | Textband S.36, S.76 |
-| **VD** | Versorgungsdichte = ÄAVE je 100.000 Einwohner:innen der Wohnbevölkerung | Textband S.36–37 |
-| **VDmin / VDmax** | Grenzen des Versorgungsdichte-Soll-Intervalls (kurz: Soll-Intervall) je Fach, Planungshorizont 2030 | Textband S.37 |
-| **Vertragsärztliche Planstellen** | IST: Anzahl der Planstellen je KV-Träger laut Stellenplan; eine Stelle hat meist Verträge mit mehreren Trägern («die Werte dürfen nicht addiert werden»); OÖ: besetzte und unbesetzte Stellen | Tabellenband S.251; Steiermark Anlage 1 S.65; OÖ Anlage S.10, Fußnote |
-| **Sachleistungsstellen** | PLAN: aus den PLAN-ÄAVE abgeleitete Stellen, «Planstellen für niedergelassene VertragsärztInnen und der geplanten ärztlichen Vollzeitäquivalente in Ambulatorien»; gemeinsame Stellen aller KV-Träger und zusätzliche einzelner Träger, «jeweils» mit dem Maximalanteil für vertragsärztliche Planstellen in Prozent; EVA als Teilmenge der gemeinsamen | Tabellenband S.252 |
+| **Sachleistung** | ambulanter Bereich mit Kassenvertrag: niedergelassene Ärzt:innen und Gruppenpraxen mit Kassenvertrag, selbständige Ambulatorien mit Kassenvertrag, Kassenambulatorien **und Spitalsambulanzen**. Nicht zu verwechseln mit den *Sachleistungsstellen*: Die planen nur den extramuralen Teil (Planstellen und Ambulatorien, Tabellenband S.232; Tirol, Anlage S.1, Fußnote (8): «Sachleistungsstellen sollen die Versorgung im niedergelassenen Bereich sowie in selbständigen Ambulatorien … abbilden») | Textband S.15 |
+| **Wahlärzt:innen** | niedergelassen, ohne Vertrag mit einer Krankenkasse (ausgenommen KFA/KUF), mit mindestens einer Privatordination; Fach = Erstfach laut Ärzteliste | Textband S.236 |
+| **SVE** | Standardversorgungseinheit: Planungsgröße einiger Länder statt ÄAVE; ein Umrechnungsschlüssel auf ÄAVE je Fach ist anzugeben | Textband S.37, S.78 |
+| **VD** | Versorgungsdichte = ÄAVE je 100.000 Einwohner:innen der Wohnbevölkerung | Textband S.38–39 |
+| **VDmin / VDmax** | Grenzen des Versorgungsdichte-Soll-Intervalls (kurz: Soll-Intervall) je Fach, Planungshorizont 2030 | Textband S.39 |
+| **Vertragsärztliche Planstellen** | IST: Anzahl der Planstellen je KV-Träger laut Stellenplan; eine Stelle hat meist Verträge mit mehreren Trägern («die Werte dürfen nicht addiert werden»); OÖ: besetzte und unbesetzte Stellen | Tabellenband S.231; Steiermark Anlage 1 S.65; OÖ Anlage S.10, Fußnote |
+| **Sachleistungsstellen** | PLAN: aus den PLAN-ÄAVE abgeleitete Stellen, «Planstellen für niedergelassene VertragsärztInnen und der geplanten ärztlichen Vollzeitäquivalente in Ambulatorien»; gemeinsame Stellen aller KV-Träger und zusätzliche einzelner Träger, «jeweils» mit dem Maximalanteil für vertragsärztliche Planstellen in Prozent; EVA als Teilmenge der gemeinsamen | Tabellenband S.232 |
 
 ---
 
@@ -42,7 +42,7 @@ sie später auch für andere Datensätze dienen kann.
 ### R1 – VD für den Vergleich mit dem Soll-Intervall enthält Wahlärzt:innen
 
 > VD Versorgungsdichte – ÄAVE (inkl. „abrechnungsrelevante“ WahlärztInnen) pro 100.000 EinwohnerInnen der
-> Wohnbevölkerung — *Textband S.37, Legende*
+> Wohnbevölkerung — *Textband S.39, Legende*
 
 Die Soll-Intervalle (VDmin/VDmax) wurden mit Wahlärzt:innen berechnet. Eine VD nur aus der Sachleistung liegt
 systematisch darunter.
@@ -50,10 +50,10 @@ systematisch darunter.
 **Gleichzeitig gilt für PLAN:**
 
 > In der Darstellung des PLAN-Stands ÄAVE insgesamt sind WahlärztInnen und selbstständige Ambulatorien ohne
-> Kassenvertrag nicht enthalten, da diese nicht der Versorgungsplanung unterliegen. — *Tabellenband S.252*
+> Kassenvertrag nicht enthalten, da diese nicht der Versorgungsplanung unterliegen. — *Tabellenband S.232*
 
 Für PLAN 2030 gibt es also in den RSG keine Wahlärzt:innen. Im IST sind sie in der Matrix nur «optional»
-(Tabellenband S.251; Textband S.75). Für die Planung selbst gilt aber:
+(Tabellenband S.231; Textband S.76). Für die Planung selbst gilt aber:
 
 > Daher sind bei der integrativen Versorgungsplanung als Rahmenbedingungen jedenfalls mit zu berücksichtigen:
 > • Die Versorgungswirksamkeit von WahlärztInnen, WahltherapeutInnen, Sanatorien und sonstigen Wahleinrichtungen,
@@ -78,10 +78,10 @@ heben. Die Zeile `wahl` bleibt in der Tabelle Planungsmatrizen für eigene Auswe
 
 Laut ÖSG zählen die Spitalsambulanzen zur Sachleistung (Textband S.15). Die Zeile «ÄAVE insgesamt» der RSG-Matrix
 ist spitalsambulant + niedergelassen mit Kassenvertrag + selbständige Ambulatorien mit Kassenvertrag +
-Kassenambulatorien (Tabellenband S.251).
+Kassenambulatorien (Tabellenband S.231).
 
 Einschränkung laut ÖSG: Den spitalsambulanten ÄAVE «kommt nur eine eingeschränkte Aussagekraft zu», weil
-Spitalsambulanz und extramuraler Bereich unterschiedlich arbeiten (Textband S.36, Fußnote 39).
+Spitalsambulanz und extramuraler Bereich unterschiedlich arbeiten (Textband S.38, Fußnote 39).
 
 ### R2a – Woraus eine ÄAVE entsteht
 
@@ -104,21 +104,21 @@ mit ganzjährigem ÖGK-Vertrag, statistische Ausreißer ausgenommen (S.12, A2; A
 
 **Die Einheit ist in sich nicht einheitlich.** Extramural misst sie Patientenköpfe je Quartal, spitalsambulant
 ärztliche Vollzeitäquivalente, bei Instituten abgerechnete Beträge. Der ÖSG hält dazu selbst fest, den
-spitalsambulanten ÄAVE komme «nur eine eingeschränkte Aussagekraft» zu (Textband S.36, Fußnote 39, siehe R2);
+spitalsambulanten ÄAVE komme «nur eine eingeschränkte Aussagekraft» zu (Textband S.38, Fußnote 39, siehe R2);
 S.13, C1–C3 zeigt, warum. Eine Zeile «insgesamt» addiert damit drei verschieden konstruierte Größen. Für den
 Vergleich mit dem Soll-Intervall verlangt der ÖSG trotzdem die Summe (R3).
 
 ### R3 – So entstehen die Soll-Intervalle
 
 - Basis: Regiomed **2021**, **Österreich ohne Wien** (Wien als Großstadt nicht vergleichbar). *Methodenband S.18,
-  Fußnote 1; Textband S.36: «Auf Basis der errechneten Versorgungsdichte im Bundesdurchschnitt (ohne Wien)»*
+  Fußnote 1; Textband S.38: «Auf Basis der errechneten Versorgungsdichte im Bundesdurchschnitt (ohne Wien)»*
 - Schritte: VD 2021 je Fach → ÄAVE 2030 mit Bevölkerung 2030 → plus Umlagerung stationär → spitalsambulant →
   neuer Mittelwert 2030. *Methodenband S.18*
 - Soll-Intervall = Mittelwert 2030 **±30 %**: «Die oberen und unteren Grenzen der Planungsrichtwerte‐Intervalle 2030 …
   ergeben sich durch die bereits bisher verwendete Bandbreite von +/–30 Prozent (ausgehend vom in Schritt 4
   ermittelten Mittelwert zum Planungsrichtwerte‐Intervall 2030).» *Methodenband S.19, Schritt 5.* Nachgerechnet: AM
   VDmin 34,9 / VDmax 64,8 → Mitte 49,85, ±30 % ergibt genau diese Grenzen. Die Mitte ist also **nicht** VD2021 (48,7).
-- **Widerspruch in den Unterlagen:** Textband S.36 («Auf Basis der errechneten Versorgungsdichte im Bundesdurchschnitt
+- **Widerspruch in den Unterlagen:** Textband S.38 («Auf Basis der errechneten Versorgungsdichte im Bundesdurchschnitt
   (ohne Wien) wurde durch Heranziehen einer Bandbreite von +/-30 % das Versorgungsdichte-Soll-Intervall ermittelt»)
   und Methodenband S.13, Tabelle 1.1 («Bandbreitenmodell (+/–30 % um BdoW)») lesen sich, als läge VD2021 in der Mitte.
   Die gedruckten Grenzen passen nur zu Schritt 5: mit VD2021 als Mitte wäre VDmin bei AM 34,1, gedruckt ist 34,9. Wir
@@ -128,14 +128,14 @@ Vergleich mit dem Soll-Intervall verlangt der ÖSG trotzdem die Summe (R3).
   rund ± 27 %. Ein Test prüft beides (`tests/test_oesg_methodik.py`,
   `test_soll_intervall_ist_mitte_plus_minus_30_prozent`).
 - Die VD «soll in jeder Versorgungsregion (unter Berücksichtigung von regionalen Austauschbeziehungen) im angegebenen
-  Intervall liegen» (*Textband S.36*).
+  Intervall liegen» (*Textband S.38*).
 - Soll-Intervalle gelten für den Planungshorizont 2030. Ein IST-Wert daran gemessen heißt: «wo stehen wir gemessen an
   der Norm 2030».
 
 **Drei Kennzahlen zum Soll-Intervall**, alle **unsere**, nicht aus dem ÖSG, nur bei `insgesamt`. Sie setzen nur an den
 gedruckten Grenzen VDmin und VDmax an, nie an der Mitte, und widersprechen sich deshalb nie (Test):
 - **Lage** (Spalte `Lage_im_Intervall`): `unter`, `im` oder `über`; eine VD genau auf einer Grenze liegt `im`
-  Intervall. Das ist die Aussage, die der ÖSG verlangt: Die VD soll «im angegebenen Intervall liegen» (Textband S.36).
+  Intervall. Das ist die Aussage, die der ÖSG verlangt: Die VD soll «im angegebenen Intervall liegen» (Textband S.38).
 - **Position** (Spalte `Position_im_Intervall`) = (VD − VDmin) / (VDmax − VDmin): 0 = Untergrenze, 1 = Obergrenze,
   < 0 darunter, > 1 darüber. Sie macht die Fächer vergleichbar und zeigt auch innerhalb, wie nah eine Region einer
   Grenze ist. Innerhalb des Intervalls macht der ÖSG keinen Unterschied.
@@ -146,16 +146,16 @@ gedruckten Grenzen VDmin und VDmax an, nie an der Mitte, und widersprechen sich 
 Alle drei messen die Sachleistung allein (R1): «über» gilt auch nach ÖSG, «unter» und «im» nicht abschließend. Wann
 welche Zahl passt, mit Beispielen: [DATEN.md](DATEN.md#vergleich-mit-dem-soll-intervall-welche-zahl-für-welche-aussage).
 
-Der Begriff «Versorgungsdichte-Soll-Intervall» stammt aus dem Textband (S.36, Legende S.37); der Methodenband nennt
+Der Begriff «Versorgungsdichte-Soll-Intervall» stammt aus dem Textband (S.38, Legende S.37); der Methodenband nennt
 dasselbe «Planungsrichtwerte-Intervall» (S.18–19).
 
 ### Österreich – keine eigene Ebene in den Kennzahlen
 
 **Was der ÖSG sagt:**
-- Das Soll-Intervall gilt **je Versorgungsregion** (Textband S.36, Zitat bei R3). Eine Versorgungsdichte für ganz
+- Das Soll-Intervall gilt **je Versorgungsregion** (Textband S.38, Zitat bei R3). Eine Versorgungsdichte für ganz
   Österreich ist keine Planungsgröße des ÖSG.
-- Ein Bundesdurchschnitt kommt nur als Ausgangspunkt der Soll-Intervalle vor, und zwar **ohne Wien** (Textband S.36;
-  Legende VD2021 «ohne Wien», S.37; Methodenband S.18).
+- Ein Bundesdurchschnitt kommt nur als Ausgangspunkt der Soll-Intervalle vor, und zwar **ohne Wien** (Textband S.38;
+  Legende VD2021 «ohne Wien», Textband S.39; Methodenband S.18).
 
 **Dazu kommt:** Die IST-Jahre der Länder unterscheiden sich (2022: Burgenland, Kärnten, OÖ, Steiermark, Wien;
 2023: NÖ, Salzburg, Tirol, Vorarlberg). Eine Österreich-Summe im IST ist kein Stand zu einem Stichtag.
@@ -168,17 +168,17 @@ Wer Österreich-Werte braucht, rechnet sie in der eigenen Analyse und legt dort 
 ### R4 – Fächer zusammenfassen
 
 **Namen der Spalten.** Die Tabelle Planungsmatrizen verwendet die Kürzel der ÖSG-Vorlage der RSG-Planungsmatrix
-(Tabellenband, Anhang 9, S.259: «AM(4) AN KIJU KJC(2) KJP CH NCH(1) IM GGH NEU PSY DER AU HNO URO PCH(2) PUL ORTR(3) MKG
+(Tabellenband, Anhang 9, S.239: «AM(4) AN KIJU KJC(2) KJP CH NCH(1) IM GGH NEU PSY DER AU HNO URO PCH(2) PUL ORTR(3) MKG
 ZMK STR RAD NUK PMR PAT LAB SON/IDB(5) gesamt»), ohne die Fußnotenzeichen; dazu KFO, das sechs Länder als eigene Spalte
 führen. Was die Fußnoten der Vorlage bedeuten: [DATEN.md](DATEN.md#fußnoten).
 
-**Zuschnitt für den Richtwert.** Die Richtwerttabelle (Textband S.37) schneidet manche Fächer anders zu als die
+**Zuschnitt für den Richtwert.** Die Richtwerttabelle (Textband S.39) schneidet manche Fächer anders zu als die
 Spalten der Matrix. Für den Vergleich zählen die Kennzahlen die Spalten so zusammen, wie der Richtwert sie enthält:
 
-| Richtwert-Zeile (Textband S.37) | Spalten der Matrix | Beleg |
+| Richtwert-Zeile (Textband S.39) | Spalten der Matrix | Beleg |
 |---|---|---|
 | AM | AM + ZAE (SON/IDB spitalsambulant) | R5 |
-| CH | CH + KJC + PCH | Vorlage S.259, Fußnote (2) an KJC und PCH: «zugeordnet zu CH»; Tabellenband S.252: «ÄAVE für PCH sind unter der CH subsummiert und werden nur in Bezug auf die vertragsärztlichen Planstellen der KV-Träger im IST-Stand ausgewiesen.» In der Vorlage sind die ÄAVE-Zellen von KJC und PCH mit «-» vorbelegt |
+| CH | CH + KJC + PCH | Vorlage (Tabellenband S.239), Fußnote (2) an KJC und PCH: «zugeordnet zu CH»; Tabellenband S.232: «ÄAVE für PCH sind unter der CH subsummiert und werden nur in Bezug auf die vertragsärztlichen Planstellen der KV-Träger im IST-Stand ausgewiesen.» In der Vorlage sind die ÄAVE-Zellen von KJC und PCH mit «-» vorbelegt |
 | IM | IM + PUL | Unterzeile «- davon Pulmologie (PUL) / Innere Medizin-Pneumologie (IM-PUL)»; in der Matrix getrennte Spalten |
 | PUL | PUL | eigener Richtwert der Unterzeile |
 | ORTR | ORTR | Fußnote 2: «Summe aus UC, OR und den im spitalsambulanten Bereich dem Fachbereich ORTR zugeordneten ÄAVE»; die RSG-2030-Matrizen haben keine eigenen OR/UC-Spalten. Die Spalte ORTR enthält in allen Ländern Orthopädie und Unfallchirurgie (Abgleich mit dem RSG-Monitoring, [PRUEFUNG.md](PRUEFUNG.md#abgleich-mit-dem-rsg-monitoring)); OÖ sagt es in der Fußnote «inkl. Unfallkrankenhaus Linz» nur ausdrücklich |
@@ -187,7 +187,7 @@ Spalten der Matrix. Für den Vergleich zählen die Kennzahlen die Spalten so zus
 | KJP | KJP | Richtwert «in Anlehnung an die Bedarfsplanungsrichtlinie in Deutschland» (Fußnote 1) |
 | KIJU, GGH, NEU, PSY, DER, AU, HNO, URO, MKG | gleichnamige Spalte | |
 | KJC, NCH, PCH | – | kein Richtwert («*»); KJC und PCH gehen in CH ein, NCH «in Regiomed nicht berücksichtigt» (Vorlage, Fußnote (1)) |
-| RAD, LAB, NUK, PAT, PMR | – | keine Richtwerte, nicht im Regiomed-Modell (Textband S.38; Methodenband S.26) |
+| RAD, LAB, NUK, PAT, PMR | – | keine Richtwerte, nicht im Regiomed-Modell (Textband S.39; Methodenband S.26) |
 | AN, STR, SON/IDB | – | keine Richtwertzeile; SON/IDB spitalsambulant geht als ZAE in AM ein (R5) |
 
 Damit gibt es Kennzahlen für **17 Fächer**: die 16 Fächer mit eigener Spalte und Richtwert und KFO als Unterzeile von
@@ -211,7 +211,7 @@ Die RSG-Verordnungen selbst sagen nichts zu Summen über Fächer; ihre Spalte «
 Matrixspalten, in der jede ÄAVE einmal vorkommt (KFO als eigene Spalte neben ZMK, wo es sie gibt).
 
 **KJC und PCH ohne eigene ÄAVE.** In allen Ländern stehen bei KJC und PCH in jeder ÄAVE-Zeile 0 bzw. «-»; Werte gibt es
-nur bei Planstellen und Sachleistungsstellen, wie im Tabellenband S.252 beschrieben. Die Summe CH + KJC + PCH ändert
+nur bei Planstellen und Sachleistungsstellen, wie im Tabellenband S.232 beschrieben. Die Summe CH + KJC + PCH ändert
 heute also nichts. Sie sichert den Vergleich, falls ein Land KJC oder PCH doch getrennt ausweist; die Prüfung
 `kjc_pch_in_ch` meldet dann eine Abweichung, und es ist zu klären, ob der Wert in CH schon enthalten ist.
 
@@ -248,7 +248,7 @@ So gelesen und übernommen:
   **Nicht aus dem Dokument** kommen zwei Punkte: die PLAN-Zuordnung zu den gemeinsamen Sachleistungsstellen, gelesen
   aus «SV» ohne Träger und aus dem Muster der sechs Länder mit eigener KFO-Spalte, die KFO dort vollständig führen
   (zusätzliche je Träger überall 0); und die 100 %, weil die Fußnote von *Planstellen* spricht und das der
-  vertragsärztliche Teil der Sachleistungsstellen ist (Tabellenband S.252) – die sechs Länder drucken 75–100 %.
+  vertragsärztliche Teil der Sachleistungsstellen ist (Tabellenband S.232) – die sechs Länder drucken 75–100 %.
   Bestätigt ist beides nicht ([offene_punkte.md](offene_punkte.md)).
 - **Nicht doppelt gezählt:** Dass KFO nicht schon in den gedruckten ZMK-Werten steckt, sagt die Verordnung mit
   «zusätzlich» und «zuzügl.» (siehe oben) und bestätigt der Abgleich mit dem RSG-Monitoring, das ZMK «inkl. KFO»
@@ -278,9 +278,9 @@ weist im IST nur 0,2 ÄAVE KFO mit Kassenvertrag aus (Wahlärzt:innen 7,5), im P
   Erstversorgungseinheiten (ZAE) im Bereich des spitalsambulanten Leistungserbringung wurde für das Jahr 2030 das
   diesbezügliche Potenzial für ZAE-relevante spitalsambulante ÄAVE errechnet und aufgrund der Funktion
   ‹Erstversorgung auf allgemeinmedizinischem Niveau› im Fachbereich ‹Allgemeinmedizin› ergänzt».
-- Textband S.37, Legende zur Richtwerttabelle: «** Im Bereich der AM inkl. ZAE (in RSG-PM: SON/IDB) und EVA in der
+- Textband S.39, Legende zur Richtwerttabelle: «** Im Bereich der AM inkl. ZAE (in RSG-PM: SON/IDB) und EVA in der
   Funktion von Akutordinationen».
-- Vorlage der RSG-Planungsmatrix (Tabellenband S.259), Fußnote (5) an SON/IDB: «spitalsambulant = ZAE; ggf. (zzgl)
+- Vorlage der RSG-Planungsmatrix (Tabellenband S.239), Fußnote (5) an SON/IDB: «spitalsambulant = ZAE; ggf. (zzgl)
   EVA : ÄAVE IST x, PLAN x» und «extramural = sonstige/interdisziplinäre Angebote».
 
 **Regel:** In den Kennzahlen ist **AM = Spalte AM + SON/IDB spitalsambulant** (in den
@@ -323,7 +323,7 @@ laut Monitoring 2023, in ÄAVE.
 - **Tirol** nennt in der Fußnote zur ZAE «davon 4,8 VZÄ in der AM, 1 VZÄ in der KIJU und 2,25 VZÄ in der ORTR durch L-ZK
   als zusätzliche SLS der SV anrechenbar» (Anlage S.1; je VR eigene Zahlen). Das betrifft die Anrechnung von Ärzt:innen
   der ZAE als Sachleistungsstellen, keine Aufteilung der ZAE-ÄAVE auf Fächer: VZÄ sind Personal, keine ÄAVE, und die
-  genannten 8,05 VZÄ sind nur ein Teil der ZAE (IST 14,1, PLAN 16,3 ÄAVE). Die ZAE gehen nach Textband S.37 ganz in AM;
+  genannten 8,05 VZÄ sind nur ein Teil der ZAE (IST 14,1, PLAN 16,3 ÄAVE). Die ZAE gehen nach Textband S.39 ganz in AM;
   KIJU und ORTR bleiben, wie gedruckt. Das ist unsere Lesart, nicht bestätigt (Rückfrage,
   [offene_punkte.md](offene_punkte.md#unklare-angaben-in-den-verordnungen)): Wären die VZÄ als Anteil der ZAE-Versorgung
   je Fach gemeint, gehörten in Tirol BL etwa 1 ÄAVE zu KIJU (67,2) und 2,25 zu ORTR (75,6) statt zu AM (370,8 IST) – je
@@ -331,7 +331,7 @@ laut Monitoring 2023, in ÄAVE.
 
 ### R6 – SVE-Länder: ÄAVE-Äquivalente verwenden
 
-Wer mit SVE plant, muss die Werte je Fach auf ÄAVE umrechnen (Textband S.36, S.76). In RSG 2030 betrifft das
+Wer mit SVE plant, muss die Werte je Fach auf ÄAVE umrechnen (Textband S.37, S.78). In RSG 2030 betrifft das
 Burgenland, Kärnten, Steiermark: Block `aequivalent` der Tabelle Planungsmatrizen. Umsetzung: `rsg2030/schema.py`
 (`massgeblicher_block`, `bl_long`, `matrix_long`), abgeleitet aus den Daten.
 
@@ -339,7 +339,7 @@ Burgenland, Kärnten, Steiermark: Block `aequivalent` der Tabelle Planungsmatriz
 arbeitenden Arzt» (DAA): dem Durchschnitt der Vertragsärzt:innen eines Fachs mit Einzelpraxis, ganzjährigem kurativem
 Vertrag, mindestens einer kurativen Konsultation pro Quartal und Vertrag mindestens mit der ÖGK, um statistische
 Ausreißer bereinigt (*Methodenband S.17*, «neue Regiomed-Methode»). SVE legt der ÖSG nicht fest: «alternative
-Planungsgrößen, die ggf. in den RSG anstatt ÄAVE verwendet und definiert werden» (*Tabellenband S.269*). Nur Kärnten
+Planungsgrößen, die ggf. in den RSG anstatt ÄAVE verwendet und definiert werden» (*Tabellenband S.249*). Nur Kärnten
 beschreibt seine: Bezugsgröße ist die durchschnittliche Versorgungswirksamkeit einer ganzjährigen
 Kassen-Einzelordination des Fachs, gemessen in Kontakten, um Ausreißer bereinigt; «Sowohl eine SVE als auch eine ÄAVE
 entsprechen grundsätzlich einem durchschnittlich arbeitenden Arzt bzw. Ärztin». SVE werden nur für die
@@ -347,10 +347,10 @@ Spitalsambulanzen verwendet, extramural gelten die ÄAVE aus Regiomed; umgerechn
 2030 × Umrechnungsfaktor 2022 = ÄAVE-Ä 2030» (*Kärnten Anhang S.30*). Burgenland und Steiermark definieren SVE nicht;
 ihre Matrizen sind gleich aufgebaut (SVE nur spitalsambulant, Faktoren je Region und Fach).
 
-**Was der ÖSG verlangt** (*Tabellenband S.254*). Wer statt ÄAVE andere Planungsgrößen verwendet, gibt «je Sektor und je
+**Was der ÖSG verlangt** (*Tabellenband S.234*). Wer statt ÄAVE andere Planungsgrößen verwendet, gibt «je Sektor und je
 Fachrichtung für die IST-Werte einen Umrechnungsschlüssel» an; «unter Anwendung dieser Umrechnungsfaktoren sind für die
 PLAN-Werte ÄAVE-Äquivalente als Näherungswerte für den Vergleich mit den ÖSG-Planungsrichtwerten auszuweisen». Laut
-Vorlage (S.259) gibt es keinen Faktor für RAD, NUK, PMR, PAT, LAB («n.v.»). Was ein Faktor ist, sagt die Steiermark im
+Vorlage (Tabellenband S.239) gibt es keinen Faktor für RAD, NUK, PMR, PAT, LAB («n.v.»). Was ein Faktor ist, sagt die Steiermark im
 Glossar ihrer Anlage 1 (S.65): «Bei den spitalsambulanten ÄrztInnen basiert der Faktor auf dem Verhältnis der für die
 RSG-Planung pro Fach ermittelten SVE zu den in Regiomed ausgewiesenen ÄAVE im selben Bundesland und Datenjahr.»
 Extramural sind SVE und ÄAVE «weitgehend methodisch angepasst», der Faktor ist dort 1 bzw. nicht angegeben («-»).
@@ -396,7 +396,7 @@ wird.
 
 - Wohnbevölkerung 2021 = 8.932.664 (ohne Wien 7.011.715), 2030 = 9.347.316 (ohne Wien 7.282.458); Quellen
   Statistik Austria, Bevölkerungsstatistik 2021 und Bevölkerungsprognose «Aktualisierung November 2022».
-  *Textband S.38.* Beides sind Stände zum 1.1. (der Wert 2030 steht in Statistik Austria, Statistische Nachrichten
+  *Textband S.39.* Beides sind Stände zum 1.1. (der Wert 2030 steht in Statistik Austria, Statistische Nachrichten
   1/2023, Tabelle 9 «Bevölkerung zum 01.01.»).
 - Kleinräumig: «… für Jahre ohne aktualisierte kleinräumige ÖROK-Prognose wird die Grobabschätzung der
   Bevölkerungsentwicklung auf Gemeindeebene durch ein GÖG-eigenes Näherungsverfahren berechnet (dabei wird die
@@ -423,7 +423,7 @@ haben wir nicht geprüft. Unterschied für Österreich:
 
 | 1.1.2030 | Prognose 2025 (verwendet) | Prognose 2022 (ÖSG) | Abweichung |
 |---|---:|---:|---:|
-| Österreich | 9.321.070 (Test) | 9.347.316 (Textband S.38) | −0,28 % |
+| Österreich | 9.321.070 (Test) | 9.347.316 (Textband S.39) | −0,28 % |
 
 Begründung: Die Soll-Intervalle sind Dichten. Für «liegt die Planung 2030 im Soll-Intervall?» ist die neueste Prognose
 die beste Schätzung der Bevölkerung 2030.
@@ -496,22 +496,22 @@ den Wahlarztbereich in diesem Zusammenhang nicht ausdrücklich.
 ### R9 – Versorgungsaufträge nur für die Sachleistung
 
 Versorgungsaufträge gibt es nur für Kassenärzt:innen, Ambulatorien mit Kassenvertrag, Kassenambulatorien und
-Spitalsambulanzen von Fonds-KA/UKH; Wahlärzt:innen und Ambulatorien ohne Kassenvertrag nicht (Textband S.77).
+Spitalsambulanzen von Fonds-KA/UKH; Wahlärzt:innen und Ambulatorien ohne Kassenvertrag nicht (Textband S.78).
 Ihre Versorgungswirksamkeit ist «als Rahmenbedingung» mitzuberücksichtigen (Textband S.15).
 
 ### R10 – Teilzeilen: spitalsambulant, extramural, PVE
 
 **Was der ÖSG sagt.**
 - Die Matrix gliedert die ÄAVE im IST nach spitalsambulant, niedergelassen, selbständige Ambulatorien,
-  Kassenambulatorien und insgesamt, dazu die Teilmengen VGF und PVE (Tabellenband S.251); im PLAN nach spitalsambulant,
+  Kassenambulatorien und insgesamt, dazu die Teilmengen VGF und PVE (Tabellenband S.231); im PLAN nach spitalsambulant,
   «niedergelassenen ÄrztInnen (mit Kassenvertrag) und in selbständigen Ambulatorien tätigen ÄrztInnen … gesamt» und
   insgesamt (S.252). In beiden Abschnitten gibt es also spitalsambulant, extramural (im IST die Summe der drei
   extramuralen Zeilen, [DATEN.md](DATEN.md#zeilen)) und insgesamt.
 - PVE: «In der Allgemeinmedizin (AM) und der Kinder- und Jugendheilkunde (KIJU) ist im IST-Stand … und im PLAN-Stand …
   die tatsächliche (IST-Stand) bzw. die Mindestanzahl (PLAN-Stand) der ÄAVE … in Primärversorgungseinheiten (PVE)
   auszuweisen» (S.251).
-- ZAE sind spitalsambulant: Vorlage S.259, Fußnote (5) «spitalsambulant = ZAE».
-- Die Soll-Intervalle sind «Planungsrichtwerte für den gesamten ambulanten Bereich» (Textband S.37), berechnet aus den
+- ZAE sind spitalsambulant: Vorlage (Tabellenband S.239), Fußnote (5) «spitalsambulant = ZAE».
+- Die Soll-Intervalle sind «Planungsrichtwerte für den gesamten ambulanten Bereich» (Textband S.39), berechnet aus den
   ÄAVE «im gesamten ambulanten Versorgungsbereich» (S.36). Für einzelne Sektoren oder für PVE gibt es keinen Richtwert.
 
 **Regel:** Die Tabelle Versorgungsdichte enthält je Region, Abschnitt und Fach die Zeilen
@@ -531,12 +531,12 @@ extramural fasst sie zusammen), VGF (im PLAN nur in OÖ und der Steiermark), Wah
 
 ### Stellen – nicht in der Tabelle Versorgungsdichte
 
-**Was der ÖSG sagt.** IST: «Anzahl der vertragsärztlichen Planstellen je KV-Träger» (Tabellenband S.251). PLAN:
+**Was der ÖSG sagt.** IST: «Anzahl der vertragsärztlichen Planstellen je KV-Träger» (Tabellenband S.231). PLAN:
 Sachleistungsstellen, «Planstellen für niedergelassene VertragsärztInnen und der geplanten ärztlichen
 Vollzeitäquivalente in Ambulatorien», «für gemeinsame Sachleistungsstellen aller KV-Träger und für die zusätzlichen
 Sachleistungsstellen einzelner KV-Träger. Davon ist jeweils der Maximalanteil für vertragsärztliche Planstellen in
 Prozent auszuweisen» (S.252). Als endgültig sieht der ÖSG das nicht: In der Liste der Matrix-Inhalte spricht er
-vom «Vorliegen einer detaillierten Definition von Sachleistungsstellen» als etwas Künftigem (Textband S.75, bei der
+vom «Vorliegen einer detaillierten Definition von Sachleistungsstellen» als etwas Künftigem (Textband S.76, bei der
 optionalen Zeile «ÄAVE gesamt»).
 
 **Was die Länder dazu sagen.**
@@ -582,7 +582,7 @@ in der Tabelle Planungsmatrizen; wie man sie liest: [DATEN.md](DATEN.md#stellen-
 ```
 Tabelle Planungsmatrizen ─ ÄAVE-Zeilen spitalsambulant, extramural, insgesamt, pve; ÖSG-Fächerzuschnitt (R2, R4–R6, R10) ─→ ÄAVE-Eingang
                          ─ + Bevölkerung (R7) ─→ VD = ÄAVE ÷ Bevölkerung × 100.000
-                         ─ + Richtwerte (R3, Textband S.37), nur Zeile insgesamt ─→ Lage, Position, ÄAVE-Abstand
+                         ─ + Richtwerte (R3, Textband S.39), nur Zeile insgesamt ─→ Lage, Position, ÄAVE-Abstand
 ```
 
 1. **ÄAVE-Eingang** (`rsg2030/analyse_eingang.py` → Vertrag `oesg_methodik/eingang.py`): eine Zeile je Region ×
@@ -591,7 +591,7 @@ Tabelle Planungsmatrizen ─ ÄAVE-Zeilen spitalsambulant, extramural, insgesamt
    (SVE-Länder: Block der Äquivalente, R6).
 2. **Bevölkerung** (`oesg_methodik/bevoelkerung.bevoelkerung_fuer`): je Region nach R7, für alle Zeilen gleich.
 3. **VD, Lage, Position und ÄAVE-Abstand zum Soll-Intervall** (`oesg_methodik/dichte.kennzahlen`), Richtwerte aus
-   `oesg_methodik/referenz/oesg_planungsrichtwerte.csv` (aus Textband S.37; `tests/test_referenz.py` prüft jeden Wert
+   `oesg_methodik/referenz/oesg_planungsrichtwerte.csv` (aus Textband S.39; `tests/test_referenz.py` prüft jeden Wert
    am PDF).
 
 Fehlt ein Wert, bleibt die Zeile weg und wird nicht geschätzt. Spalten:
@@ -617,7 +617,7 @@ Fehlt ein Wert, bleibt die Zeile weg und wird nicht geschätzt. Spalten:
    Jahresbeginn», «erstellt am 29.06.2026»). Dann weicht die Prüfsumme ab und das Register ist bewusst nachzuziehen –
    samt neuer Version, falls sich Kennzahlen ändern. Der jüngste Stichtag einer Zeitreihe kann «vorläufig» sein.
 6. **Austauschbeziehungen** (R3): Der ÖSG will die Lage «unter Berücksichtigung von regionalen
-   Austauschbeziehungen» bewertet sehen (Textband S.36). Patientenströme stecken nicht in den Kennzahlen; dafür
+   Austauschbeziehungen» bewertet sehen (Textband S.38). Patientenströme stecken nicht in den Kennzahlen; dafür
    bräuchte es eigene Daten. Lage, Position und ÄAVE-Abstand sind deshalb ein erster Blick, keine Bewertung im Sinn des
    ÖSG ([DATEN.md](DATEN.md#fallstricke), Fallstrick 11).
 

@@ -65,7 +65,7 @@ zusammengezählt: KFO 12,1, gesamt 951,3.
    Fußnote. *Dagegen:* Die Namen sind verschieden – ein Notdienstzentrum ist ein Dienst, ein Zahngesundheitszentrum
    eine eigene Einrichtung der ÖGK, also ein Kassenambulatorium. Dessen ÄAVE gehören nach ÖSG in die Zeile der
    Kassenambulatorien (R2a, D1), und OÖ druckt dort ZMK 79,1, was mit dem RSG-Monitoring auf die Stelle übereinstimmt;
-   die ärztlichen Vollzeitäquivalente von Ambulatorien gehören nach Tabellenband S.252 ohnehin in die
+   die ärztlichen Vollzeitäquivalente von Ambulatorien gehören nach Tabellenband S.232 ohnehin in die
    Sachleistungsstellen, könnten also in den gedruckten 480,3 des PLAN schon enthalten sein.
    Entscheiden lässt sich das nicht: Eine zweite Quelle gibt es nicht (das Monitoring führt weder PLAN noch
    Sachleistungsstellen). Wir haben nichts ergänzt – die Bezirke sind keine Ebene dieses Datensatzes, und jede
@@ -93,7 +93,7 @@ Fußnote (5) ausdrücklich zu ZMK rechnet?*
 
 **Zentrale Aufnahme- und Erstversorgungseinheiten (ZAE):** Die Fußnote lautet «davon 4,8 VZÄ in der AM, 1 VZÄ in der
 KIJU und 2,25 VZÄ in der ORTR durch L-ZK als zusätzliche SLS der SV anrechenbar». Wir lesen das als Anrechnung von
-Personal als Sachleistungsstellen und zählen alle ZAE-ÄAVE zu AM, wie es der ÖSG vorsieht (Textband S.37).
+Personal als Sachleistungsstellen und zählen alle ZAE-ÄAVE zu AM, wie es der ÖSG vorsieht (Textband S.39).
 *Frage: Ist das so gemeint? Oder versorgen diese Anteile der ZAE tatsächlich Kinder (KIJU) und
 Orthopädie/Traumatologie (ORTR), sodass sie dort zu zählen wären?*
 
@@ -166,11 +166,11 @@ Zuschnitt selbst nachbauen muss.
 
 Entschieden ist:
 
-- **Der Zuschnitt gilt einheitenneutral.** Er legt fest, welche Matrixspalten ein Fach bilden (Textband S.37),
+- **Der Zuschnitt gilt einheitenneutral.** Er legt fest, welche Matrixspalten ein Fach bilden (Textband S.39),
   unabhängig von der Einheit; dieselbe Funktion schneidet ÄAVE und Stellen zu.
 - **Ausnahme ZAE.** Bei den ÄAVE enthält AM die ZAE aus SON/IDB, aber nur in den Zeilen `spitalsambulant` und
   `insgesamt` ([METHODIK.md](METHODIK.md), R5). Sachleistungsstellen bilden den extramuralen Bereich ab (Tabellenband
-  S.252; Tirol, Anlage S.1, Fußnote (8)), ZAE sind spitalsambulant (Vorlage S.259, Fußnote (5)) – in einer
+  Tabellenband S.232; Tirol, Anlage S.1, Fußnote (8)), ZAE sind spitalsambulant (Vorlage (Tabellenband S.239), Fußnote (5)) – in einer
   Stellen-Zeile gehört SON/IDB daher nicht zu AM. Tirol ist das einzige Land mit Stellen in SON/IDB: 8,05 im
   Bundesland, genau die 4,8 AM + 1 KIJU + 2,25 ORTR seiner Fußnote (7). Merkwürdig ist, dass dort im PLAN keine
   extramuralen ÄAVE stehen («n.v.»), aber Sachleistungsstellen; Tirol gibt für sie 0 % Maximalanteil
