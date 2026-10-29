@@ -218,7 +218,15 @@ Mensch entscheiden muss – nicht mehr:
 
 **Nicht in der Mappe**, weil eine Maschine es unabhängig prüft (Regel 1): das Seitenregister der Textseiten, die
 Richtwerte und die Zuordnung Bezirk → Versorgungsregion, Fußnoten der Textseiten, die wörtlich der ÖSG-Vorlage
-entsprechen, und jede Zelle, die beide Lesungen gleich lesen. Ebenso Zeilen und Spalten wie in der Vorlage
+entsprechen, jede Zelle, die beide Lesungen gleich lesen, und **jede Seitenangabe zum ÖSG**:
+
+- **ÖSG-Zitate:** Zu jeder Seite, die irgendwo im Repo zitiert wird, steht in
+  [`oesg_zitate.csv`](../oesg_methodik/referenz/oesg_zitate.csv) ein wörtlicher Anker aus der gepinnten Fassung;
+  `tests/test_zitate.py` prüft, dass er auf genau dieser Seite steht, dass keine zitierte Seite ohne Anker bleibt und
+  dass ein Anker nicht auf so vielen Seiten vorkommt, dass er nichts belegt. **Belegt** ist damit, dass die
+  Seitenangabe stimmt – nicht, dass die Aussage, die wir aus der Stelle ableiten, richtig ist; das bleibt Regel 3.
+  Dass sich das Dokument nicht ändert, sichert die Prüfsumme im Register, nicht dieser Test. Wechselt der ÖSG-Stand
+  (Dateinamen in `oesg_methodik.pfade.OESG_BAENDE`), nennt der Test jede Angabe, die gewandert ist, samt neuer Seite. Ebenso Zeilen und Spalten wie in der Vorlage
 (`rsg2030/vorlage.py`):
 
 - **Zeilen:** Die Beschriftung steht so in der Vorlage (in diesem Abschnitt), und der Parser hat sie der Zeile_ID dieser

@@ -36,6 +36,21 @@ def statistik_austria_dir() -> Path:
     return original_dir() / "statistik_austria"
 
 
+# Die drei Bände des ÖSG, wie das Register sie ablegt (Herkunft und Prüfsumme: rsg2030/quellen/quellen.csv).
+# Die Namen stehen nur hier: Ein neuer ÖSG-Stand wird an dieser Stelle umgestellt, und tests/test_zitate.py sagt
+# dann, welche Seitenangabe der Doku gewandert ist.
+OESG_BAENDE = {
+    "Textband": "SPG_AT_OSG_G_20251010_5_2025.pdf",
+    "Tabellenband": "OeSG_2023_-_Tabellenband.pdf",
+    "Methodenband": "Methodenband_2025.pdf",
+}
+
+
+def oesg_pdf(band: str) -> Path:
+    """Pfad eines ÖSG-Bands («Textband», «Tabellenband», «Methodenband») im Datenordner."""
+    return original_dir() / "oesg" / OESG_BAENDE[band]
+
+
 REFERENZ_DIR = Path(__file__).with_name("referenz")
 # Richtwerte ÖSG 2023 Textband S.37, von Hand abgeschrieben (in git)
 OESG_PLANUNGSRICHTWERTE_CSV = REFERENZ_DIR / "oesg_planungsrichtwerte.csv"
@@ -45,3 +60,5 @@ OESG_REGIONEN_CSV = REFERENZ_DIR / "oesg_regionen.csv"
 OESG_RSGPM_FUSSNOTEN_CSV = REFERENZ_DIR / "oesg_rsgpm_fussnoten.csv"
 # Zeilenbeschriftungen der RSG-Planungsmatrix laut ÖSG-Vorlage (S.259) und ihre Zeile_ID (geprüft in tests/test_referenz.py)
 OESG_RSGPM_ZEILEN_CSV = REFERENZ_DIR / "oesg_rsgpm_zeilen.csv"
+# Je zitierter ÖSG-Seite ein wörtlicher Anker aus der gepinnten Fassung (geprüft in tests/test_zitate.py)
+OESG_ZITATE_CSV = REFERENZ_DIR / "oesg_zitate.csv"

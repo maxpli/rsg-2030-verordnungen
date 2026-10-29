@@ -11,14 +11,12 @@ import pdfplumber
 import pytest
 
 from oesg_methodik import regionen_erzeugen
-from oesg_methodik.pfade import OESG_PLANUNGSRICHTWERTE_CSV, OESG_REGIONEN_CSV, original_dir
+from oesg_methodik.pfade import OESG_PLANUNGSRICHTWERTE_CSV, OESG_REGIONEN_CSV, oesg_pdf
 
 pytestmark = pytest.mark.slow  # liest Quelldateien aus daten_original/
 
-# ÖSG 2023, Stand 10.10.2025, aus dem RIS (ÖSG-Gutachten 5/2025): Hauptdokument = Textband, Anlage = Tabellenband
-TEXTBAND = "SPG_AT_OSG_G_20251010_5_2025.pdf"
-TABELLENBAND = "OeSG_2023_-_Tabellenband.pdf"
-SEITE = 37
+# Welche Dateien die beiden Bände sind, steht in `oesg_methodik.pfade.OESG_BAENDE` (ein Ort je ÖSG-Stand).
+SEITE = 37  # Textband: Tabelle der Planungsrichtwerte
 SPALTEN = ["Err_Min", "VDmin", "VDmax", "VD2021", "BEVmin"]
 
 
@@ -29,7 +27,7 @@ def _zahl(t: str) -> float:
 
 def _tabelle_textband() -> dict[str, list[float]]:
     """Tabelle «Planungsrichtwerte für den gesamten ambulanten Bereich» (Textband S.37): Kürzel → die fünf Werte."""
-    with pdfplumber.open(original_dir() / "oesg" / TEXTBAND) as pdf:
+    with pdfplumber.open(oesg_pdf("Textband")) as pdf:
         text = pdf.pages[SEITE - 1].extract_text()
     teil = text[text.index("Planungsrichtwerte für den gesamten ambulanten Bereich") : text.index("Legende:")]
     zeilen: dict[str, list[float]] = {}
@@ -65,7 +63,7 @@ def test_fussnoten_vorlage_wie_tabellenband():
     from rsg2030.fussnoten import norm, vorlage
     from rsg2030.matrix_extract import kompakt
 
-    with pdfplumber.open(original_dir() / "oesg" / TABELLENBAND) as pdf:
+    with pdfplumber.open(oesg_pdf("Tabellenband")) as pdf:
         seite = kompakt(norm(pdf.pages[259 - 1].extract_text()))
     for z, t in zip(vorlage()["Zeichen"], vorlage()["Text"]):
         assert kompakt(norm(z + t)) in seite, f"{z} {t}"
@@ -81,7 +79,7 @@ def test_zeilen_vorlage_wie_tabellenband():
     def ohne_platzhalter(t: str) -> str:
         return kompakt(" ".join(w for w in t.split() if w not in {"x", "-", "n.v."}))
 
-    with pdfplumber.open(original_dir() / "oesg" / TABELLENBAND) as pdf:
+    with pdfplumber.open(oesg_pdf("Tabellenband")) as pdf:
         seite = ohne_platzhalter(pdf.pages[259 - 1].extract_text())
     for t in zeilen()["Beschriftung"]:
         assert ohne_platzhalter(t) in seite, t
@@ -92,7 +90,7 @@ def test_spalten_vorlage_wie_tabellenband():
     Tabellenband (Anhang 9, S.259), ohne Fußnotenzeichen und in derselben Reihenfolge."""
     from rsg2030.vorlage import SPALTEN_VORLAGE
 
-    with pdfplumber.open(original_dir() / "oesg" / TABELLENBAND) as pdf:
+    with pdfplumber.open(oesg_pdf("Tabellenband")) as pdf:
         text = pdf.pages[259 - 1].extract_text()
     kopf = next(z for z in text.splitlines() if z.startswith("AM(4)"))
     gelesen = re.sub(r"\(\d\)", " ", kopf).split()
