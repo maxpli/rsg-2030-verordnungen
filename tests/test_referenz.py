@@ -137,3 +137,71 @@ def test_spalten_vorlage_wie_tabellenband():
     kopf = next(z for z in text.splitlines() if z.startswith("AM(4)"))
     gelesen = re.sub(r"\(\d\)", " ", kopf).split()
     assert tuple(gelesen) == SPALTEN_VORLAGE, gelesen
+
+
+# ---------- VD2021 der Richtwerttabelle aus der Planungsgrundlagenmatrix (Anhang 5) nachrechnen ----------
+
+A5_SEITEN = {"Österreich": 15, "Wien": 28}  # Anhang 5 (Tabellenband S.15, S.28)
+# Spaltenkopf der Zeile «Ambulante ärztliche Versorgung», ohne Fußnotenzeichen; «insg» ohne Punkt (split).
+A5_KOPF = ("AM", "KIJU", "KJC", "KJP", "CH", "NCH", "IM", "GGH", "NEU", "PSY", "DER", "AU", "HNO", "URO",
+           "PCH", "PUL", "ORTR", "MKG", "ZMK", "KFO", "RAD", "NUK", "PMR", "PAT", "insg")  # fmt: skip
+A5_SUMME = "Summe ÄAVE im ambulanten Bereich (exkl. WÄ)"
+A5_WAE = "Niedergel. Wahlärztinnen/-ärzte (ÄAVE)"
+A5_EW = re.compile(r"EW insgesamt \(2021\): ([\d.]+)")
+# Der Anhang 5 schneidet fast alles schon wie die Richtwertzeilen: «CH inkl. KJC und PCH» (Fußnote 3),
+# «ZMK inkl. Dr.med.dent, Dentisten und KFO» (Fußnote 5), ORTR = «Summe aus OR, UCH und ORTR» (Fußnote 1).
+# Nur IM und PUL stehen getrennt – IM = IM + PUL ist die Teilmengen-Lesart («- davon», METHODIK R4).
+A5_ZUSCHNITT = {"IM": ("IM", "PUL")}
+
+
+def _anhang5() -> tuple[dict[tuple[str, str], dict[str, float]], int]:
+    """Die beiden ÄAVE-Zeilen (Sachleistung, Wahlärzt:innen) je Seite und die Einwohner ohne Wien."""
+    zeilen: dict[tuple[str, str], dict[str, float]] = {}
+    ew: dict[str, int] = {}
+    with pdfplumber.open(oesg_pdf("Tabellenband")) as pdf:
+        for region, seite in A5_SEITEN.items():
+            text = pdf.pages[seite - 1].extract_text()
+            assert text.split("\n")[1].strip() == region, f"S.{seite} ist nicht die Seite «{region}»"
+            ew[region] = int(A5_EW.search(text).group(1).replace(".", ""))  # type: ignore[union-attr]
+            for anfang, name in ((A5_SUMME, "SL"), (A5_WAE, "WÄ")):
+                zeile = next(z for z in text.split("\n") if z.startswith(anfang))
+                werte = zeile.removeprefix(anfang).split()
+                assert len(werte) == len(A5_KOPF), (region, anfang, werte)
+                zeilen[region, name] = {
+                    k: float(w.replace(".", "").replace(",", "."))
+                    for k, w in zip(A5_KOPF, werte)
+                    if w not in ("-", "n.v.")
+                }
+    return zeilen, ew["Österreich"] - ew["Wien"]
+
+
+def test_vd2021_aus_der_planungsgrundlagenmatrix():
+    """Die Spalte VD2021 der Richtwerttabelle (Textband S.39) ist exakt nachrechenbar – alle 17 Fächer auf die
+    gedruckte Nachkommastelle – aus dem Anhang 5 (Tabellenband S.15, S.28): (Summe ÄAVE exkl. WÄ **plus**
+    niedergelassene Wahlärzt:innen), Österreich minus Wien, geteilt durch die Einwohner ohne Wien, × 100.000.
+
+    Damit sind drei Lesarten zugleich Zahl: Die Basis der Richtwerttabelle enthält Wahlärzt:innen (METHODIK R1,
+    VD-Definition der Legende; ohne sie weichen 14 der 17 Zeilen ab), die Richtwertzeile IM enthält PUL
+    («- davon», R4 – IM allein ergäbe 15,9 statt 18,2), und die Bevölkerung ist die ohne Wien (R3/R7). Für ZMK
+    (inkl. KFO), CH (inkl. KJC/PCH) und ORTR bestätigt der Treffer den Schnitt der Anhang-5-Fußnoten, der dort
+    schon dem der Richtwertzeilen entspricht."""
+    from oesg_methodik.faecher import OESG_ANALYSEKERN
+
+    zeilen, bev = _anhang5()
+    assert bev == 7_011_715  # Statistik Austria, 1.1.2021 ohne Wien – dieselbe Zahl wie in METHODIK R7
+
+    def vd(spalten: tuple[str, ...]) -> float:
+        aave = sum(
+            zeilen["Österreich", block].get(s, 0.0) - zeilen["Wien", block].get(s, 0.0)
+            for s in spalten
+            for block in ("SL", "WÄ")
+        )
+        return round(aave / bev * 100000, 1)
+
+    soll = pd.read_csv(OESG_PLANUNGSRICHTWERTE_CSV, sep=";", decimal=",").set_index("Fachrichtung")["VD2021"]
+    for fach in OESG_ANALYSEKERN:
+        spalten = A5_ZUSCHNITT.get(fach, (fach,))
+        assert zeilen["Österreich", "SL"].get(spalten[0]) is not None, f"{fach}: Spalte nicht gelesen"
+        assert vd(spalten) == soll[fach], f"{fach}: {vd(spalten)} statt VD2021 {soll[fach]}"
+    # Gegenprobe der Teilmengen-Lesart: IM ohne PUL verfehlt die gedruckte VD2021 deutlich
+    assert vd(("IM",)) == 15.9 != soll["IM"]

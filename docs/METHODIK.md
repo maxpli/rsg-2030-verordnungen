@@ -47,6 +47,12 @@ sie später auch für andere Datensätze dienen kann.
 Die Soll-Intervalle (VDmin/VDmax) wurden mit Wahlärzt:innen berechnet. Eine VD nur aus der Sachleistung liegt
 systematisch darunter.
 
+Das ist nachgerechnet: Die Spalte VD2021 der Richtwerttabelle ergibt sich – alle 17 Fächer auf die gedruckte
+Nachkommastelle – aus der Planungsgrundlagenmatrix als (Summe ÄAVE exkl. WÄ **plus** niedergelassene
+Wahlärzt:innen) ohne Wien, geteilt durch die Einwohner ohne Wien (Anhang 5, Tabellenband S.15, S.28). Ohne die
+Wahlärzt:innen weichen 14 der 17 Zeilen ab. Test:
+`tests/test_referenz.py::test_vd2021_aus_der_planungsgrundlagenmatrix`.
+
 **Gleichzeitig gilt für PLAN:**
 
 > In der Darstellung des PLAN-Stands ÄAVE insgesamt sind WahlärztInnen und selbstständige Ambulatorien ohne
@@ -206,6 +212,11 @@ des ÖSG (Tabellenband, Anhang 5, S.15–60, «Ambulante ärztliche Versorgung»
 - IM und PUL sind dort getrennte Spalten und gehen beide in «insg.» ein; IM enthält dort also PUL nicht. Das ist
   derselbe Zuschnitt wie in der RSG-Planungsmatrix und der Grund für IM = IM + PUL.
 - Ebenso dort Fußnote 3 «CH inkl. KJC und PCH» (KJC und PCH ohne Werte) – wie CH = CH + KJC + PCH hier.
+
+Die Teilmengen-Lesart ist inzwischen nachgerechnet: Die VD2021-Spalte der Richtwerttabelle ergibt sich exakt aus dem
+Anhang 5 (Basis inkl. Wahlärzt:innen, R1) – die Zeile IM (18,2) nur als IM + PUL (IM allein ergäbe 15,9), ZMK (40,4)
+nur inkl. KFO, KFO (3,9) als eigene Unterzeile. Test:
+`tests/test_referenz.py::test_vd2021_aus_der_planungsgrundlagenmatrix`.
 
 Die RSG-Verordnungen selbst sagen nichts zu Summen über Fächer; ihre Spalte «gesamt» ist die Zeilensumme der
 Matrixspalten, in der jede ÄAVE einmal vorkommt (KFO als eigene Spalte neben ZMK, wo es sie gibt).
