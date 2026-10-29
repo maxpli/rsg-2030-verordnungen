@@ -163,7 +163,7 @@ Neue Fassungen, die unter einer **neuen Adresse** erscheinen, findet der Wächte
 |---|---|---|
 | Bevölkerungsprognose von Statistik Austria | in der Regel jährlich (laut Datensatz «Aktualisierungszeitraum: jährlich»), zuletzt 10.–12.11.2025 | prüfen, ob eine neue Datenversion mit dem neuen Jahrgang sinnvoll ist (METHODIK.md, R7) |
 | ÖROK-Prognose (Anteile der Versorgungsregionen) | etwa alle drei bis fünf Jahre, zuletzt «ÖROK-Prognose 2021» (April 2022) | wie oben |
-| ÖSG (Richtwerte, Versorgungsregionen) | bei Revisionen, zuletzt Stand 10.10.2025 | Text- und Tabellenband meldet der Wächter (RIS); Regionale Gliederung und Methodenband erscheinen bei der GÖG unter neuer Adresse: Richtwerte und Regionen neu prüfen, Quellen im Register ergänzen |
+| ÖSG (Richtwerte, Versorgungsregionen) | bei Revisionen, zuletzt Stand 09.10.2026 | Text- und Tabellenband meldet der Wächter (RIS); Regionale Gliederung und Methodenband erscheinen bei der GÖG unter neuer Adresse: Richtwerte und Regionen neu prüfen, Quellen im Register ergänzen |
 
 Diese Termine am besten in den eigenen Kalender eintragen.
 

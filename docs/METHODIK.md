@@ -11,8 +11,8 @@ den Anhängen eigens (z. B. «RSG-PM / Seite 1 von 12»); im Methodenband ist di
 
 | Kürzel | Dokument |
 |---|---|
-| Textband | ÖSG 2023 – Textband, Stand 10.10.2025; im RIS kundgemacht als ÖSG-Gutachten 5/2025 (`SPG_AT_OSG_G_20251010_5_2025`, Hauptdokument) |
-| Tabellenband | ÖSG 2023 – Tabellenband, Stand 10.10.2025, Anlage desselben RIS-Dokuments (Anhang 9 = RSG-Planungsmatrix) |
+| Textband | ÖSG 2023 – Textband, Stand 09.10.2026; im RIS kundgemacht als ÖSG-Gutachten 8/2026 (`SPG_AT_OSG_G_20261009_8_2026`, Hauptdokument) |
+| Tabellenband | ÖSG 2023 – Tabellenband, Stand 09.10.2026, Anlage desselben RIS-Dokuments (Anhang 9 = RSG-Planungsmatrix) |
 | Methodenband | Methodenband zum ÖSG 2023 – Wartung 2025 (nur bei der GÖG, nicht im RIS) |
 
 Im Code steckt die ÖSG-Methodik im Paket `oesg_methodik/` – unabhängig vom Datensatz RSG 2030 (`rsg2030/`), damit

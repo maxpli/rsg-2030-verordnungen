@@ -13,8 +13,10 @@ Drei Regeln, die hier durchgesetzt werden, weil sie leicht brechen:
    deshalb in mehreren Zeilen; «die Werte dürfen nicht addiert werden» (Tabellenband S.231). Wien druckt für diesen
    Fall eine eigene, bereinigte Zeile (`planstellen_oegk_svs_bvaeb`) – wir rechnen sie weder aus den Trägern aus noch
    in sie hinein.
-   *PLAN (`slst_…`):* **summierbar.** Gemeinsame Stellen aller Träger und zusätzliche einzelner Träger sind
-   verschiedene Stellen (Tabellenband S.232). Beleg aus der Verordnung: Wiens gedruckte `slst_gesamt` ist in allen 27
+   *PLAN (`slst_…`):* **summierbar.** Das sagen schon die Bezeichnungen der ÖSG-Vorlage: «Gemeinsame
+   Sachleistungsstellen aller KV-Träger» gegenüber «**zusätzliche** ÖGK-/SVS-/BVAEB-Sachleistungsstellen» – und,
+   davon unterschieden, «**- davon** in EVA» für die Teilmenge. Dieselbe Unterscheidung wie bei den Fußnoten
+   («zusätzlich» gegen «davon»). Bestätigt durch die Verordnung selbst: Wiens gedruckte `slst_gesamt` ist in allen 27
    Fachspalten genau `slst_gemeinsam` + die drei `slst_zus_…` (Bundesland gesamt 3.065 + 0 + 264 + 217 = 3.546).
    Die Höchstzahl der Kassenpraxen **eines** Trägers ist dagegen gemeinsam × % + sein zusätzliches × %
    (docs/DATEN.md, «Stellen lesen») – dabei wird wieder nicht über Träger summiert.
