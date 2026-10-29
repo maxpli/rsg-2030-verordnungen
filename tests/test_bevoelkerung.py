@@ -111,7 +111,8 @@ VR_EW_2021_TABELLENBAND = {
 # (VR 64); mit 1.1.2020 wurde sie zur Gänze auf Sankt Veit in der Südsteiermark (61060) und Straß in Steiermark
 # (61061) aufgeteilt, beide Bezirk Leibnitz (VR 65; Statistik Austria, Gemeindeverzeichnis Stand 1.1.2021, S.165).
 # Die Differenz ist exakt Murfelds Wohnbevölkerung am 1.1.2019: 1.671 (Land Steiermark, Steirische Statistiken,
-# Heft 9/2019, S.121). Welchen Stand die GÖG dem Gebiet zurechnet: docs/offene_punkte.md, Rückfrage an die GÖG.
+# Heft 9/2019, S.121). Entscheidung: Wir rechnen auf dem Gebietsstand der Bevölkerungsdaten (METHODIK, «Bekannte
+# Grenzen» 7); ob die Gliederung territorial gilt oder Bezirksänderungen folgt: docs/offene_punkte.md.
 ABWEICHUNG_VR_64_65 = {"64": -1_671, "65": 1_671}
 
 

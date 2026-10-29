@@ -137,15 +137,14 @@ den übrigen Ländern?*
 
 Niederösterreich, Salzburg, Wien: keine offene Frage zur eigenen Verordnung.
 
-## Rückfrage an die GÖG: VR-Zuschnitt unterhalb der Bezirke
+## GÖG-Gliederung: territorial oder je Gebietsstand?
 
-Der Tabellenband nennt für die Oststeiermark (VR 64) 1.671 Einwohner mehr und für die West-/Südsteiermark (VR 65)
-genauso viele weniger als die Summe der Bezirke laut GÖG-«Regionaler Gliederung» (1.1.2021; die anderen 30 VR sind
-exakt gleich; Tabellenband S.49, S.50; Test `tests/test_bevoelkerung.py`). Erklärbar über den Gebietsstand: Die
-Gliederung trägt den Stand 2019, und die Gemeinde Murfeld (1.671 Einwohner am 1.1.2019) wechselte mit 1.1.2020 vom
-Bezirk Südoststeiermark (VR 64) in den Bezirk Leibnitz (VR 65) – Belege in [METHODIK.md](METHODIK.md), «Bekannte
-Grenzen» 7. Zu fragen wäre: Rechnet die GÖG die VR-Bevölkerung des Anhangs 5 auf dem Gebietsstand 2019 (Murfeld mit
-dem Stand 1.1.2019 in der VR 64), und bleibt das bei künftigen Gebietsänderungen so?
+Dass die ÖSG-Zahlen auf dem Gebietsstand 2019 beruhen, ist geklärt – die GÖG dokumentiert es selbst doppelt (Kopf
+der «Regionalen Gliederung»; die VR-Bevölkerung 64/65 enthält Murfeld exakt mit dem Stand 1.1.2019; Belege in
+[METHODIK.md](METHODIK.md), «Bekannte Grenzen» 7). Offen ist nur die Lesart für die Zukunft: Gilt die
+VR-Gliederung **territorial** (Stand 2019 eingefroren) oder folgt sie **künftigen Bezirksänderungen**? Praktisch
+wird das erst bei der nächsten Gebietsänderung über eine Bezirks- und damit VR-Grenze; der Test
+`tests/test_bevoelkerung.py` schlägt dann an, und die Frage wäre bei der GÖG zu klären.
 
 ## Zweite Durchsicht (Beiträge willkommen)
 

@@ -641,11 +641,15 @@ Fehlt ein Wert, bleibt die Zeile weg und wird nicht geschätzt. Spalten:
    **Gebietsstand 2019** – dort liegt die Gemeinde Murfeld im Bezirk Südoststeiermark (VR 64). Mit 1.1.2020 wurde
    Murfeld zur Gänze auf Sankt Veit in der Südsteiermark und Straß in Steiermark aufgeteilt, beide Bezirk Leibnitz
    (VR 65; LGBl. Stm. Nr. 46/2019; Statistik Austria, Gemeindeverzeichnis Stand 1.1.2021, S.165). Unsere Bevölkerung
-   (1.1.2021) zählt das Gebiet deshalb zur VR 65, der ÖSG offenbar zur VR 64 – die Differenz ist exakt Murfelds
-   Wohnbevölkerung am 1.1.2019: 1.671 (Land Steiermark, Steirische Statistiken, Heft 9/2019, S.121). Welchen
-   Bevölkerungsstand die GÖG dem Gebiet zurechnet, kann nur sie bestätigen
-   ([offene_punkte.md](offene_punkte.md#rückfrage-an-die-gög-vr-zuschnitt-unterhalb-der-bezirke)); die VD der beiden
-   Regionen trägt diese Unschärfe ([DATEN.md](DATEN.md#fallstricke), Fallstrick 12).
+   (1.1.2021) zählt das Gebiet deshalb zur VR 65, der ÖSG zur VR 64 – die Differenz ist exakt Murfelds
+   Wohnbevölkerung am 1.1.2019: 1.671 (Land Steiermark, Steirische Statistiken, Heft 9/2019, S.121).
+   **Entscheidung: Wir rechnen auf dem Gebietsstand der Bevölkerungsdaten.** Die GÖG-Variante nachzubauen hieße,
+   für IST 2022/2023 und PLAN 2030 einen eingefrorenen Wert fortzuschreiben, den die GÖG für diese Stichtage nirgends
+   veröffentlicht, oder das Ex-Gebiet unterhalb der Gemeinde herauszulösen (eigene Datenquelle für eine einzige
+   Region); die Steiermark-Verordnung nennt weder Bevölkerung noch Gemeindezuordnung, der Zähler wäre also nicht
+   kontrollierbar. Offen ist nur, ob die VR-Gliederung territorial (Stand 2019) gilt oder künftigen
+   Bezirksänderungen folgt ([offene_punkte.md](offene_punkte.md#gög-gliederung-territorial-oder-je-gebietsstand));
+   die VD der beiden Regionen trägt diese Unschärfe ([DATEN.md](DATEN.md#fallstricke), Fallstrick 12).
 
 ---
 
