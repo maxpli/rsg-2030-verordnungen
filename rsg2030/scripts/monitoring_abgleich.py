@@ -3,7 +3,8 @@
 Vergleicht das IST jeder BL-Matrix (Long-CSV, vergleichbarer Block laut `schema.bl_long`) mit der Kurzfassung des
 RSG-Monitorings desselben Datenjahrs, je Teilzeile und Fach, dazu die Spalte «gesamt». Zusätzlich: AM und IM
 spitalsambulant im Monitoring von 2022 auf 2023 und die ZAE laut Fußnote («davon … in ZAE», erst ab Datenjahr 2023) –
-daran sieht man, wo die ZAE vorher stecken. Was das Ergebnis heißt: docs/PRUEFUNG.md, «Abgleich mit dem
+daran sieht man, wo die ZAE vorher stecken. Dazu ZMK und KFO getrennt: Das Monitoring führt ZMK «inkl. KFO», also
+zeigt die Differenz, ob KFO in der gedruckten ZMK-Spalte eines Landes schon steckt, fehlt oder dazugehört. Was das Ergebnis heißt: docs/PRUEFUNG.md, «Abgleich mit dem
 RSG-Monitoring». Kein Wert aus dem Monitoring geht in die Daten; eine Abweichung entscheidet ein Mensch.
 
 Die Kurzfassungen stehen im Register `rsg2030/quellen/quellen.csv` mit Verwendet = «Abgleich» (URL, SHA-256); sie
@@ -46,14 +47,21 @@ ZEILEN = {
     "ÄAVE in Kassenambulatorien": "kassen_amb",
     "ÄAVE insgesamt": "insgesamt",
     "ÄAVE Wahlärztinnen": "wahl",
+    # «besetzte und unbesetzte Planstellen» (Fußnote); Quelle laut Blatt «Anmerkungen u. Quellen»: ÖGK.
+    # Die Zeile darunter («Vertragsärztinnen/-ärzte von BVAEB oder SVS ohne ÖGK-Vertrag») zählt Personen ohne
+    # ÖGK-Vertrag, nicht Planstellen je Träger – sie passt zu keiner Zeile der Matrix und bleibt draußen.
+    "ÖGK-Planstellen": "planstellen_oegk",
 }
-ENDE = "IST Kassenplanstellen"  # danach folgen Planstellen und SVE, nicht verglichen
+# Die PLAN-Zeilen heißen wie die IST-Zeilen («ÄAVE spitalsambulant»): ab dem PLAN-Abschnitt nicht weiterlesen.
+ENDE = re.compile(r"^(PLAN (ÄAVE|SVE)|RSG[- ]Planungsstand)")
 
 # Spaltenkopf im Monitoring (ohne Fußnotenzeichen wie «(2)») → Fachspalte der Long-CSV, wo der Name anders ist.
 # ORTR = OR + UCH + ORTR (METHODIK R4); ZMK(3) ist «inkl. KFO», daher auf unserer Seite ZMK + KFO.
 FACH = {"AM/PV": "AM", "SON": "SON/IDB"}
 ORTR_TEILE = ("OR", "UCH", "ORTR")
 SCHWELLE_PROZENT = 3  # ÄAVE im Monitoring, ab der ein Abstand in Prozent aussagekräftig ist
+# Zeilen, die das Monitoring führt und in denen KFO vorkommt: dort muss ZMK + KFO zu «ZMK inkl. KFO» passen
+KFO_ZEILEN = ("niedergelassen", "insgesamt", "planstellen_oegk")
 ZAE_FUSSNOTE = re.compile(r"spitalsambulant: davon ([\d.,]+) in ZAE")
 
 
@@ -83,13 +91,14 @@ def _zahl(v: object) -> float:
 
 
 def lies_monitoring(pfad: Path) -> pd.DataFrame:
-    """IST-ÄAVE je Land (Blatt), Teilzeile und Fach: Spalten Land, Jahr, Zeile_ID, Fach, Monitoring. Das Datenjahr
-    steht über den Zeilen («IST ÄAVE 2022»)."""
+    """IST je Land (Blatt), Zeile und Fach: Spalten Land, Jahr, Zeile_ID, Fach, Monitoring. Gelesen werden die
+    ÄAVE-Zeilen und die ÖGK-Planstellen (`ZEILEN`). Das Datenjahr steht über den Zeilen («IST ÄAVE 2022»)."""
     wb = openpyxl.load_workbook(pfad, read_only=True, data_only=True)
     zeilen = []
     for ws in wb.worksheets:
         kopf: list[str] | None = None
         jahr: int | None = None
+        gelesen: set[str] = set()
         for r in ws.iter_rows(values_only=True):
             if kopf is None:
                 if len(r) > 3 and r[3] == "AM/PV":
@@ -99,18 +108,27 @@ def lies_monitoring(pfad: Path) -> pd.DataFrame:
             if m := JAHR.match(text):
                 jahr = int(m.group(1))
                 continue
-            if text.startswith(ENDE):
+            if ENDE.match(text):
                 break
             zid = next((z for anfang, z in ZEILEN.items() if text.startswith(anfang)), None)
             if zid is None:
                 continue
+            if zid in gelesen:  # dieselbe Zeile zweimal: der PLAN-Abschnitt wurde nicht erkannt
+                raise RuntimeError(f"{pfad.name}, Blatt {ws.title}: Zeile «{text}» doppelt")
+            gelesen.add(zid)
             if jahr is None:
                 raise RuntimeError(f"{pfad.name}, Blatt {ws.title}: kein «IST ÄAVE <Jahr>» über den Zeilen")
             werte = {fach(k): _zahl(v) for k, v in zip(kopf[3:], r[3:]) if k}
-            werte["ORTR"] = sum(werte.get(k, float("nan")) for k in ORTR_TEILE)
+            # leere Teilspalte = dort kein eigener Ausweis (UCH in der Planstellen-Zeile), nicht «unbekannt»:
+            # nur wenn alle drei leer sind, bleibt ORTR leer
+            werte["ORTR"] = pd.Series([werte.get(k) for k in ORTR_TEILE]).sum(min_count=1)
             for k, w in werte.items():
                 if k not in ORTR_TEILE[:2]:
                     zeilen.append(dict(Land=ws.title, Jahr=jahr, Zeile_ID=zid, Fach=k, Monitoring=w))
+        # Die Planstellen stehen zwischen den IST- und den PLAN-ÄAVE: Fehlen sie, hat sich der Aufbau geändert
+        # und der PLAN-Abschnitt beginnt woanders, als `ENDE` annimmt.
+        if kopf is not None and "planstellen_oegk" not in gelesen:
+            raise RuntimeError(f"{pfad.name}, Blatt {ws.title}: keine Zeile «ÖGK-Planstellen»")
     return pd.DataFrame(zeilen)
 
 
@@ -127,8 +145,9 @@ def zae_fussnoten(pfad: Path) -> dict[str, float]:
 
 
 def lies_verordnungen(long: pd.DataFrame) -> pd.DataFrame:
-    """IST je Land (vergleichbarer Block), Teilzeile und Fach samt «gesamt»: Spalten Land, Jahr, Zeile_ID, Fach,
-    Verordnung, Rundung. KFO geht in ZMK ein, wie im Monitoring."""
+    """IST je Land (vergleichbarer Block), Zeile und Fach samt «gesamt»: Spalten Land, Jahr, Zeile_ID, Fach,
+    Verordnung, Rundung. KFO geht in ZMK ein, wie im Monitoring («ZMK inkl. KFO»). Die Planstellen stehen in allen
+    Ländern im Block «haupt»; `bl_long` nimmt Zeilen, die es nur dort gibt, dazu (METHODIK R6)."""
     teile = []
     for land in long["Land"].unique():
         m = bl_long(long, land)
@@ -139,6 +158,26 @@ def lies_verordnungen(long: pd.DataFrame) -> pd.DataFrame:
         )
         teile.append(g)
     return pd.concat(teile, ignore_index=True)
+
+
+def kfo_vergleich(long: pd.DataFrame, mon: pd.DataFrame) -> pd.DataFrame:
+    """ZMK und KFO getrennt neben dem Monitoring, dessen ZMK «inkl. KFO» ist: Spalten ZMK, KFO, Summe, Monitoring,
+    Differenz. Steckt KFO schon in der gedruckten ZMK-Spalte, ist die Summe um KFO zu hoch; fehlt KFO, ist sie um
+    KFO zu niedrig. Daran hängt die Lesart der KFO-Fußnote in Oberösterreich (METHODIK.md R4). Mit den Ländern ohne
+    KFO-Angabe, denn dort fällt das Fehlen genauso auf."""
+    teile = []
+    for land in long["Land"].unique():
+        m = bl_long(long, land)
+        m = m[(m["Abschnitt"] == "IST") & m["Zeile_ID"].isin(KFO_ZEILEN) & m["Fach"].isin(("ZMK", "KFO"))]
+        p = m.pivot_table(index=["Land", "Jahr", "Zeile_ID"], columns="Fach", values="Wert", dropna=False)
+        teile.append(p.reindex(columns=["ZMK", "KFO"]).reset_index())
+    v = pd.concat(teile, ignore_index=True)
+    v["Jahr"] = v["Jahr"].astype(int)
+    v["Summe"] = v[["ZMK", "KFO"]].sum(axis=1, min_count=1)
+    v = v.merge(mon[mon["Fach"] == "ZMK"].drop(columns="Fach"), on=["Land", "Jahr", "Zeile_ID"], how="left")
+    v["Differenz"] = (v["Summe"] - v["Monitoring"]).round(3)
+    v["Zeile_ID"] = pd.Categorical(v["Zeile_ID"], KFO_ZEILEN)
+    return v.sort_values(["Zeile_ID", "Jahr", "Land"]).reset_index(drop=True)
 
 
 def vergleiche(vo: pd.DataFrame, mon: pd.DataFrame) -> pd.DataFrame:
@@ -165,9 +204,9 @@ def _tabelle(tab: pd.DataFrame) -> None:
         log.info("   %s", z)
 
 
-def bericht(v: pd.DataFrame, mon: pd.DataFrame, zae: dict[tuple[str, int], float]) -> None:
+def bericht(v: pd.DataFrame, mon: pd.DataFrame, zae: dict[tuple[str, int], float], kfo: pd.DataFrame) -> None:
     log.info(
-        "Je Teilzeile und Land: Fächer verglichen, davon gleich, «gesamt» und die Abweichungen (Verordnung / Monitoring)"
+        "Je Zeile und Land: Fächer verglichen, davon gleich, «gesamt» und die Abweichungen (Verordnung / Monitoring)"
     )
     for zid in ZEILEN.values():
         z = v[v["Zeile_ID"] == zid]
@@ -192,6 +231,10 @@ def bericht(v: pd.DataFrame, mon: pd.DataFrame, zae: dict[tuple[str, int], float
     log.info("")
     log.info("── niedergelassen: Verordnung über Monitoring, in %% (Fächer ab %s ÄAVE im Monitoring)", SCHWELLE_PROZENT)
     _tabelle(tab.sort_index())
+    log.info("")
+    log.info("── ZMK und KFO getrennt gegen «ZMK inkl. KFO» im Monitoring (IST); «leer» = kein KFO ausgewiesen")
+    sp = ["ZMK", "KFO", "Summe", "Monitoring", "Differenz"]
+    _tabelle(kfo.set_index(["Zeile_ID", "Jahr", "Land"])[sp].map(_fmt))
     s = mon[
         (mon["Zeile_ID"] == "spitalsambulant") & mon["Fach"].isin(["AM", "IM"]) & (mon["Land"] != "Österreich gesamt")
     ]
@@ -214,7 +257,8 @@ def main(argv: list[str] | None = None) -> int:
     if not long_csv.exists():
         log.error("❌ %s fehlt → python -m rsg2030 daten", long_csv)
         return 1
-    vo = lies_verordnungen(pd.read_csv(long_csv))
+    long = pd.read_csv(long_csv)
+    vo = lies_verordnungen(long)
     try:
         teile = [(lies_monitoring(p), zae_fussnoten(p)) for p in kurzfassungen()]
     except (RuntimeError, OSError) as e:
@@ -222,7 +266,7 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     mon = pd.concat([m for m, _ in teile])
     zae = {(land, int(m["Jahr"].iloc[0])): w for m, z in teile for land, w in z.items()}
-    bericht(vergleiche(vo, mon), mon, zae)
+    bericht(vergleiche(vo, mon), mon, zae, kfo_vergleich(long, mon))
     return 0
 
 
