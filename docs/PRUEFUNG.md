@@ -62,7 +62,7 @@ Damit hat jede Art von Fehler genau eine Stelle, die sie findet:
 | Lücke oder Widerspruch im PDF selbst | Zeilensumme passt nicht | Ebene 4: Prüfungen → Korrektur mit Regel → Mensch (Regel 3) |
 | Fußnote, die die Bedeutung einer Zahl ändert | «ZMK einschließlich KFO», «PLAN = IST fortgeschrieben» | Verzeichnis aller Fußnoten: vollständig und wie gedruckt per Test (Regel 1), Einordnung durch einen Menschen (Regel 3) |
 | falsche Referenzdaten der Kennzahlen | Richtwert vertippt, Bezirk in der falschen Region | Test gegen ÖSG-Textband S.39 und GÖG «Regionale Gliederung» (Regel 1) |
-| falsch gerechnete Versorgungsdichte | Bevölkerung der falschen Region | Handrechnungen je Land, Bevölkerung gegen die ÖSG-Zahlen (Tests, Regel 1) |
+| falsch gerechnete Versorgungsdichte | Bevölkerung der falschen Region | Handrechnungen je Land; Bevölkerung gegen die ÖSG-Zahlen, je VR gegen das «EW insgesamt (2021)» des Tabellenbands – 30 von 32 exakt, VR 64/65 als bekannte Abweichung ±1.671 (Tests, Regel 1) |
 | Teilzeile falsch zugeschnitten | ZAE bei extramural addiert; AM spitalsambulant ohne ZAE | Test: spitalsambulant + extramural = insgesamt je Region, Abschnitt und Fach (Toleranz = Rundung der gedruckten Zellen); Handrechnungen NÖ, Burgenland VR 12, OÖ, Wien, Tirol (Regel 1) |
 | Teilzeile in SVE statt ÄAVE | Steiermark spitalsambulant aus dem Block `haupt` | Abbruch, wenn eine Zeile der Tabelle Versorgungsdichte nicht in ÄAVE ist; Handrechnung Steiermark (Regel 1) |
 | Zeile, Fach oder Soll-Intervall, die es nicht geben darf | PVE in AN (Vorarlberg druckt dort «0,0»); Soll-Intervall bei spitalsambulant | Vertrag der ÄAVE-Eingabe (`oesg_methodik/eingang.py`) und Tests (Regel 1) |

@@ -9,6 +9,9 @@ Tabellenband;12;Regelwerk zur Berechnung ärztlicher ambulanter Versorgungseinhe
 Tabellenband;13;abgerechneten Betrag pro Arzt“ des jeweiligen Faches aus der Ärztekostenstatistik dividiert (falls es keinen;Institute: abgerechnete Beträge (R2a, E1)
 Tabellenband;15;"Pflegedienstleistungsstatistik; Summen nur bedingt aussagekräftig, da nicht alle Angaben in allen Bundesländern";Anhang 5: Beginn der ambulanten Kennzahlen
 Tabellenband;28;EW insgesamt (2021): 1.920.949;Anhang 5, Seite Wien: ÄAVE 2021 für die VD2021-Nachrechnung (R1, R4)
+Tabellenband;29;EW insgesamt (2021): 198.922;Anhang 5, VR 11: erste VR-Seite, EW 2021 je VR (R7, Test Bevölkerung)
+Tabellenband;49;EW insgesamt (2021): 267.047;Anhang 5, VR 64 Oststeiermark: EW 2021 (Bekannte Grenzen 7, VR 64/65 ±1.671)
+Tabellenband;50;EW insgesamt (2021): 195.441;Anhang 5, VR 65 West-/Südsteiermark: EW 2021 (Bekannte Grenzen 7, VR 64/65 ±1.671)
 Tabellenband;231;Angabe optional) In der Allgemeinmedizin (AM) und der Kinderund Jugendheilkunde (KIJU) ist im IST-Stand im;Wahlärzt:innen: Angabe optional
 Tabellenband;231;vertragsärztlichen Planstellen je KV-Träger im Basis-Daten-Jahr im IST-Stand je Fachrichtung und gesamt. Anzahl;IST: Planstellen je Träger (Stellen-Zeilen)
 Tabellenband;232;Planstellen für niedergelassene VertragsärztInnen und der geplanten ärztlichen Vollzeitäquivalente in;PLAN: Sachleistungsstellen (Stellen-Zeilen)

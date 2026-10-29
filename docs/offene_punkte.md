@@ -137,6 +137,14 @@ den übrigen Ländern?*
 
 Niederösterreich, Salzburg, Wien: keine offene Frage zur eigenen Verordnung.
 
+## Rückfrage an die GÖG: VR-Zuschnitt unterhalb der Bezirke
+
+Der Tabellenband nennt für die Oststeiermark (VR 64) 1.671 Einwohner mehr und für die West-/Südsteiermark (VR 65)
+genauso viele weniger als die Summe der Bezirke laut GÖG-«Regionaler Gliederung» (1.1.2021; die anderen 30 VR sind
+exakt gleich; Tabellenband S.49, S.50; Test `tests/test_bevoelkerung.py`). Die einzige Gemeinde des Bezirks
+Deutschlandsberg mit genau 1.671 Einwohnern ist Sankt Josef (Weststeiermark). Zu fragen wäre: Schneidet der ÖSG die
+VR 64/65 auf Gemeindeebene anders zu als die Bezirksliste, und wo ist dieser Zuschnitt veröffentlicht?
+
 ## Zweite Durchsicht (Beiträge willkommen)
 
 Die Freigabe hat bisher eine Person gemacht. Eine unabhängige Durchsicht durch eine ÖSG-kundige Person würde die

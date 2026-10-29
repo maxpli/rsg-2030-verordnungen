@@ -424,7 +424,7 @@ wird.
 
 | | Quelle | Verhältnis zum ÖSG |
 |---|---|---|
-| IST, BL und VR | Statistik Austria Open Data, «Bevölkerungsstand zu Jahresbeginn» (`OGD_bevstandjbab2002_BevStand_<Jahr>`, je Gemeinde; Bezirk = erste drei Stellen der Gemeindekennziffer, Wien: Gemeindebezirke), 1.1. des IST-Jahres der jeweiligen Matrix; VR = Summe ihrer Bezirke laut `oesg_methodik/referenz/oesg_regionen.csv` | **gleich:** 1.1.2021 ergibt genau 8.932.664 bzw. 7.011.715 (Test) |
+| IST, BL und VR | Statistik Austria Open Data, «Bevölkerungsstand zu Jahresbeginn» (`OGD_bevstandjbab2002_BevStand_<Jahr>`, je Gemeinde; Bezirk = erste drei Stellen der Gemeindekennziffer, Wien: Gemeindebezirke), 1.1. des IST-Jahres der jeweiligen Matrix; VR = Summe ihrer Bezirke laut `oesg_methodik/referenz/oesg_regionen.csv` | **gleich:** 1.1.2021 ergibt genau 8.932.664 bzw. 7.011.715; die Bezirks-Summe je VR trifft das «EW insgesamt (2021)» des Anhangs 5 in 30 von 32 VR exakt, VR 64/65 ±1.671 («Bekannte Grenzen» 7; Tests) |
 | PLAN 2030, BL | Statistik Austria Open Data, **Bevölkerungsprognose 2025**, Hauptszenario, «Bevölkerung zum Jahresanfang» 2030 (`OGD_bevjahresanf_PR_BEVJA_10`), Summe über Alter und Geschlecht | **Abweichung:** neuere Prognose als im ÖSG (siehe unten) |
 | PLAN 2030, VR | Anteil der VR an ihrem Land 2030 laut **ÖROK-Prognose 2021** × BL-Wert 2030 | **gleiches Prinzip** wie Methodenband S.13; VR summieren sich genau zum BL |
 
@@ -634,6 +634,14 @@ Fehlt ein Wert, bleibt die Zeile weg und wird nicht geschätzt. Spalten:
    Austauschbeziehungen» bewertet sehen (Textband S.38). Patientenströme stecken nicht in den Kennzahlen; dafür
    bräuchte es eigene Daten. Lage, Position und ÄAVE-Abstand sind deshalb ein erster Blick, keine Bewertung im Sinn des
    ÖSG ([DATEN.md](DATEN.md#fallstricke), Fallstrick 11).
+7. **Bevölkerung der VR 64 und 65:** Der Tabellenband druckt je VR das «EW insgesamt (2021)» (Anhang 5, S.29–60);
+   unsere Summe der Bezirke laut GÖG-Gliederung trifft 30 von 32 VR exakt. Die Oststeiermark (VR 64) liegt um 1.671
+   darunter, die West-/Südsteiermark (VR 65) um 1.671 darüber (Tabellenband S.49, S.50; Test
+   `tests/test_bevoelkerung.py`). Naheliegend, aber unbestätigt: Sankt Josef (Weststeiermark) – die einzige Gemeinde
+   des Bezirks Deutschlandsberg (laut GÖG ganz in VR 65) mit genau 1.671 Einwohnern am 1.1.2021 – zählt im ÖSG zur
+   VR 64. Wie der ÖSG die VR unterhalb der Bezirke zuschneidet, ist nicht veröffentlicht
+   ([offene_punkte.md](offene_punkte.md#rückfrage-an-die-gög-vr-zuschnitt-unterhalb-der-bezirke)); die VD der beiden
+   Regionen trägt diese Unschärfe ([DATEN.md](DATEN.md#fallstricke), Fallstrick 12).
 
 ---
 

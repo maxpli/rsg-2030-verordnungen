@@ -227,6 +227,11 @@ Bitte vor jeder Auswertung lesen.
       höher, das Umland eher tiefer. Das gilt besonders auf Ebene der Versorgungsregionen.
     - **IST gegen die Norm 2030:** Die Soll-Intervalle gelten für 2030; ein IST-Wert daran gemessen zeigt den Abstand
       zur Norm 2030, nicht eine Verletzung im IST-Jahr.
+12. **Bevölkerung der VR 64/65 weicht vom ÖSG ab.** Die VR-Bevölkerung ist die Summe der Bezirke laut
+    GÖG-Gliederung; der ÖSG-Tabellenband nennt für die Oststeiermark (VR 64) 1.671 Einwohner mehr und für die
+    West-/Südsteiermark (VR 65) 1.671 weniger (1.1.2021) – alle anderen 30 VR sind exakt gleich. Vermutlich eine
+    Gemeinde an der Regionsgrenze ([METHODIK.md](METHODIK.md#bekannte-grenzen-und-offene-fragen), Punkt 7); die VD
+    und die Position im Soll-Intervall dieser beiden Regionen tragen diese Unschärfe.
 
 ---
 
