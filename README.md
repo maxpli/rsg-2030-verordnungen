@@ -160,4 +160,5 @@ Zwei Pakete: `oesg_methodik/` (die ÖSG-Regeln, unabhängig vom Datensatz) und `
 Projekte binden das Paket in einer festen Version ein:
 `rsg-2030-verordnungen @ git+https://github.com/maxpli/rsg-2030-verordnungen@2026.1` (Datenordner: Arbeitsordner
 oder `RSG2030_DATEN`). Was in den veröffentlichten Dateien steht, bitte dort lesen, nicht mit Funktionen des Pakets
-nachrechnen.
+nachrechnen. Vor dem Umstellen auf eine neue Version: Abschnitt «Schnittstelle» im [CHANGELOG](CHANGELOG.md) – dort
+steht, was sich an den importierbaren Namen geändert hat.

@@ -18,7 +18,11 @@ import pandas as pd
 from oesg_methodik import BUNDESLAENDER
 from oesg_methodik.eingang import PVE_FAECHER, SACHLEISTUNG, ZEILEN, pruefe
 from oesg_methodik.faecher import OESG_ANALYSEKERN, ZAE, ZAE_QUELLE, ZAE_ZEILEN, summe_im_zuschnitt, teile, zuschnitt
+from oesg_methodik.stellen_eingang import OHNE_PROZENT
+from oesg_methodik.stellen_eingang import ZEILEN as STELLEN_ZEILEN
+from oesg_methodik.stellen_eingang import pruefe as stellen_pruefe
 from rsg2030.config import LONG_DATEI, ausgabe_dir
+from rsg2030.matrix_extract import PROZENT_SUFFIX
 from rsg2030.schema import BLOCK_AEQ, bl_long, matrix_long
 
 PLAN_JAHR = 2030
@@ -79,6 +83,23 @@ def vr_tabellen(long: pd.DataFrame) -> dict[tuple[str, str], pd.DataFrame]:
     return out
 
 
+def _zuschnitt_text(block: pd.Series, fach: str, zeile: str, nur_regel: frozenset[str]) -> str:
+    """Wie der Wert entstanden ist (`faecher.zuschnitt`), dazu der Vermerk für Spalten, die nicht in der Tabelle des
+    PDF stehen und nur per Korrekturregel dazukommen (OÖ: KFO aus der Fußnote zu ZMK).
+
+    Beide Eingangstabellen bauen diesen Text mit **derselben** Funktion: Nur so ist der `Zuschnitt` einer Stellen-Zeile
+    zeichengleich mit dem der zugehörigen ÄAVE-Zeile, und nur dann bedeutet ein Fach in beiden Tabellen dasselbe
+    (Test: `tests/test_stellen.py`)."""
+    text = zuschnitt(block, fach, zeile)
+    vermerk = [s for s in teile(fach, zeile) if s in nur_regel and f" {s}" in f" {text}"]
+    return text + "".join(
+        " (nicht in der Tabelle, per Korrekturregel)"
+        if s == fach
+        else f" ({s} nicht in der Tabelle, per Korrekturregel)"
+        for s in vermerk
+    )
+
+
 def _aave_zeilen(df: pd.DataFrame, ist_jahr: int, nur_regel: frozenset[str] = frozenset(), **schluessel) -> list[dict]:
     """ÄAVE je ÄAVE-Zeile (`eingang.ZEILEN`, ohne Wahlärzt:innen) und Richtwert-Fach aus einer breiten Matrix,
     zugeschnitten nach `oesg_methodik.faecher.teile` (AM mit der Spalte `ZAE` nur in `ZAE_ZEILEN`, siehe `_breit`);
@@ -96,14 +117,7 @@ def _aave_zeilen(df: pd.DataFrame, ist_jahr: int, nur_regel: frozenset[str] = fr
             aave = summe_im_zuschnitt(block, fach, zeile)
             if aave is None:
                 continue
-            text = zuschnitt(block, fach, zeile)
-            vermerk = [s for s in teile(fach, zeile) if s in nur_regel and f" {s}" in f" {text}"]
-            text += "".join(
-                " (nicht in der Tabelle, per Korrekturregel)"
-                if s == fach
-                else f" ({s} nicht in der Tabelle, per Korrekturregel)"
-                for s in vermerk
-            )
+            text = _zuschnitt_text(block, fach, zeile, nur_regel)
             rows.append(
                 {
                     **schluessel,
@@ -155,6 +169,74 @@ def _eingang_zeilen(
         }
         for r in _aave_zeilen(df, ist_jahr, nur_regel)
     ]
+
+
+def _stellen_zeilen(df: pd.DataFrame, ist_jahr: int, nur_regel: frozenset[str], **kopf) -> list[dict]:
+    """Stellen je Stellen-Zeile (`stellen_eingang.ZEILEN`) und Richtwert-Fach aus einer breiten Matrix.
+
+    Zugeschnitten wird mit derselben Funktion wie die ÄAVE (`faecher.summe_im_zuschnitt`); die ZAE fallen dabei von
+    selbst weg, weil eine Stellen-Zeile nicht in `ZAE_ZEILEN` steht. Der Maximalanteil vertragsärztlicher Planstellen
+    steht je Matrixspalte in einer eigenen Zeile (`<zeile>_max_vaep_prozent`): gerechnet wird Stellen × Prozent **je
+    Spalte**, erst danach summiert. Prozentsätze werden nie gemittelt.
+
+    `Max_VAEP_Prozent` bleibt leer, wenn für einen Teil der Stellen kein Prozentsatz gedruckt ist – ein Anteil, der
+    nur einen Teil der Zeile abdeckt, wäre irreführend. Dass das heute nirgends vorkommt, hält ein Test fest; die
+    Rohdatenprüfung `checks.pruefe_prozent_gewichtet` meldet solche Zellen schon beim Auslesen."""
+    rows: list[dict] = []
+    nach_zeile = {str(r["Zeile_ID"]): r for _, r in df.iterrows() if str(r["Abschnitt"]) == "PLAN"}
+    for _, block in df.iterrows():
+        abschnitt, zeile = str(block["Abschnitt"]), str(block["Zeile_ID"])
+        if zeile not in STELLEN_ZEILEN or abschnitt not in ABSCHNITTE:
+            continue
+        prozente = nach_zeile.get(zeile + PROZENT_SUFFIX) if zeile not in OHNE_PROZENT else None
+        jahr = ist_jahr if abschnitt == "IST" else PLAN_JAHR
+        for fach in OESG_ANALYSEKERN:
+            stellen = summe_im_zuschnitt(block, fach, zeile)
+            if stellen is None:
+                continue
+            max_stellen, basis = 0.0, 0.0
+            for spalte in teile(fach, zeile):
+                wert = block.get(spalte)
+                anteil = None if prozente is None else prozente.get(spalte)
+                if pd.notna(wert) and anteil is not None and pd.notna(anteil):
+                    max_stellen += float(wert) * float(anteil) / 100
+                    basis += float(wert)
+            # abgedeckt: Für jede Stelle dieses Fachs ist ein Prozentsatz gedruckt. Sonst bleiben beide Felder leer –
+            # ein Anteil, der nur einen Teil der Zeile abdeckt, wäre irreführend.
+            abgedeckt = prozente is not None and abs(basis - stellen) < 1e-9
+            rows.append(
+                {
+                    **kopf,
+                    "Abschnitt": abschnitt,
+                    "Jahr": jahr,
+                    "Zeile_ID": zeile,
+                    "Fach": fach,
+                    "Stellen": stellen,
+                    "Zuschnitt": _zuschnitt_text(block, fach, zeile, nur_regel),
+                    "Max_VAEP_Stellen": round(max_stellen, 6) if abgedeckt else None,
+                    # bei 0 Stellen gibt es keinen Anteil (0 von 0), wohl aber die 0 oben
+                    "Max_VAEP_Prozent": round(max_stellen / stellen * 100, 6) if abgedeckt and stellen > 0 else None,
+                }
+            )
+    return rows
+
+
+def stellen_eingang(long: pd.DataFrame | None = None) -> pd.DataFrame:
+    """Stellen-Eingang für `oesg_methodik.stellen_eingang`: alle BL und VR, Stellen-Zeilen im ÖSG-Zuschnitt.
+
+    Dieselben Fächer wie `aave_eingang` und derselbe `Zuschnitt`-Text – sonst verglichen Auswertungen ÄAVE und Stellen
+    über verschieden geschnittene Fächer (docs/METHODIK.md, «Stellen»)."""
+    long = lade_matrix_long() if long is None else long
+    ist_years = ist_jahre(long)
+    nur_regel = _nur_per_regel(long)
+    rows: list[dict] = []
+    for land, df in bl_tabellen(long).items():
+        k = nur_regel.get((land, "BL", land), frozenset())
+        rows += _stellen_zeilen(df, ist_years[land], k, Datensatz=DATENSATZ, Land=land, Ebene="BL", Region_ID=land)
+    for (land, vr), df in vr_tabellen(long).items():
+        k = nur_regel.get((land, "VR", vr), frozenset())
+        rows += _stellen_zeilen(df, ist_years[land], k, Datensatz=DATENSATZ, Land=land, Ebene="VR", Region_ID=vr)
+    return stellen_pruefe(pd.DataFrame(rows))
 
 
 def _nur_per_regel(long: pd.DataFrame) -> dict[tuple[str, str, str], frozenset[str]]:

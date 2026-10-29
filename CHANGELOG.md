@@ -1,7 +1,9 @@
 # Änderungen
 
 Hier steht, was sich zwischen Versionen an den **Daten** ändert – jede Änderung einer Prüfsumme in
-`rsg2030/erwartete_ausgaben.csv`, mit Grund – und an den Befehlen. Versionen: `<Verordnungsstand>.<Nummer>`.
+`rsg2030/erwartete_ausgaben.csv`, mit Grund –, an den Befehlen und an der **importierbaren Schnittstelle**. Wer das
+Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem Umstellen den Abschnitt
+«Schnittstelle» der neuen Version. Versionen: `<Verordnungsstand>.<Nummer>`.
 
 ## 2026.2 – in Arbeit
 
@@ -52,6 +54,22 @@ Hier steht, was sich zwischen Versionen an den **Daten** ändert – jede Änder
   steht das Kürzel **nach** den Werten. Jetzt wird jede Folge von fünf Werten in der Form der Tabellenspalten gesucht
   und ihr das nächstgelegene Kürzel zugeordnet – damit fallen auch Fußnotenzeichen weg, die vorne («(KJP)1 30 …»)
   wie hinten («… 3,9 * 1 vorrangig …») an die Werte stoßen.
+
+**Schnittstelle – Umstellung nötig:**
+
+- `oesg_methodik.faecher.aave_fach` heißt jetzt **`summe_im_zuschnitt`**. Gleiche Argumente, gleiches Verhalten, nur
+  der Name. Grund: Der Zuschnitt gilt einheitenneutral – dieselbe Funktion schneidet ÄAVE und Stellen zu (für eine
+  Stellen-Zeile fällt die ZAE von selbst weg), und «aave» wäre dort falsch. Bewusst **ohne Alias**: Zwei Namen für
+  eine Funktion laden dazu ein, den falschen zu nehmen.
+
+  ```python
+  from oesg_methodik.faecher import summe_im_zuschnitt  # vorher: aave_fach
+
+  summe_im_zuschnitt(zeile, "ZMK")  # unverändert
+  ```
+
+  Betroffen ist nur, wer `oesg_methodik` **importiert**. Wer die veröffentlichten Dateien liest – der Normalfall –,
+  muss nichts tun.
 
 **Befehle:**
 
