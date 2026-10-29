@@ -8,9 +8,17 @@ legt Spalten und Regeln fest. Bedeutung der Zeilen: docs/DATEN.md, «Stellen les
 
 Drei Regeln, die hier durchgesetzt werden, weil sie leicht brechen:
 
-1. **Nie über Träger summieren.** Eine Stelle hat meist Verträge mit mehreren Trägern, «die Werte dürfen nicht addiert
-   werden» (Tabellenband S.231). Darum gibt es je Träger eine eigene Zeile und keine Zeile, die sie zusammenzählt –
-   außer das Land druckt selbst eine (Wien: `planstellen_oegk_svs_bvaeb`, `slst_gesamt`).
+1. **IST und PLAN verhalten sich entgegengesetzt – das ist die häufigste Falle.**
+   *IST (`planstellen_…`):* **nicht summieren.** Dieselbe Stelle hat meist Verträge mit mehreren Trägern und steht
+   deshalb in mehreren Zeilen; «die Werte dürfen nicht addiert werden» (Tabellenband S.231). Wien druckt für diesen
+   Fall eine eigene, bereinigte Zeile (`planstellen_oegk_svs_bvaeb`) – wir rechnen sie weder aus den Trägern aus noch
+   in sie hinein.
+   *PLAN (`slst_…`):* **summierbar.** Gemeinsame Stellen aller Träger und zusätzliche einzelner Träger sind
+   verschiedene Stellen (Tabellenband S.232). Beleg aus der Verordnung: Wiens gedruckte `slst_gesamt` ist in allen 27
+   Fachspalten genau `slst_gemeinsam` + die drei `slst_zus_…` (Bundesland gesamt 3.065 + 0 + 264 + 217 = 3.546).
+   Die Höchstzahl der Kassenpraxen **eines** Trägers ist dagegen gemeinsam × % + sein zusätzliches × %
+   (docs/DATEN.md, «Stellen lesen») – dabei wird wieder nicht über Träger summiert.
+   Abgeleitet wird hier nichts: Die Tabelle führt die gedruckten Zeilen, eine Gesamtzeile nur, wo das Land sie druckt.
 2. **Prozentsätze werden nicht summiert.** Der Maximalanteil vertragsärztlicher Planstellen steht je Matrixspalte;
    gerechnet wird Stellen × Prozent je Spalte, erst danach summiert (`Max_VAEP_Stellen`). `Max_VAEP_Prozent` ist das
    Ergebnis geteilt durch die Stellen – ein gewichtetes Mittel, nie ein Mittel aus Prozentsätzen.
@@ -45,11 +53,12 @@ Versorgungsdichte. `Max_VAEP_*`: leer, wo die Matrix keinen Maximalanteil führt
 SCHLUESSEL = [c for c in SPALTEN if c not in ("Stellen", "Zuschnitt", "Max_VAEP_Stellen", "Max_VAEP_Prozent")]
 
 IST_ZEILEN = ("planstellen_oegk", "planstellen_svs", "planstellen_bvaeb", "planstellen_oegk_svs_bvaeb")
-"""Vertragsärztliche Planstellen je KV-Träger im IST (Tabellenband S.231). `planstellen_oegk_svs_bvaeb` druckt nur
-Wien: eine gemeinsame Zeile statt dreier – wir rechnen sie nicht aus den Trägern aus und nicht in sie hinein."""
+"""Vertragsärztliche Planstellen je KV-Träger im IST (Tabellenband S.231). **Nicht addieren**: dieselbe Stelle steht
+in mehreren Zeilen. `planstellen_oegk_svs_bvaeb` druckt nur Wien, als bereinigte Zeile statt dreier."""
 PLAN_ZEILEN = ("slst_gemeinsam", "slst_eva", "slst_zus_oegk", "slst_zus_svs", "slst_zus_bvaeb", "slst_gesamt")
 """Sachleistungsstellen im PLAN (Tabellenband S.232): gemeinsame Stellen aller Träger, davon in Einrichtungen für
-Erstversorgung-Allgemeinmedizin (`slst_eva`, Teilmenge), zusätzliche je Träger; `slst_gesamt` druckt nur Wien."""
+Erstversorgung-Allgemeinmedizin (`slst_eva`, **Teilmenge** – nicht dazuzählen), zusätzliche je Träger. Anders als im
+IST sind gemeinsame und zusätzliche verschiedene Stellen und damit summierbar; `slst_gesamt` druckt nur Wien."""
 ZEILEN = IST_ZEILEN + PLAN_ZEILEN
 
 TEILMENGEN = {"slst_eva": "slst_gemeinsam"}
