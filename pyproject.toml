@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rsg-2030-verordnungen"
-version = "2026.1"
+version = "2026.2"
 description = "RSG 2030: Planungsmatrizen der Verordnungen ausgelesen und geprüft, mit Versorgungsdichte im Vergleich zum Versorgungsdichte-Soll-Intervall (ÖSG)"
 readme = "README.md"
 license = "MIT"

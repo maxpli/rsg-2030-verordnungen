@@ -159,10 +159,22 @@ Bitte vor jeder Auswertung lesen.
      weglassen (so zählt auch der ÖSG, METHODIK.md R4). Auch dann ist es nicht die ganze ambulante Versorgung: NCH, AN,
      STR, RAD, NUK, PMR, PAT, LAB und SON/IDB außer der ZAE haben keinen Richtwert. Gesamtwerte stehen in der Tabelle
      Planungsmatrizen (Fachspalte `gesamt`; dort kommt jede ÄAVE einmal vor).
+   - **Wo KFO steckt, ist je Land verschieden** – die Spalte `Zuschnitt` sagt es für jede Zelle. Sechs Länder
+     (Burgenland, Kärnten, NÖ, Salzburg, Steiermark, Tirol) drucken eine eigene KFO-Spalte: `Zuschnitt` «ZMK + KFO»,
+     dazu eine eigene KFO-Zeile. Oberösterreich nennt KFO nur in einer Fußnote (nächster Punkt). Vorarlberg und Wien
+     haben keine KFO-Spalte und keine KFO-Zeile: `Zuschnitt` «ZMK (KFO nicht getrennt ausgewiesen)». Das heißt
+     **enthalten, nur nicht einzeln gezeigt**, nicht «fehlt» – Wien schreibt es in Fußnote (5) («ZMK einschließlich
+     54 SLS KFO»), Vorarlberg im Textteil («ZMK; einschließlich Kieferorthopädie, KFO», PDF-Seite 4). Die ZMK-Werte
+     dieser beiden Länder sind also vollständig. Bei Wien kommt hinzu, dass dieselbe Fußnote auch
+     «Zahnbehandler + Dentisten» zu ZMK rechnet; ob die anderen Länder das ebenso tun, sagen sie nicht
+     ([offene_punkte.md](offene_punkte.md), «Steiermark»).
    - **KFO in Oberösterreich:** Das PDF nennt KFO nur in einer Fußnote zu ZMK, als **einen** Wert je Region (BL 38,2
      ÄAVE, gleich für IST und PLAN). Übernommen in `niedergelassen` (IST), `extramural` und `insgesamt`; die Aufteilung
-     auf spitalsambulant, selbständige Ambulatorien, Kassenambulatorien, VGF/PVE und die 32 Planstellen gibt es nicht,
-     und dass KFO niedergelassen mit Kassenvertrag ist, ist eine Annahme. In der Tabelle Versorgungsdichte steckt KFO in
+     auf spitalsambulant, selbständige Ambulatorien, Kassenambulatorien und VGF/PVE gibt es nicht, und dass KFO
+     niedergelassen mit Kassenvertrag ist, ist eine Annahme. Die 32 KFO-Planstellen derselben Fußnote stehen in den
+     Stellen-Zeilen (IST je Träger, PLAN gemeinsame Sachleistungsstellen mit 100 % Maximalanteil;
+     [METHODIK.md](METHODIK.md), R4). Dass es die Planstellen aller drei Träger sind, steht auf den Bezirksseiten
+     derselben Anlage; der Maximalanteil und die PLAN-Zuordnung stehen nirgends und sind gelesen. In der Tabelle Versorgungsdichte steckt KFO in
      OÖ deshalb in `extramural` und `insgesamt`, nicht in `spitalsambulant` (Zuschnitt dort «ZMK (KFO nicht getrennt
      ausgewiesen)»). In der Tabelle Planungsmatrizen stehen die Werte mit `Quelle = korrigiert`, Regel `zusatz:…`.
 5. **Keine Österreich-Werte in der Tabelle Versorgungsdichte.** Der ÖSG misst die Versorgungsdichte je
@@ -319,7 +331,8 @@ Laut ÖSG optional (Tabellenband S.251), für PLAN nach ÖSG nie enthalten (Tabe
 | **Summe** | **6 von 9 mit Werten** | **14 von 32 mit Werten** |
 
 Oberösterreich weist ZMK ohne Kieferorthopädie aus; die Wahlärzt:innen in KFO nennt die OÖ-Fußnote nicht
-([METHODIK.md](METHODIK.md), R4).
+([METHODIK.md](METHODIK.md), R4). `wahl` ZMK ist dort also unvollständig – um wie viel, sagt die Verordnung nicht
+(Größenordnung: [PRUEFUNG.md](PRUEFUNG.md#abgleich-mit-dem-rsg-monitoring), Punkt 4).
 
 ---
 
@@ -344,6 +357,9 @@ gilt:
   gerechnet und erst danach summiert; das gesamt-% ist ein gewichtetes Mittel und dafür nicht geeignet.
 - **Technische Fächer:** In Burgenland, Salzburg und Tirol steht an den technischen Fächern «Für Ambulatorien können
   derzeit keine Sachleistungsstellen ausgewiesen werden» (Fußnote); dort sind die Sachleistungsstellen nur Planstellen.
+- **KFO in Oberösterreich:** Die 32 KFO-Planstellen stammen aus der Fußnote zu ZMK, nicht aus der Matrix
+  (`Quelle = korrigiert`, Regel `zusatz:32` bzw. `wert:100` für den Maximalanteil). ZMK + KFO bedeutet damit bei den
+  ÄAVE und bei den Stellen dasselbe; die Lesart ist nicht bestätigt ([offene_punkte.md](offene_punkte.md)).
 
 ### Fußnoten
 
@@ -358,6 +374,14 @@ Die Fußnoten der Matrixseiten stehen nicht in der Tabelle Planungsmatrizen, son
 | Teilmenge | nennt einen «davon»-Wert (z. B. EVA, Unfallchirurgie, PSD), der nicht als eigene Zelle übernommen wird |
 | betrifft Werte | ändert Zahlen oder ihre Bedeutung – Verweis auf die Regel bzw. Doku-Stelle |
 | Methodenfrage | offen, Verweis auf [offene_punkte.md](offene_punkte.md) |
+
+**Was in den Teilmengen-Fußnoten steht** – diese Werte sind in den Zellen schon enthalten und stehen nicht einzeln in
+der Tabelle: «davon in Unfallchirurgie (UC)» mit ÄAVE und Planstellen (Kärnten, NÖ, Salzburg, Tirol, Wien), «davon in
+Akut-Ordinationen EVA», in NÖ auch mit Planstellen (BL PLAN 4, VR 34 und 35 je 2), und die Ambulatorien der
+psychosozialen Versorgung: Kärnten «davon … ÄAVE in PSD-Ambulatorien», Burgenland «… werden mit den PLAN-VZÄ
+(KJP = 6,625; PSY = 5,00) in den PLAN-Werten berücksichtigt», Steiermark «davon geplante ärztliche VZÄ (KJP = 4,00;
+PSY = 15,50) für die sozialpsychiatrischen Ambulatorien», Wien «davon 32 SLS in KJP-PSD-Ambulatorien». Wer KJP und PSY
+liest, sollte wissen, dass dort in diesen Ländern die ärztlichen VZÄ dieser Ambulatorien stecken.
 
 **Fußnoten der ÖSG-Vorlage** (Tabellenband, Anhang 9 RSG-PM, S.259; hinterlegt in
 `oesg_methodik/referenz/oesg_rsgpm_fussnoten.csv`). Die Länder übernehmen sie, oft mit anderer Nummer:

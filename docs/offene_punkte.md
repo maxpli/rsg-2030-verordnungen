@@ -37,15 +37,57 @@ zusammengezählt: KFO 12,1, gesamt 951,3.
 
 ### Oberösterreich (Anlage, S.9–27)
 
-1. **KFO:** KFO hat keine eigene Spalte, sie steht nur in der Fußnote zu ZMK: «zusätzlich KFO: IST 2022 und Plan 2030:
-   38,2 ÄAVE bzw. 32 vertragskieferorthopädische Planstellen SV» (S.10; je Region eigene Zahlen auf S.12–27). Wir
-   zählen die 38,2 ÄAVE im IST und im PLAN zu den Niedergelassenen mit Kassenvertrag und zu «insgesamt». Die 32
-   Planstellen übernehmen wir nicht, weil die Fußnote keinen Träger nennt.
+1. **KFO:** KFO hat in der Matrix keine eigene Spalte, sie steht in der Fußnote zu ZMK: «zusätzlich KFO: IST 2022 und
+   Plan 2030: 38,2 ÄAVE bzw. 32 vertragskieferorthopädische Planstellen SV» (S.10; je Region eigene Zahlen auf
+   S.12–27). Wir zählen die 38,2 ÄAVE im IST und im PLAN zu den Niedergelassenen mit Kassenvertrag und zu
+   «insgesamt»; die 32 Planstellen im IST zu jeder Träger-Zeile (ÖGK, SVS, BVAEB) und im PLAN zu den gemeinsamen
+   Sachleistungsstellen, mit 100 % Maximalanteil vertragsärztlicher Planstellen.
+   **Aus dem Dokument belegt** ist davon zweierlei – dass die Zahlen zusätzlich sind und welche Träger gemeint sind –,
+   und zwar auf den Bezirksseiten derselben Anlage (S.13, 16, 19, 22, 25, 28): Dort steht je Bezirk «ZMK – zuzügl. in Kieferorthopädie (KFO): *n* vertragskieferorthopädische
+   Planstellen: ÖGK, SVS, BVAEB». Das sind die Träger, und «zuzügl.» heißt zusätzlich – in derselben Zeile steht für
+   ORTR «davon in Unfallchirurgie (UC)». Die Bezirkswerte ergeben je Seite die Zahl der VR-Fußnote und zusammen 32.
+   **Offen sind drei Punkte:** ob die 38,2 ÄAVE niedergelassen mit Kassenvertrag sind (die Fußnote nennt keinen
+   Sektor), die PLAN-Zuordnung zu den gemeinsamen Sachleistungsstellen und der Maximalanteil von 100 %. Welches Indiz
+   wofür trägt, steht in [PRUEFUNG.md](PRUEFUNG.md#abgleich-mit-dem-rsg-monitoring), «Steckt KFO schon in der
+   gedruckten ZMK-Spalte?»; die Umsetzung in [METHODIK.md](METHODIK.md), R4.
    *Frage: Sind die 38,2 ÄAVE niedergelassen mit Kassenvertrag, und gelten sie für IST und PLAN gleichermaßen? Sind
-   die 32 Planstellen gemeinsame Sachleistungsstellen aller Träger?*
-2. **Zusätzliche SVS-Sachleistungsstellen URO (S.9 Bundesland, S.11 VR 41):** Dort stehen 1,5 Stellen, das Feld für den
-   Maximalanteil vertragsärztlicher Planstellen (in Prozent) ist leer. Wir lassen es leer.
+   die 32 Planstellen im PLAN gemeinsame Sachleistungsstellen – und dürfen alle als Kassenpraxis besetzt werden
+   (100 %)?*
+2. **ÖGK-Zahngesundheitszentrum (nur Bezirksseite S.13, Linz Stadt):** Dort steht hinter den KFO-Planstellen
+   «+ 2,2 Sachleistungsstellen in ÖGK-Zahngesundheitszentrum» – eine Zahl, die auf keiner BL- oder VR-Seite vorkommt
+   (Test: `tests/test_fussnoten.py::test_ooe_zahngesundheitszentrum_nur_auf_der_bezirksseite`). Die Fußnoten dort
+   nehmen stattdessen ein nicht beziffertes «zahnärztliches Notdienstzentrum Linz» aus ZMK heraus (S.10, S.12).
+   **Hypothese:** Beides ist dieselbe Einrichtung, und die Bezirksseite beziffert, was die Matrix-Fußnote nur
+   ausnimmt. *Dafür:* Die Ausnahmen der Fußnoten liegen dort, wo die Verordnung sie nennt – das Bundesland nennt
+   Notdienstzentrum Linz **und** Vorgriffstelle Steyr, die VR 41 nur Linz, die VR 44 nur Steyr, und laut ÖSG-Referenz
+   besteht die VR 41 aus Linz (Stadt) und Linz-Land, die VR 44 aus Steyr (Stadt) und zwei weiteren Bezirken. Die 2,2
+   stehen genau auf der Bezirksseite von Linz (Stadt) und dort mit «+», also als Zusatz, passend zum «exkl.» der
+   Fußnote. *Dagegen:* Die Namen sind verschieden – ein Notdienstzentrum ist ein Dienst, ein Zahngesundheitszentrum
+   eine eigene Einrichtung der ÖGK, also ein Kassenambulatorium. Dessen ÄAVE gehören nach ÖSG in die Zeile der
+   Kassenambulatorien (R2a, D1), und OÖ druckt dort ZMK 79,1, was mit dem RSG-Monitoring auf die Stelle übereinstimmt;
+   die ärztlichen Vollzeitäquivalente von Ambulatorien gehören nach Tabellenband S.252 ohnehin in die
+   Sachleistungsstellen, könnten also in den gedruckten 480,3 des PLAN schon enthalten sein.
+   Entscheiden lässt sich das nicht: Eine zweite Quelle gibt es nicht (das Monitoring führt weder PLAN noch
+   Sachleistungsstellen). Wir haben nichts ergänzt – die Bezirke sind keine Ebene dieses Datensatzes, und jede
+   Zuordnung wäre geraten.
+   *Frage: Ist das ÖGK-Zahngesundheitszentrum das in den Fußnoten ausgenommene zahnärztliche Notdienstzentrum Linz –
+   und sind die 2,2 Sachleistungsstellen in den ZMK-Werten des Bundeslands und der VR 41 enthalten oder nicht?*
+3. **Zusätzliche SVS-Sachleistungsstellen URO (S.9 Bundesland, S.11 VR 41):** Dort stehen 1,5 Stellen, das Feld für den
+   Maximalanteil vertragsärztlicher Planstellen (in Prozent) ist leer – URO ist das einzige Fach dieser Zeile mit
+   Stellen, aber ohne Prozentsatz. Wir lesen es als 0 %, weil 0 % in dieser Zeile der häufigste gedruckte Wert ist
+   (Bundesland 4 von 12 Fächern mit Prozentsatz, VR 41 6 von 12); aus einer anderen Zahl folgt der Wert nicht
+   (Bundesland = VR 41). Es ist also eine Lesart, keine Herleitung. Folge: Das gesamt-% der Zeile wird abgeleitet.
    *Frage: Welcher Maximalanteil gilt?*
+
+### Steiermark (Anlage 1, S.1)
+
+**ZMK, IST, vertragsärztliche Planstellen:** Gedruckt sind 358 ÖGK-Planstellen in ZMK und 25 in KFO, zusammen 383. Das
+RSG-Monitoring der GÖG weist für dasselbe Jahr 407 ÖGK-Planstellen in ZMK aus, dort ausdrücklich «inkl. KFO»; in den
+übrigen Fächern stimmen die Planstellen bis auf CH (4 gegenüber 0) und die technischen Fächer überein
+([PRUEFUNG.md](PRUEFUNG.md#abgleich-mit-dem-rsg-monitoring), «Vertragsärztliche Planstellen»). Woher die 24 Stellen
+Unterschied kommen, sagt die Verordnung nicht; wir haben die gedruckten Werte übernommen.
+*Frage: Was zählen die ZMK-Planstellen der Verordnung – auch Zahnbehandler:innen und Dentist:innen, die Wien in
+Fußnote (5) ausdrücklich zu ZMK rechnet?*
 
 ### Tirol (Anlage, S.1, S.3, S.5, S.7, Fußnote (7))
 
@@ -57,11 +99,30 @@ Orthopädie/Traumatologie (ORTR), sodass sie dort zu zählen wären?*
 
 ### Vorarlberg (Anlage, S.1, S.3, S.5)
 
-**ZMK, PLAN 2030, gemeinsame Sachleistungsstellen:** Der Maximalanteil vertragsärztlicher Planstellen ist im
-Bundesland mit 90 % angegeben (128 Stellen). Die Regionen haben 89 % (VR 81, 71 Stellen) und 96 % (VR 82, 57 Stellen);
-gewichtet ergibt das 92,1 %. Damit kommt man auf höchstens 115,2 bzw. 117,9 Kassenstellen. Wir haben die gedruckten
-90 % übernommen.
-*Frage: Welcher Wert gilt für das Bundesland?*
+1. **ZMK, PLAN 2030, gemeinsame Sachleistungsstellen:** Der Maximalanteil vertragsärztlicher Planstellen ist im
+   Bundesland mit 90 % angegeben (128 Stellen). Die Regionen haben 89 % (VR 81, 71 Stellen) und 96 % (VR 82, 57
+   Stellen); gewichtet ergibt das 92,1 %. Damit kommt man auf höchstens 115,2 bzw. 117,9 Kassenstellen. Wir haben die
+   gedruckten 90 % übernommen.
+   *Frage: Welcher Wert gilt für das Bundesland?*
+2. **ZMK, IST, vertragsärztliche Planstellen:** Gedruckt sind 110 ÖGK-Planstellen. KFO hat keine eigene Spalte und
+   ist laut Textteil in ZMK enthalten: «Zahn-, Mund- und Kieferheilkunde (ZMK; einschließlich Kieferorthopädie,
+   KFO)», und das gilt dort ausdrücklich für «IST-Standdarstellung und Kapazitätsplanung»
+   (`4_VO_RSG_Vbg_2025_Textteil_RSG_zur_Erlaeuterung.pdf`, PDF-Seite 4 = Dokumentseite 1, Abschnitt «Hinweis»; KFO
+   kommt in der Anlage nicht vor). Das RSG-Monitoring weist 123 ÖGK-Planstellen «inkl. KFO» aus. Anders als in
+   den übrigen Ländern weicht Vorarlberg aber auch sonst in vielen Fächern ab, und das Monitoring druckt dort
+   Planstellen mit Nachkommastellen (AM 158,4 gegenüber 160) – der Unterschied bei ZMK steht also nicht für sich
+   ([PRUEFUNG.md](PRUEFUNG.md#abgleich-mit-dem-rsg-monitoring)). Die 13 Stellen liegen in der Größenordnung einer
+   KFO-Spalte (Tirol 18 von 246, NÖ 37 von 502); die ZMK-ÄAVE passen dagegen ins Muster der Länder, deren ZMK KFO
+   enthält (+13,8 % gegenüber dem Monitoring, NÖ +13,5 %, Tirol +13,5 %). Wir haben die gedruckten Werte übernommen.
+   Der Textteil hilft hier nur zur Hälfte: Er rechnet die Kieferorthopädie zum Planungsbereich «Zahnärztliche
+   Versorgung» und sagt, dieser sei «im IST 2023 in ÄAVE abgebildet» und für 2030 «in Sachleistungsstellen
+   übergeleitet» (PDF-Seite 19 = Dokumentseite 16). Beide Aussagen betreffen ÄAVE und PLAN-Sachleistungsstellen – die
+   vertragsärztlichen Planstellen des IST, also genau die Zeile mit dem Unterschied, kommen dort nicht vor.
+   **Für die Daten ist hier nichts zu entscheiden:** Die Anlage nennt nirgends eine KFO-Zahl, es gibt also nichts zu
+   ergänzen; wir übernehmen die gedruckten Werte, und laut Textteil ist KFO in ZMK enthalten. Offen ist nur, woher der
+   Unterschied zum Monitoring kommt – eine Frage an das Land, keine Entscheidung von uns.
+   *Frage: Enthalten die ZMK-Planstellen im IST die Kieferorthopädie, wie der Textteil es für die ÄAVE und die
+   Sachleistungsstellen sagt?*
 
 ### Alle Länder: Bezugswert der niedergelassenen ÄAVE
 
@@ -74,7 +135,7 @@ DAA; METHODIK R8).
 *Frage: Mit dem DAA welchen Jahres sind die niedergelassenen ÄAVE der Verordnung gerechnet, in Oberösterreich und in
 den übrigen Ländern?*
 
-Niederösterreich, Salzburg, Steiermark, Wien: keine offene Frage zur eigenen Verordnung.
+Niederösterreich, Salzburg, Wien: keine offene Frage zur eigenen Verordnung.
 
 ## Zweite Durchsicht (Beiträge willkommen)
 
@@ -97,24 +158,35 @@ eigene, gekennzeichnete Größe, nicht als Wert der Verordnungen. Eine solche Qu
 Die Tabelle Versorgungsdichte liefert die ÄAVE im ÖSG-Zuschnitt (IM inkl. PUL, ZMK inkl. KFO, CH inkl. KJC/PCH),
 die Stellen stehen nur in der Tabelle Planungsmatrizen und dort je **Matrixspalte**. Wer ÄAVE und Stellen
 gegenüberstellt, muss die Stellen deshalb selbst über dieselben Spalten summieren; sonst vergleicht er verschiedene
-Fächer. Der Zuschnitt wäre derselbe wie bei den ÄAVE: Er legt fest, welche Matrixspalten ein Fach bilden (Textband
-S.37), unabhängig von der Einheit. Summiert würde je Stellen-Zeile, gemeinsame und trägerspezifische getrennt, nie
-über Träger (DATEN.md, «Stellen lesen»). Für die Aufnahme spricht, dass sonst jede Auswertung diesen Zuschnitt selbst
-nachbauen muss.
+Fächer. Geplant ist dafür eine eigene Datei `RSG_2030_Stellen.csv` (eigener Befehl `stellen`, Teil von «alles») und
+keine zusätzlichen Zeilen in der Tabelle Versorgungsdichte: Stellen haben dort keine Dichte und kein Soll-Intervall
+([METHODIK.md](METHODIK.md), «Stellen»). Summiert wird je Stellen-Zeile, gemeinsame und trägerspezifische getrennt,
+nie über Träger ([DATEN.md](DATEN.md#stellen-lesen)). Für die Aufnahme spricht, dass sonst jede Auswertung diesen
+Zuschnitt selbst nachbauen muss.
 
-Offen sind zwei Dinge:
+Entschieden ist:
 
-1. **Wo die Stellen hingehören.** Die Tabelle Versorgungsdichte enthält bewusst keine Stellen (METHODIK.md, «Stellen
-   – nicht in der Tabelle Versorgungsdichte»). Stellen im Zuschnitt bräuchten eigene Zeilen oder eine eigene Tabelle.
-2. **KFO in Oberösterreich.** Vorarlberg und Wien führen KFO in der Spalte ZMK (Vorarlberg laut Textteil für die
-   ganze Spalte, Wien laut Fußnote (5) ausdrücklich für die Stellen: «einschließlich 54 SLS KFO»). Oberösterreich
-   nennt KFO nur in einer Fußnote zu ZMK; der Datensatz übernimmt daraus die ÄAVE, die 32 Planstellen nicht, weil die
-   Fußnote keinen Träger nennt. ZMK enthielte dort KFO bei den ÄAVE, aber nicht bei den Stellen. Für eine Lesart als
-   gemeinsame Stellen spricht das Muster der sechs Länder mit eigener KFO-Spalte (Tabelle Planungsmatrizen): Dort
-   stehen die KFO-Stellen ganz in `slst_gemeinsam`, die Zusatzzeilen je Träger sind bei KFO 0, und im IST hat jeder
-   Träger gleich viele KFO-Planstellen. Bestätigt ist die Lesart nicht (Frage an Oberösterreich oben). Die 32
-   Planstellen wie die ÄAVE per Korrekturregel aus der Fußnote zu übernehmen, wäre eine Datenänderung (neue
-   Prüfsumme der Tabelle Planungsmatrizen).
+- **Der Zuschnitt gilt einheitenneutral.** Er legt fest, welche Matrixspalten ein Fach bilden (Textband S.37),
+  unabhängig von der Einheit; dieselbe Funktion schneidet ÄAVE und Stellen zu.
+- **Ausnahme ZAE.** Bei den ÄAVE enthält AM die ZAE aus SON/IDB, aber nur in den Zeilen `spitalsambulant` und
+  `insgesamt` ([METHODIK.md](METHODIK.md), R5). Sachleistungsstellen bilden den extramuralen Bereich ab (Tabellenband
+  S.252; Tirol, Anlage S.1, Fußnote (8)), ZAE sind spitalsambulant (Vorlage S.259, Fußnote (5)) – in einer
+  Stellen-Zeile gehört SON/IDB daher nicht zu AM. Tirol ist das einzige Land mit Stellen in SON/IDB: 8,05 im
+  Bundesland, genau die 4,8 AM + 1 KIJU + 2,25 ORTR seiner Fußnote (7). Merkwürdig ist, dass dort im PLAN keine
+  extramuralen ÄAVE stehen («n.v.»), aber Sachleistungsstellen; Tirol gibt für sie 0 % Maximalanteil
+  vertragsärztlicher Planstellen an, es sind also keine Kassenstellen. Sie bleiben in SON/IDB und damit außerhalb des
+  Zuschnitts – wie alle Fächer ohne Richtwert, in denen 1,4–3,8 % der Stellen eines Landes stehen (NCH, RAD, PAT, LAB,
+  PMR, SON/IDB). Eine Prüfung gegen die gedruckte Spalte «gesamt» hält fest, dass dabei nichts still wegfällt.
+- **Prozentsätze werden nicht summiert.** Je Matrixspalte Stellen × Maximalanteil, erst danach summiert, dazu die
+  Basis, für die ein Prozentsatz vorliegt. Die Teilmengen-Zeile EVA hat in der Vorlage keinen Maximalanteil und
+  bekommt keinen; 0 % wäre eine Behauptung, denn die Vorlage nennt EVA «Akut-Ordinationen» und NÖ beziffert in
+  derselben Fußnote EVA-Planstellen.
+- **KFO in Oberösterreich** ist gelöst: Die 32 Planstellen der Fußnote stehen seit 2026.2 in den Daten (oben,
+  «Oberösterreich»). ZMK + KFO bedeutet damit bei den ÄAVE und bei den Stellen dasselbe.
+
+Offen ist die Umsetzung selbst: Spalten der Datei, Prüfungen und Tests (Zuschnitt zeichengleich mit der Tabelle
+Versorgungsdichte, Vollständigkeit gegen «gesamt», Summe der VR = Bundesland, Handrechnungen je Sonderfall) und die
+Freigabe durch einen Menschen.
 
 ## Webseite
 

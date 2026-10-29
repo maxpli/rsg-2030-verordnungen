@@ -3,10 +3,44 @@
 Hier steht, was sich zwischen Versionen an den **Daten** ändert – jede Änderung einer Prüfsumme in
 `rsg2030/erwartete_ausgaben.csv`, mit Grund – und an den Befehlen. Versionen: `<Verordnungsstand>.<Nummer>`.
 
-## in Arbeit
+## 2026.2 – in Arbeit
+
+**Daten:**
+
+| Datei | SHA-256 | Zeilen (inkl. Kopf) |
+|---|---|---:|
+| `RSG_2030_Planungsmatrizen.csv` | `071178b62b46c2fda2e99f78226d8871ed98382baf0264f60b7282872ca2498e` | 30.841 |
+
+`RSG_2030_Versorgungsdichte.csv` bleibt unverändert (gleiche Prüfsumme wie 2026.1): In die Versorgungsdichte gehen nur
+ÄAVE-Zeilen ein, und an denen ändert sich nichts.
+
+- **Oberösterreich: die KFO-Stellen der Fußnote übernommen** (39 Zellen mehr). Die Fußnote zu «ZMK*» nennt «IST 2022
+  und Plan 2030: 38,2 ÄAVE bzw. 32 vertragskieferorthopädische Planstellen SV» (Anlage S.10, je Region S.12–27). Die
+  ÄAVE standen schon in den Daten, die Planstellen nicht – das Fach ZMK bedeutete damit bei den ÄAVE etwas anderes als
+  bei den Stellen. Jetzt: IST in jeder Träger-Zeile 32 (ÖGK, SVS, BVAEB – so führen alle sechs Länder mit eigener
+  KFO-Spalte ihre KFO-Planstellen, auch wo ZMK bei der SVS «-» ist), PLAN 32 in den gemeinsamen Sachleistungsstellen
+  («SV» ohne Träger), Maximalanteil vertragsärztlicher Planstellen 100 % (die Fußnote nennt Planstellen), «gesamt» der
+  Zeilen + 32. Die Träger nennt die Verordnung selbst, auf den Bezirksseiten derselben Anlage: «ZMK – zuzügl. in
+  Kieferorthopädie (KFO): n vertragskieferorthopädische Planstellen: ÖGK, SVS, BVAEB», je Seite die Zahl der
+  VR-Fußnote und zusammen 32 (neuer Test). «zuzügl.» steht dort neben «davon in Unfallchirurgie (UC)» – die
+  Verordnung trennt zusätzlich von enthalten. Dazu das RSG-Monitoring, das ZMK «inkl. KFO» führt: ÖGK-Planstellen 414
+  gegenüber gedruckt 381, mit der Übernahme 413; Gegenprobe Wien, das «ZMK einschließlich 54 SLS KFO» schreibt und
+  ohne Ergänzung passt. Welches Indiz was zeigt und was nicht:
+  [docs/PRUEFUNG.md](docs/PRUEFUNG.md), «Steckt KFO schon in der gedruckten ZMK-Spalte?». Offen bleiben der
+  Maximalanteil von 100 % und die PLAN-Zuordnung ([docs/offene_punkte.md](docs/offene_punkte.md), «Oberösterreich»).
+- **Oberösterreich: Maximalanteil der zusätzlichen SVS-Stellen für URO = 0 %**, bisher leer und als bekannte
+  Abweichung geführt. Der Wert folgt aus keiner anderen Zahl; 0 % ist in dieser Zeile der häufigste gedruckte Wert und
+  steht als Lesart da, nicht als Herleitung. Folge: Das gesamt-% der Zeile wird jetzt abgeleitet.
+- Die 16 neuen Regeln sind noch **nicht freigegeben** (Blatt «Entscheidungen» in `freigabe.xlsx`).
 
 **Befehle:**
 
+- `monitoring_abgleich` vergleicht jetzt auch die **ÖGK-Planstellen** des RSG-Monitorings je Fach und Land, nicht nur
+  die ÄAVE-Zeilen (docs/PRUEFUNG.md, «Vertragsärztliche Planstellen»). Nebenbei behoben: ORTR blieb im Abgleich leer,
+  wenn das Monitoring eine der Teilspalten OR/UCH/ORTR leer lässt – eine leere Teilspalte zählt jetzt als 0.
+- `monitoring_abgleich` stellt außerdem **ZMK und KFO getrennt** neben den Monitoring-Wert, der ZMK «inkl. KFO»
+  führt. Daran liest man ab, ob KFO in der gedruckten ZMK-Spalte eines Landes schon steckt, fehlt oder dazugehört –
+  die Gegenprobe zur KFO-Fußnote Oberösterreichs (docs/PRUEFUNG.md).
 - `waechter`: Antwortet das RIS nicht (es schickt gelegentlich «HTTP 503» und bittet um Pause), ist das ein Hinweis
   «nicht erreichbar – kein Abgleich in diesem Lauf» statt eines Abbruchs mit Traceback. Der Lauf endet weiter mit
   Exit 1, damit in der Mail steht, dass dieser Abgleich ausgefallen ist.

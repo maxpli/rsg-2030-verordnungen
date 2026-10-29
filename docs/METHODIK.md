@@ -223,7 +223,7 @@ genau einmal enthalten sein:
 | Bgld, Ktn, NÖ, Sbg, Stmk, Tirol | eigene Spalte KFO | ZMK + KFO | Matrix |
 | Wien | keine Spalte, in ZMK enthalten | ZMK | Fußnote (5): «ZMK einschließlich 54 SLS KFO» (Anlage S.33–36) |
 | Vorarlberg | keine Spalte, in ZMK enthalten | ZMK | Textteil S.4: «Zahn-, Mund- und Kieferheilkunde (ZMK; einschließlich Kieferorthopädie, KFO)» |
-| **OÖ** | keine Spalte, **nicht** in ZMK; nur in der Fußnote zu «ZMK*» | ZMK + KFO aus der Fußnote (Korrekturregeln `zusatz:`, Art «Fußnote») | Anlage S.10 (BL), S.12–27 (VR) |
+| **OÖ** | keine Spalte, **nicht** in ZMK; nur in der Fußnote zu «ZMK*» | ZMK + KFO aus der Fußnote, ÄAVE **und** Stellen (Korrekturregeln `zusatz:`/`wert:`, Art «Fußnote») | Anlage S.10 (BL), S.12–27 (VR) |
 
 **OÖ im Detail.** Fußnote S.10: «ZMK – exkl.: zahnärztliches Notdienstzentrum Linz und eine Vorgriffstelle in Steyr;
 zusätzlich KFO: IST 2022 und Plan 2030: 38,2 ÄAVE bzw. 32 vertragskieferorthopädische Planstellen SV». Je VR steht
@@ -236,13 +236,35 @@ So gelesen und übernommen:
 - **Zeilen:** KFO-Zelle in `insgesamt` und in der Zeile der Niedergelassenen (IST `niedergelassen`, PLAN
   `extramural`), «gesamt» dieser Zeilen + Wert. Annahme: KFO ist extramural mit Kassenvertrag; die Fußnote
   nennt den Sektor nicht.
-- **Nicht übernommen:** die 32 Planstellen (die Fußnote nennt keinen Träger, die Matrix hat Planstellen-Zeilen je
-  Träger) und Wahlärzt:innen in KFO (nicht angegeben).
+- **Stellen:** Die «32 vertragskieferorthopädischen Planstellen SV» stehen seit 2026.2 ebenfalls in den Daten: im
+  IST in jeder Träger-Zeile (ÖGK, SVS, BVAEB), im PLAN in den gemeinsamen Sachleistungsstellen, Maximalanteil
+  vertragsärztlicher Planstellen 100 %; «gesamt» dieser Zeilen + 32.
+  **Die Träger nennt die Verordnung selbst** – nicht in der Matrix-Fußnote, aber auf den Bezirksseiten derselben
+  Anlage (S.13, 16, 19, 22, 25, 28): «ZMK – zuzügl. in Kieferorthopädie (KFO): *n* vertragskieferorthopädische
+  Planstellen: **ÖGK, SVS, BVAEB**», für jeden der 18 Bezirke. Die Bezirkswerte ergeben je Seite genau die Zahl der
+  VR-Fußnote (9, 5, 5, 3, 5, 5) und zusammen die 32 des Bundeslands (Test:
+  `tests/test_fussnoten.py::test_ooe_kfo_planstellen_stehen_auf_den_bezirksseiten`). Dieselbe Zeile unterscheidet
+  «zuzügl.» von «davon in Unfallchirurgie (UC)» – die Verordnung trennt also zusätzlich von enthalten.
+  **Nicht aus dem Dokument** kommen zwei Punkte: die PLAN-Zuordnung zu den gemeinsamen Sachleistungsstellen, gelesen
+  aus «SV» ohne Träger und aus dem Muster der sechs Länder mit eigener KFO-Spalte, die KFO dort vollständig führen
+  (zusätzliche je Träger überall 0); und die 100 %, weil die Fußnote von *Planstellen* spricht und das der
+  vertragsärztliche Teil der Sachleistungsstellen ist (Tabellenband S.252) – die sechs Länder drucken 75–100 %.
+  Bestätigt ist beides nicht ([offene_punkte.md](offene_punkte.md)).
+- **Nicht doppelt gezählt:** Dass KFO nicht schon in den gedruckten ZMK-Werten steckt, sagt die Verordnung mit
+  «zusätzlich» und «zuzügl.» (siehe oben) und bestätigt der Abgleich mit dem RSG-Monitoring, das ZMK «inkl. KFO»
+  führt: ÖGK-Planstellen 381 gegenüber 414, mit den 32 dann 413, wie in den anderen Ländern auf 0 bis 2 Stellen.
+  Gegenprobe Wien, dessen Fußnote (5) «ZMK einschließlich 54 SLS KFO» sagt: Dort stimmen die ZMK-Planstellen ohne
+  jede Ergänzung (697 gegenüber 697). Die Lage ist mit mehreren unabhängigen Indizien belegt, von denen keines für
+  sich entscheidet – welches was zeigt und was nicht, steht in
+  [PRUEFUNG.md](PRUEFUNG.md#abgleich-mit-dem-rsg-monitoring), «Steckt KFO schon in der gedruckten ZMK-Spalte?».
+- **Nicht übernommen:** Wahlärzt:innen in KFO (nicht angegeben).
 - **Nicht ergänzt:** ZMK ohne «zahnärztliches Notdienstzentrum Linz» (BL, VR 41) und ohne «eine Vorgriffstelle in
   Steyr» (BL, VR 44). Die Fußnote beziffert beides nicht, also bleibt es draußen; ZMK in OÖ ist dort minimal zu
   niedrig (eine Stelle bzw. ein Notdienst gegenüber mehreren hundert ÄAVE). Eine Vorgriffstelle wird – allgemein,
   nicht aus den Unterlagen – im Vorgriff auf eine künftige Planstelle besetzt (z. B. überlappende Praxisübergabe).
 - Wirkung: OÖ ZMK BL IST 534,6 → 572,8 ÄAVE (VD 35,5 → 38,1), PLAN 606,6 → 644,8 (39,0 → 41,5); VR entsprechend.
+  Bei den Stellen kommt je Träger-Zeile und in den gemeinsamen Sachleistungsstellen eine KFO-Zelle mit 32 dazu
+  (BL IST ÖGK gesamt 1.520,1 → 1.552,1; PLAN gemeinsam 1.711,5 → 1.743,5).
 
 **KFO als eigene Kennzahl:** gegen die Unterzeile «- davon mit kieferorthopädischem
 Schwerpunkt» (2,8–5,1), nur wo KFO eine eigene Spalte hat oder, in OÖ, aus der Fußnote kommt; in Wien und Vorarlberg

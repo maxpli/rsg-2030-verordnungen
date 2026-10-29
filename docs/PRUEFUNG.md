@@ -253,7 +253,8 @@ Werte werden nie von Hand überschrieben.
 ## Abgleich mit dem RSG-Monitoring
 
 Für Version 2026.1 wurden die IST-Werte mit dem RSG-Monitoring der GÖG verglichen: dasselbe Datenjahr, je Land,
-Teilzeile und Fach, bei den SVE-Ländern der Block `aequivalent`. Nachrechnen: `python -m
+Zeile und Fach – die ÄAVE-Zeilen und die vertragsärztlichen ÖGK-Planstellen –, bei den SVE-Ländern der Block
+`aequivalent`. Nachrechnen: `python -m
 rsg2030.scripts.monitoring_abgleich` lädt die beiden Kurzfassungen (im Register mit Verwendet = «Abgleich», `download`
 lädt sie), prüft ihre Prüfsumme und zeigt jede Zahl dieses Abschnitts; gleich heißt auf 0,1 ÄAVE (Wien auf 1). Das
 Monitoring rechnet ebenfalls mit Regiomed, ist aber von unserer Abschrift unabhängig. Es zeigt also, ob die Verordnungen
@@ -285,6 +286,94 @@ also eines anderen DAA-Stands (METHODIK R8): Das Monitoring rechnet laut Methode
 die Wahlärzt:innen stimmen, obwohl sie laut fachlicher Auskunft ebenfalls über den DAA umgerechnet werden, passt nicht
 ganz dazu. Es sind die Werte der Verordnungen, keine Lesefehler (DATEN.md, Fallstricke 2 und 9).
 
+**Vertragsärztliche Planstellen (IST, nur ÖGK):** Das Monitoring führt eine Zeile «ÖGK-Planstellen» (besetzte und
+unbesetzte; Quelle laut Blatt «Anmerkungen u. Quellen»: ÖGK). Verglichen wird sie mit `planstellen_oegk`, ZMK und KFO
+zusammengezählt wie dort («ZMK inkl. KFO»). Die Zeile darunter («Vertragsärztinnen/-ärzte von BVAEB oder SVS ohne
+ÖGK-Vertrag») zählt Personen ohne ÖGK-Vertrag, nicht Planstellen je Träger, und bleibt draußen; ORTR ist auch hier
+OR + UCH + ORTR, wobei eine leere Teilspalte als 0 zählt – das Monitoring lässt UCH in dieser Zeile mancher Länder
+leer. Was dabei herauskommt:
+
+- **Technische Fächer:** RAD, LAB, PAT, PMR und NCH haben in den Verordnungen Planstellen, im Monitoring steht «-»; in
+  Wien ist es umgekehrt (RAD 0 gegenüber 76, LAB 0 gegenüber 24). Dort weisen die beiden Quellen Verschiedenes aus.
+- **ZMK:** In OÖ stand gedruckt 381 gegenüber 414 im Monitoring – fast genau die 32 Planstellen, die nur in der
+  Fußnote zu ZMK stehen. Seit sie übernommen sind ([METHODIK.md](METHODIK.md), R4), sind es 413 gegenüber 414, also
+  gleich innerhalb der Rundung, und OÖ weicht nur noch in den technischen Fächern ab. Steiermark (383 gegenüber 407)
+  und Vorarlberg (110 gegenüber 123) sind offen ([offene_punkte.md](offene_punkte.md)); in Vorarlberg, das KFO
+  nirgends ausweist, ist der Abstand so groß wie eine KFO-Spalte – mehr als eine Vermutung ist das nicht, denn dort
+  weichen auch viele andere Fächer ab.
+- **Einzelne Fächer:** Kärnten AM 261 gegenüber 262 und AU 28 gegenüber 30, Salzburg DER 18,5 gegenüber 19,5 und GGH
+  26,5 gegenüber 27, Tirol KJP 4 gegenüber 0, Steiermark CH 4 gegenüber 0.
+- **Vorarlberg** weicht als einziges Land in vielen Fächern ab, und das Monitoring druckt dort Planstellen mit
+  Nachkommastellen (AM 158,4 gegenüber 160). Dort trägt der Abgleich wenig.
+
+**Steckt KFO schon in der gedruckten ZMK-Spalte?** Das ist die Gegenprobe zur KFO-Fußnote Oberösterreichs
+(«zusätzlich KFO: IST 2022 und Plan 2030: 38,2 ÄAVE bzw. 32 vertragskieferorthopädische Planstellen SV»). Drei
+Lesarten sind denkbar:
+
+| | Lesart | Folge |
+|---|---|---|
+| **A** | beide Zahlen zusätzlich | so stehen sie in den Daten (seit 2026.2) |
+| **B** | beide schon in der ZMK-Spalte enthalten | wir würden sie doppelt zählen |
+| **C** | gemischt, nur eine enthalten | bis 2026.1 in den Daten: ÄAVE übernommen, Planstellen nicht |
+
+Keine einzelne Prüfung entscheidet das. Es sind mehrere voneinander unabhängige Indizien, und sie zeigen alle auf A.
+Grundlage ist, dass das Monitoring ZMK «inkl. KFO» führt; der Abgleich stellt ZMK und KFO deshalb getrennt neben den
+Monitoring-Wert (Abschnitt «ZMK und KFO getrennt»). Von stark nach schwach:
+
+1. **Die Verordnung selbst, auf den Bezirksseiten** (Anlage S.13, 16, 19, 22, 25, 28; diese Seiten tragen eine
+   andere Tabelle als die Planungsmatrix und stehen darum nicht im Fußnotenverzeichnis, das die BL- und VR-Seiten
+   abdeckt). Dort steht für jeden der 18
+   Bezirke: «ZMK – **zuzügl.** in Kieferorthopädie (KFO): *n* vertragskieferorthopädische Planstellen: **ÖGK, SVS,
+   BVAEB**». Die Bezirkswerte ergeben je Seite genau die Zahl der VR-Fußnote (9, 5, 5, 3, 5, 5) und zusammen die 32
+   des Bundeslands. In derselben Fußnotenzeile steht für ORTR «**davon** in Unfallchirurgie (UC): *n*
+   vertragsärztliche Planstellen» – die Verordnung unterscheidet also zusätzlich von enthalten und wählt für KFO das
+   eine Wort, für UC das andere.
+   *Zeigt:* B und C sind für die Planstellen ausgeschlossen, und die drei Träger sind keine Annahme von uns.
+   *Zeigt nicht:* nichts über die ÄAVE, nichts über den Maximalanteil, nichts über die PLAN-Zuordnung. Gepinnt als
+   Test (`tests/test_fussnoten.py::test_ooe_kfo_planstellen_stehen_auf_den_bezirksseiten`).
+2. **Wien als Gegenprobe.** Wiens Fußnote (5) sagt das Gegenteil: «ZMK **einschließlich** 54 SLS KFO». Entsprechend
+   stimmen Wiens ZMK-Planstellen ohne jede Ergänzung mit dem Monitoring überein (697 gegenüber 697), während
+   Oberösterreich ohne die Fußnotenzahl 33 Stellen darunter liegt.
+   *Zeigt:* Das Wort in der Fußnote entscheidet tatsächlich darüber, ob KFO in der Spalte steckt – und eine
+   unabhängige Quelle bestätigt beide Fälle. *Zeigt nicht:* dass OÖ es genauso meint wie Wien es schreibt.
+3. **ÖGK-Planstellen gegen das Monitoring.** In fünf der sechs Länder mit KFO-Spalte passen die beiden Quellen erst
+   mit dem KFO-Wert: Burgenland, Kärnten, NÖ und Tirol auf 0, Salzburg auf 2 Planstellen (ohne KFO wären es −6, −12,
+   −37, −18 und −10); Wien ohne KFO-Spalte passt auf 0. In OÖ bleibt mit den 32 ein Abstand von −1, ohne sie −33.
+   *Zeigt:* Die Lücke in OÖ hat genau die Größe, die die Fußnote nennt, gemessen an einer Quelle außerhalb der
+   Verordnung. *Zeigt nicht:* dass eine Abweichung dieser Zeile immer KFO ist – in der Steiermark bleiben 24 Stellen
+   offen, obwohl KFO dort eingerechnet ist (siehe oben).
+4. **Wahlärzt:innen.** Diese Zeile stimmt in OÖ in allen 16 Fächern mit dem Monitoring überein, auf 0,1 ÄAVE genau
+   (AM 18,2 gegenüber 18,10, GGH 22,2 gegenüber 22,15, PUL 0,2 gegenüber 0,16) – nur ZMK nicht, 23,4 gegenüber 29,42.
+   Hier wirkt der Bezugswert nicht, der die Niedergelassenen verschiebt (Punkt 5), und die anderen «exkl.»-Angaben
+   der Fußnote können es nicht sein: Notdienstzentrum und Vorgriffstelle sind Kassenstellen und kommen in dieser
+   Zeile nicht vor.
+   *Zeigt:* In einer Zeile, in der beide Quellen sonst praktisch deckungsgleich sind, verhält sich die ZMK-Spalte
+   Oberösterreichs wie eine Spalte ohne KFO. *Zeigt nicht:* wie groß KFO dort ist – die Fußnote nennt für
+   Wahlärzt:innen kein KFO, die 6,0 sind also ein plausibler Erklärungswert (übrige Länder 2,6 bis 7,5), keine
+   Messung. Eine andere Ursache für diese eine Zelle ist nicht ausgeschlossen. Übernommen wird der Wert nicht: Aus
+   dem Monitoring geht keine Zahl in die Daten ([METHODIK.md](METHODIK.md), R4).
+5. **Niedergelassene ÄAVE.** Hier liegen die Verordnungen überall über dem Monitoring (siehe oben), ein Abstand von 0
+   ist nicht zu erwarten: Von allen IST-Zeilen wird einzig die der Niedergelassenen durch einen Bezugswert geteilt
+   (Quartalserstpatient:innen je Durchschnittsarzt, R2a; Tabellenband Anhang 5 – PM, S.12, A1–A3). Deshalb stimmen
+   Spitalsambulanzen (OÖ 568,3 gegenüber 568,3), Kassenambulatorien (79,1 gegenüber 79,1) und selbständige
+   Ambulatorien (4,6 gegenüber 4,7) innerhalb der Rundung, die Niedergelassenen aber in keinem Land. Rechnet man den
+   Abstand der anderen Länder in ZMK (+7,8 %) und den OÖ-Zuschlag der übrigen Fächer (+5,2 pp; Streuung +4,1 bis
+   +5,9, nur KJP mit 6 ÄAVE +8,4) auf den Monitoring-Wert 435,9 hoch, wären 492,7 ÄAVE zu erwarten – gedruckt +
+   Fußnote sind 493,7, nur gedruckt 455,5.
+   *Zeigt:* Die Größenordnung der 38,2 passt; was ohne die Fußnote fehlt, ist fast genau ihre eigene Zahl.
+   *Zeigt nicht:* nichts Exaktes. Die Rechnung setzt voraus, dass der Bezugswert-Abstand innerhalb eines Landes über
+   die Fächer gleich wirkt – gut gestützt durch 14 Fächer, aber eine Annahme.
+6. **ÄAVE je Planstelle.** Die Fußnote nennt mit 38,2 zu 32 dasselbe Verhältnis wie die gedruckte Spalte mit 455,5 zu
+   381 (1,19 gegenüber 1,20). Lesart C ergäbe dagegen 1,30 (493,7 zu 381).
+   *Zeigt:* C ist auch rechnerisch unplausibel; beide Fußnotenzahlen sind gleicher Art. *Zeigt nicht:* ob sie beide
+   drin oder beide draußen sind – das Verhältnis ändert sich nicht, wenn man eine anteilige Teilmenge abzieht.
+
+**Was offen bleibt:** Für die Planstellen ist A aus dem Dokument belegt (Punkt 1). Für die 38,2 ÄAVE ist A ein
+Schluss von derselben Spalte und derselben Fußnote her, gestützt durch die Punkte 4 bis 6, aber nicht aus dem
+Dokument belegt. Offen bleiben außerdem der Maximalanteil von 100 % und die PLAN-Zuordnung zu den gemeinsamen
+Sachleistungsstellen; beides steht nirgends. Bestätigen kann das nur das Land ([offene_punkte.md](offene_punkte.md)).
+
+
 **Was der Abgleich geklärt hat:**
 
 - **ZAE:** Das Monitoring weist die ZAE erst ab Datenjahr 2023 getrennt aus; bis 2022 stecken sie in den Fachspalten,
@@ -308,7 +397,8 @@ S.216; die Methodenänderungen, die der ÖSG nennt, betreffen den «vertragsärz
 METHODIK R8.)
 
 **Belegt:** Das IST spitalsambulant, in den Ambulatorien und bei den Wahlärzt:innen passt zu einer unabhängigen Quelle,
-je Land und Fach, bis auf die genannten Ausnahmen. **Nicht belegt:** PLAN und Versorgungsregionen – das Monitoring kennt
+je Land und Fach, bis auf die genannten Ausnahmen; dasselbe gilt für die ÖGK-Planstellen in den Fächern mit Richtwert,
+außer bei ZMK in der Steiermark und in Vorarlberg. **Nicht belegt:** PLAN und Versorgungsregionen – das Monitoring kennt
 nur IST und Bundesländer. Der Abgleich ist nicht Teil des Laufs; wiederholen, wenn sich das IST ändert. Kein Wert wird
 aus dem Monitoring übernommen: Es ist eine andere Quelle, nicht die Verordnung.
 
