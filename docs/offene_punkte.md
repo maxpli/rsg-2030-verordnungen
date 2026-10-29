@@ -153,41 +153,6 @@ Wahlärzt:innen im IST-Jahr übernehmen und für 2030 als Szenario fortschreiben
 eigene, gekennzeichnete Größe, nicht als Wert der Verordnungen. Eine solche Quelle ist das RSG-Monitoring der GÖG
 (Zeile «ÄAVE WahlärztInnen», je Land und Jahr; PRUEFUNG.md, «Abgleich mit dem RSG-Monitoring»).
 
-## Mögliche Erweiterung: Sachleistungsstellen im ÖSG-Zuschnitt
-
-Die Tabelle Versorgungsdichte liefert die ÄAVE im ÖSG-Zuschnitt (IM inkl. PUL, ZMK inkl. KFO, CH inkl. KJC/PCH),
-die Stellen stehen nur in der Tabelle Planungsmatrizen und dort je **Matrixspalte**. Wer ÄAVE und Stellen
-gegenüberstellt, muss die Stellen deshalb selbst über dieselben Spalten summieren; sonst vergleicht er verschiedene
-Fächer. Geplant ist dafür eine eigene Datei `RSG_2030_Stellen.csv` (eigener Befehl `stellen`, Teil von «alles») und
-keine zusätzlichen Zeilen in der Tabelle Versorgungsdichte: Stellen haben dort keine Dichte und kein Soll-Intervall
-([METHODIK.md](METHODIK.md), «Stellen»). Summiert wird je Stellen-Zeile, gemeinsame und trägerspezifische getrennt,
-nie über Träger ([DATEN.md](DATEN.md#stellen-lesen)). Für die Aufnahme spricht, dass sonst jede Auswertung diesen
-Zuschnitt selbst nachbauen muss.
-
-Entschieden ist:
-
-- **Der Zuschnitt gilt einheitenneutral.** Er legt fest, welche Matrixspalten ein Fach bilden (Textband S.39),
-  unabhängig von der Einheit; dieselbe Funktion schneidet ÄAVE und Stellen zu.
-- **Ausnahme ZAE.** Bei den ÄAVE enthält AM die ZAE aus SON/IDB, aber nur in den Zeilen `spitalsambulant` und
-  `insgesamt` ([METHODIK.md](METHODIK.md), R5). Sachleistungsstellen bilden den extramuralen Bereich ab
-  (Tabellenband S.232; Tirol, Anlage S.1, Fußnote (8)), ZAE sind spitalsambulant (Vorlage (Tabellenband S.239), Fußnote (5)) – in einer
-  Stellen-Zeile gehört SON/IDB daher nicht zu AM. Tirol ist das einzige Land mit Stellen in SON/IDB: 8,05 im
-  Bundesland, genau die 4,8 AM + 1 KIJU + 2,25 ORTR seiner Fußnote (7). Merkwürdig ist, dass dort im PLAN keine
-  extramuralen ÄAVE stehen («n.v.»), aber Sachleistungsstellen; Tirol gibt für sie 0 % Maximalanteil
-  vertragsärztlicher Planstellen an, es sind also keine Kassenstellen. Sie bleiben in SON/IDB und damit außerhalb des
-  Zuschnitts – wie alle Fächer ohne Richtwert, in denen 1,4–3,8 % der Stellen eines Landes stehen (NCH, RAD, PAT, LAB,
-  PMR, SON/IDB). Eine Prüfung gegen die gedruckte Spalte «gesamt» hält fest, dass dabei nichts still wegfällt.
-- **Prozentsätze werden nicht summiert.** Je Matrixspalte Stellen × Maximalanteil, erst danach summiert, dazu die
-  Basis, für die ein Prozentsatz vorliegt. Die Teilmengen-Zeile EVA hat in der Vorlage keinen Maximalanteil und
-  bekommt keinen; 0 % wäre eine Behauptung, denn die Vorlage nennt EVA «Akut-Ordinationen» und NÖ beziffert in
-  derselben Fußnote EVA-Planstellen.
-- **KFO in Oberösterreich** ist gelöst: Die 32 Planstellen der Fußnote stehen seit 2026.2 in den Daten (oben,
-  «Oberösterreich»). ZMK + KFO bedeutet damit bei den ÄAVE und bei den Stellen dasselbe.
-
-Offen ist die Umsetzung selbst: Spalten der Datei, Prüfungen und Tests (Zuschnitt zeichengleich mit der Tabelle
-Versorgungsdichte, Vollständigkeit gegen «gesamt», Summe der VR = Bundesland, Handrechnungen je Sonderfall) und die
-Freigabe durch einen Menschen.
-
 ## Webseite
 
 Was an der Webseite ([WEB.md](WEB.md)) noch offen ist.

@@ -67,7 +67,8 @@ TEILMENGEN = {"slst_eva": "slst_gemeinsam"}
 """Zeile → Zeile, von der sie eine Teilmenge ist. Nicht zu `slst_gemeinsam` addieren, sonst doppelt gezählt."""
 OHNE_PROZENT = ("slst_eva",) + IST_ZEILEN
 """Zeilen ohne Maximalanteil in der ÖSG-Vorlage. Bei `slst_eva` ist das keine Lücke der Länder, sondern die Vorlage:
-Einen Prozentsatz zu setzen wäre eine Behauptung (docs/offene_punkte.md, «Sachleistungsstellen im ÖSG-Zuschnitt»)."""
+Einen Prozentsatz zu setzen wäre eine Behauptung – 0 % hieße «keine Kassenstellen», aber die Vorlage nennt EVA
+«Akut-Ordinationen» (Fußnote (4)), und NÖ beziffert in derselben Fußnote EVA-Planstellen."""
 
 
 def pruefe(eingang: pd.DataFrame) -> pd.DataFrame:
