@@ -102,6 +102,11 @@ Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem
 - `waechter`: Antwortet das RIS nicht (es schickt gelegentlich «HTTP 503» und bittet um Pause), ist das ein Hinweis
   «nicht erreichbar – kein Abgleich in diesem Lauf» statt eines Abbruchs mit Traceback. Der Lauf endet weiter mit
   Exit 1, damit in der Mail steht, dass dieser Abgleich ausgefallen ist.
+- CI: Tests **und Release** laden die Quellen aus dem Zwischenspeicher und prüfen jede Datei per SHA-256 gegen das
+  Register; frisch geladen wird nur, was neu ist oder fehlt. Grund: Das RIS beantwortet Anfragen aus Rechenzentren
+  seit Ende Oktober 2026 mit einem Bot-Schutz («Security Check», HTTP 503) – auch der Wayback-Crawler erhält nur
+  die Sperrseite. Der Nachweis der Release-Dateien war immer schon die Prüfsumme, nicht die frische Verbindung
+  (docs/PIPELINE.md, «Release»).
 
 ## 2026.1 – erste veröffentlichte Version
 

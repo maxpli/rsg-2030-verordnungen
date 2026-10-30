@@ -38,8 +38,9 @@ jobs:
         run: pytest -m "not slow"
 
   daten:
-    # Quellen aus dem Zwischenspeicher (Schlüssel = Register): RIS und statistik.at werden nur angefragt, wenn sich
-    # quellen.csv ändert. Prüfsummen prüft der Download trotzdem bei jedem Lauf.
+    # Quellen aus dem Zwischenspeicher (Schlüssel = Register): RIS und statistik.at werden nur für neue oder
+    # geänderte Registereinträge angefragt – ändert sich quellen.csv, ist der letzte Stand der Ausgangspunkt
+    # (restore-keys), nicht ein leerer Ordner. Prüfsummen prüft der Download trotzdem bei jedem Lauf.
     if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.voll) }}
     runs-on: ubuntu-24.04  # bewusst fest; Wechsel auf ein neueres System als eigene Änderung
     timeout-minutes: 45
@@ -57,6 +58,8 @@ jobs:
         with:
           path: daten_original
           key: daten-original-${{ hashFiles('rsg2030/quellen/quellen.csv') }}
+          restore-keys: |
+            daten-original-
       - name: Fehlende Quellen laden, Prüfsummen prüfen
         run: python -m rsg2030 download
       # Gleich nach dem Download speichern: ein späterer Testfehler soll nicht den nächsten Download auslösen

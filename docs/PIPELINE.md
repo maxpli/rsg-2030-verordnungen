@@ -145,7 +145,9 @@ der geprüften Fassung. Fehlt etwas, bricht der Release-Lauf ab (Version oder Da
 nachträglicher Eintrag fehlte in der Version.
 
 Ein Tag mit der Version (z. B. `2026.1`, muss der Version in `pyproject.toml` entsprechen) startet
-`.github/workflows/release.yml`: frischer Download ohne Zwischenspeicher, `alles`, Vergleich mit
+`.github/workflows/release.yml`: Quellen aus dem Zwischenspeicher der Test-CI, jede Datei per SHA-256 gegen das
+Register geprüft, Fehlendes frisch geladen (der Beweis ist die Prüfsumme – das RIS drosselt seit Ende Oktober 2026
+Anfragen aus Rechenzentren, ein voller Frisch-Download scheitert dort); dann `alles`, Vergleich mit
 `erwartete_ausgaben.csv`, ganze Testsuite. Nur wenn alles grün ist, legt der Lauf das Release an und hängt die
 drei CSV-Dateien, die Excel-Mappe, den Prüfbericht, die Laufprotokolle und `SHA256SUMS.txt` an. Ist etwas rot,
 entsteht kein Release; Tag löschen, Ursache beheben, neu taggen.

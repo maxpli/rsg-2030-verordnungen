@@ -1,7 +1,7 @@
 # Bei einem Versions-Tag (z. B. 2026.1): alles frisch erzeugen wie ein Nutzer beim ersten Mal, gegen die veröffentlichten
 # Prüfsummen vergleichen und die Dateien an das Release hängen. So sind die Dateien am Release nachweislich aus diesem
-# Code und den öffentlichen Quellen entstanden (Lauf und Protokoll sind unter «Actions» einsehbar), nicht auf einem
-# privaten Rechner.
+# Code und den per SHA-256 gegen das Register geprüften öffentlichen Quellen entstanden (aus dem CI-Zwischenspeicher
+# oder frisch geladen; Lauf und Protokoll sind unter «Actions» einsehbar), nicht auf einem privaten Rechner.
 # Tags «test-*» tun dasselbe, legen das Release aber nur als Entwurf an: zum Ausprobieren, sichtbar nur für das Team.
 name: Release
 
@@ -50,7 +50,26 @@ jobs:
           print("CITATION.cff: " + ("; ".join(fehler) or "in Ordnung"))
           sys.exit(1 if fehler else 0)
           EOF
-      # Bewusst ohne Cache: dieselben Quellen, die ein Nutzer bekommt
+      # Quellen aus dem Zwischenspeicher der Test-CI; der Download prüft jede Datei per SHA-256 gegen das Register
+      # und lädt nur Fehlendes frisch. Der Beweis ist die Prüfsumme, nicht die frische Verbindung: Das RIS drosselt
+      # seit Ende Oktober 2026 Anfragen aus Rechenzentren (Bot-Schutz), ein voller Frisch-Download scheitert dort.
+      - name: Quellen aus dem Zwischenspeicher
+        id: quellen
+        uses: actions/cache/restore@v6
+        with:
+          path: daten_original
+          key: daten-original-${{ hashFiles('rsg2030/quellen/quellen.csv') }}
+          restore-keys: |
+            daten-original-
+      - name: Fehlende Quellen laden, Prüfsummen prüfen
+        run: python -m rsg2030 download
+      # Gleich nach dem Download speichern (wie tests.yml): ein späterer Fehler soll den nächsten Download nicht
+      # erneut auslösen
+      - if: steps.quellen.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: daten_original
+          key: ${{ steps.quellen.outputs.cache-primary-key }}
       - name: Vom Download bis zur Versorgungsdichte
         run: python -m rsg2030 alles
       - name: Ergebnis = veröffentlichte Version
