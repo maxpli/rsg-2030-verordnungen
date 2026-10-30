@@ -16,7 +16,7 @@ authors:
     email: max.plischke@loesungswerk.at
     orcid: "https://orcid.org/0000-0002-7410-2611"
 version: "2026.2"
-date-released: 2026-10-19
+date-released: 2026-10-30
 # Code: MIT; erzeugte Daten: CC BY 4.0 (LIZENZ_DATEN.md)
 license:
   - MIT
@@ -37,27 +37,27 @@ keywords:
 references:
   - type: legal-rule
     title: "Verordnungen über die Verbindlicherklärung (von Teilen) der Regionalen Strukturpläne Gesundheit 2030"
-    date-accessed: 2026-10-19
+    date-accessed: 2026-10-30
     authors:
       - name: "Gesundheitsplanungs GmbH"
     # Je Land eine Verordnung (Kärnten zwei) im RIS; jede steht mit Dokumentnummer im Register
     url: "https://github.com/maxpli/rsg-2030-verordnungen/blob/main/rsg2030/quellen/quellen.csv"
   - type: data
     title: "Bevölkerung zum Jahresanfang und Bevölkerungsprognose"
-    date-accessed: 2026-10-19
+    date-accessed: 2026-10-30
     authors:
       - name: "Statistik Austria"
     url: "https://data.statistik.gv.at"
     license: CC-BY-4.0
   - type: data
     title: "ÖROK-Prognose 2021"
-    date-accessed: 2026-10-19
+    date-accessed: 2026-10-30
     authors:
       - name: "Österreichische Raumordnungskonferenz (ÖROK)"
     license: CC-BY-4.0
   - type: report
     title: "Österreichischer Strukturplan Gesundheit 2023, Stand 09.10.2026"
-    date-accessed: 2026-10-19
+    date-accessed: 2026-10-30
     authors:
       - name: "BMASGPK"
       - name: "Gesundheit Österreich GmbH (GÖG)"

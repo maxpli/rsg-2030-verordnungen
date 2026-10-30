@@ -5,7 +5,7 @@ Hier steht, was sich zwischen Versionen an den **Daten** ändert – jede Änder
 Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem Umstellen den Abschnitt
 «Schnittstelle» der neuen Version. Versionen: `<Verordnungsstand>.<Nummer>`.
 
-## 2026.2 – in Arbeit
+## 2026.2 – Tabelle Stellen
 
 **Daten:**
 
