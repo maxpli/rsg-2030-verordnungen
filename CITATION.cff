@@ -56,11 +56,11 @@ references:
       - name: "Österreichische Raumordnungskonferenz (ÖROK)"
     license: CC-BY-4.0
   - type: report
-    title: "Österreichischer Strukturplan Gesundheit 2023, Stand 10.10.2025"
+    title: "Österreichischer Strukturplan Gesundheit 2023, Stand 09.10.2026"
     date-accessed: 2026-10-19
     authors:
       - name: "BMASGPK"
       - name: "Gesundheit Österreich GmbH (GÖG)"
-    number: "ÖSG-Gutachten 5/2025 (RIS: SPG_AT_OSG_G_20251010_5_2025)"
-    url: "https://www.ris.bka.gv.at/Dokument.wxe?Abfrage=Spg&Dokumentnummer=SPG_AT_OSG_G_20251010_5_2025"
+    number: "ÖSG-Gutachten 8/2026 (RIS: SPG_AT_OSG_G_20261009_8_2026)"
+    url: "https://www.ris.bka.gv.at/Dokument.wxe?Abfrage=Spg&Dokumentnummer=SPG_AT_OSG_G_20261009_8_2026"
     notes: "Richtwerte aus dem Textband (RIS); Versorgungsregionen aus der Regionalen Gliederung, Stand 2023 (GÖG)"
