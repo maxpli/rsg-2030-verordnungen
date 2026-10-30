@@ -9,21 +9,56 @@ import pytest
 from rsg2030 import waechter as w
 
 
-def _ris(*nummern: str) -> bytes:
-    return "".join(f'<a href="/Dokument.wxe?Abfrage=Spg&amp;Dokumentnummer={n}">x</a>' for n in nummern).encode()
+def _ris(*nummern: str, hits: int | None = None) -> bytes:
+    """OGD-Antwort mit einem Dokument je Nummer; Typ laut Kennung (…_RSG_V_… = RsgVerordnung, sonst OsgGutachten)."""
+    import json
+
+    doks = [
+        {
+            "Data": {
+                "Metadaten": {
+                    "Technisch": {"ID": n},
+                    "Sonstige": {"Spg": {"Typ": "RsgVerordnung" if "_RSG_V_" in n else "OsgGutachten"}},
+                }
+            }
+        }
+        for n in nummern
+    ]
+    antwort = {
+        "OgdSearchResult": {
+            "OgdDocumentResults": {
+                "Hits": {"@pageNumber": "1", "@pageSize": "100", "#text": str(hits or len(nummern))},
+                "OgdDocumentReference": doks,
+            }
+        }
+    }
+    return json.dumps(antwort).encode()
 
 
-def test_such_url_stichtag():
-    url = w.such_url(date(2026, 10, 15))
-    assert "FassungVom=15.10.2026" in url and "BisKundmachungsdatum=15.10.2026" in url
-    assert "SucheNachRsgVerordnung=True" in url and "Suchworte=2030" in url
-    url = w.such_url(date(2026, 10, 15), w.SUCHE_OESG)
-    assert "SucheNachOsgGutachten=True" in url and "SucheNachRsgVerordnung=False" in url and "Suchworte=&" in url
+def test_ris_abfrage_stichtag_und_typfilter(monkeypatch):
+    """Die Abfrage geht an die OGD-Schnittstelle mit FassungVom; der Typ wird aus der Antwort gefiltert."""
+    urls: list[str] = []
+
+    def abrufen(url: str) -> bytes:
+        urls.append(url)
+        return _ris("SPG_A_RSG_V_1", "SPG_AT_OSG_G_1")
+
+    monkeypatch.setattr(w, "abrufen", abrufen)
+    assert w.ris_dokumente(date(2026, 10, 15)) == {"SPG_A_RSG_V_1"}
+    assert "data.bka.gv.at" in urls[0] and "FassungVom=2026-10-15" in urls[0] and "Suchworte=2030" in urls[0]
+    assert w.ris_dokumente(date(2026, 10, 15), typ="OsgGutachten", suchworte="") == {"SPG_AT_OSG_G_1"}
+    assert "Suchworte" not in urls[1]
 
 
 def test_ris_ohne_treffer_bricht_ab(monkeypatch):
-    monkeypatch.setattr(w, "abrufen", lambda url: b"<html>umgebaut</html>")
+    monkeypatch.setattr(w, "abrufen", lambda url: _ris())
     with pytest.raises(RuntimeError, match="ohne Treffer"):
+        w.ris_dokumente()
+
+
+def test_ris_mehr_als_eine_seite_bricht_ab(monkeypatch):
+    monkeypatch.setattr(w, "abrufen", lambda url: _ris("SPG_A_RSG_V_1", hits=101))
+    with pytest.raises(RuntimeError, match="mehr als eine Seite"):
         w.ris_dokumente()
 
 

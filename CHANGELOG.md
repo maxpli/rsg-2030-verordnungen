@@ -102,6 +102,9 @@ Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem
 - `waechter`: Antwortet das RIS nicht (es schickt gelegentlich «HTTP 503» und bittet um Pause), ist das ein Hinweis
   «nicht erreichbar – kein Abgleich in diesem Lauf» statt eines Abbruchs mit Traceback. Der Lauf endet weiter mit
   Exit 1, damit in der Mail steht, dass dieser Abgleich ausgefallen ist.
+- `waechter` sucht die geltenden Verordnungen und das ÖSG-Gutachten ebenfalls über die OGD-Schnittstelle (der Typ
+  steht in den Metadaten der Treffer und wird aus der Antwort gefiltert; die Links in den Hinweisen zeigen weiter
+  auf das Portal, denn die liest ein Mensch im Browser). Davor war der Montagslauf seit dem Bot-Schutz rot.
 - `download` holt die Dateiliste eines RIS-Dokuments über die **OGD-Schnittstelle des RIS** (data.bka.gv.at) und
   die Dateien von ogd.ris.bka.gv.at statt vom Portal www.ris.bka.gv.at – das Portal beantwortet Anfragen aus
   Rechenzentren mit dem unten genannten Bot-Schutz, die OGD-Schnittstelle ist der dokumentierte Weg für

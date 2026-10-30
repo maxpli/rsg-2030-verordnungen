@@ -7,6 +7,8 @@ wird, entscheidet ein Mensch (docs/PIPELINE.md).
 - **RIS** (immer): Suche nach allen geltenden RSG-Verordnungen mit «2030» gegen die Dokumentnummern im Register – neu
   (neue Verordnung oder Änderung, die eine neue Nummer bekommt) oder nicht mehr gefunden (außer Kraft, ersetzt).
   Ebenso das geltende ÖSG-Gutachten: Eine neue Fassung kann Richtwerte, Regionen oder die Vorlage der Matrix ändern.
+  Gesucht wird über die OGD-Schnittstelle des RIS (data.bka.gv.at; warum, steht in `rsg2030/quellen/download.py`);
+  die Links in den Hinweisen zeigen weiter auf das Portal, denn die liest ein Mensch im Browser.
 - **Originale** (`--quellen`): jede URL-Quelle neu laden und die Prüfsumme mit dem Register vergleichen. Kein Raten:
   erkennt jeden Austausch unter derselben Adresse. Was unter *neuer* Adresse erscheint (neuer Prognose-Jahrgang,
   Regionale Gliederung oder Methodenband zu einem neuen ÖSG-Stand), erkennt es nicht – dafür die Termine in
@@ -26,8 +28,8 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import logging
-import re
 import sys
 import urllib.error
 import urllib.parse
@@ -37,52 +39,42 @@ import pandas as pd
 
 from rsg2030.protokoll import einrichten
 from rsg2030.quellen import ist_rsg_verordnung, lade_quellen
-from rsg2030.quellen.download import RIS_URL, abrufen, entpacke_archiv
+from rsg2030.quellen.download import RIS_API, RIS_URL, _liste, abrufen, entpacke_archiv
 
 log = logging.getLogger(__name__)
 
 # --- RIS ---------------------------------------------------------------------------------------
 
+
 # Suche im RIS «Strukturpläne Gesundheit»: nur RSG-Verordnungen, Suchwort 2030, kundgemacht ab 2017, Fassung heute.
-SUCHE_RSG = {
-    "Abfrage": "Spg",
-    "VonKundmachungsdatum": "01.01.2017",
-    "SucheNachOsgGutachten": "False",
-    "SucheNachOsgVerordnung": "False",
-    "SucheNachRsgGutachten": "False",
-    "SucheNachRsgVerordnung": "True",
-    "Suchworte": "2030",
-    "ResultPageSize": "100",
-    "Position": "1",
-    "SkipToDocumentPage": "true",
-}
-# Der ÖSG ist im RIS als ÖSG-Gutachten kundgemacht; die Suche mit Fassung heute liefert nur das geltende.
-SUCHE_OESG = {
-    **SUCHE_RSG,
-    "SucheNachOsgGutachten": "True",
-    "SucheNachRsgVerordnung": "False",
-    "Suchworte": "",
-}
-DOKUMENT_RE = re.compile(r"Dokumentnummer=(SPG_[A-Z0-9_]+)")
+def ris_dokumente(stichtag: date | None = None, typ: str = "RsgVerordnung", suchworte: str = "2030") -> set[str]:
+    """Dokumentnummern aller am Stichtag (sonst heute) geltenden Spg-Dokumente des Typs (OGD-Schnittstelle).
 
-
-def such_url(stichtag: date, suche: dict[str, str] = SUCHE_RSG) -> str:
-    heute = stichtag.strftime("%d.%m.%Y")
-    return f"{RIS_URL}/Ergebnis.wxe?" + urllib.parse.urlencode(
-        {**suche, "FassungVom": heute, "BisKundmachungsdatum": heute}
-    )
-
-
-def ris_dokumente(stichtag: date | None = None, suche: dict[str, str] = SUCHE_RSG) -> set[str]:
-    """Dokumentnummern aller Treffer der RIS-Suche (Stand `stichtag`, sonst heute)."""
-    seite = abrufen(such_url(stichtag or date.today(), suche)).decode("utf-8", errors="replace")
-    treffer = set(DOKUMENT_RE.findall(seite))
+    Der Typ (RsgVerordnung, OsgGutachten, …) steht in den Metadaten jedes Treffers; als Abfrage-Parameter ignoriert
+    ihn die Schnittstelle still – wie jeden unbekannten Namen –, deshalb wird er aus der Antwort gefiltert, nicht in
+    der Abfrage. «FassungVom» liefert nur die am Stichtag geltenden Dokumente (kundgemacht, nicht außer Kraft)."""
+    abfrage = {
+        "Applikation": "Spg",
+        "DokumenteProSeite": "OneHundred",
+        "FassungVom": (stichtag or date.today()).isoformat(),
+    }
+    if suchworte:
+        abfrage["Suchworte"] = suchworte
+    antwort = json.loads(abrufen(f"{RIS_API}?" + urllib.parse.urlencode(abfrage)).decode("utf-8"))
+    ergebnis = antwort["OgdSearchResult"]["OgdDocumentResults"]
+    if int(ergebnis["Hits"]["#text"]) > int(ergebnis["Hits"]["@pageSize"]):
+        raise RuntimeError(
+            f"RIS-Suche liefert {ergebnis['Hits']['#text']} Treffer – mehr als eine Seite, Abgleich unvollständig"
+        )
+    treffer = {
+        ref["Data"]["Metadaten"]["Technisch"]["ID"]
+        for ref in _liste(ergebnis.get("OgdDocumentReference", []))
+        if ref["Data"]["Metadaten"]["Sonstige"]["Spg"]["Typ"] == typ
+    }
     if not treffer:
         raise RuntimeError(
-            "RIS-Suche ohne Treffer – eher hat sich die RIS-Seite geändert als die Rechtslage; Suche prüfen"
+            "RIS-Suche ohne Treffer – eher hat sich die OGD-Schnittstelle geändert als die Rechtslage; Suche prüfen"
         )
-    if len(treffer) >= int(suche["ResultPageSize"]):
-        raise RuntimeError(f"RIS-Suche liefert {len(treffer)} Treffer – mehr als eine Seite, Abgleich unvollständig")
     return treffer
 
 
@@ -115,7 +107,7 @@ def pruefe_oesg(q: pd.DataFrame) -> list[str]:
     """Das geltende ÖSG-Gutachten im RIS gegen das Register."""
     register = set(q.loc[(q["Herkunft"] == "RIS") & ~ist_rsg_verordnung(q), "Kennung"])
     try:
-        treffer = ris_dokumente(suche=SUCHE_OESG)
+        treffer = ris_dokumente(typ="OsgGutachten", suchworte="")
     except OSError as e:
         return [_nicht_erreichbar("ÖSG", e)]
     hinweise = [
