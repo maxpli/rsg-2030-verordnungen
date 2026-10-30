@@ -98,3 +98,41 @@ def test_stummer_server_wird_nicht_weiter_angefragt(monkeypatch):
     with pytest.raises(urllib.error.URLError):
         d.abrufen("https://anders.example/c.pdf", netz_versuche=1)
     assert len(anfragen) == 3  # ein Versuch, weil eine Archivkopie einspringt
+
+
+def test_pdf_links_nur_das_exakte_dokument():
+    """OGD-Antwort: Die Dokumentnummer wirkt als Suche – gelesen wird nur das Dokument mit exakt dieser ID,
+    nur PDF-Adressen, und ein einzelnes Element kommt in der Antwort ohne Liste (beide Formen)."""
+
+    def dok(id_, inhalte):
+        return {"Data": {"Metadaten": {"Technisch": {"ID": id_}}, "Dokumentliste": {"ContentReference": inhalte}}}
+
+    antwort = {
+        "OgdSearchResult": {
+            "OgdDocumentResults": {
+                "OgdDocumentReference": [
+                    dok(
+                        "SPG_X_1",
+                        [
+                            {  # Hauptdokument: Liste mehrerer Formate, nur das PDF zählt
+                                "Urls": {
+                                    "ContentUrl": [
+                                        {"DataType": "Html", "Url": "https://ogd.x/SPG_X_1/a.html"},
+                                        {"DataType": "Authentisch", "Url": "https://ogd.x/SPG_X_1/a.pdf"},
+                                    ]
+                                }
+                            },
+                            # Anlage: einzelnes Element ohne Liste
+                            {"Urls": {"ContentUrl": {"DataType": "Authentisch", "Url": "https://ogd.x/SPG_X_1/b.pdf"}}},
+                        ],
+                    ),
+                    dok(
+                        "SPG_X_10",
+                        [{"Urls": {"ContentUrl": {"DataType": "Authentisch", "Url": "https://ogd.x/falsch.pdf"}}}],
+                    ),
+                ]
+            }
+        }
+    }
+    assert d.pdf_links(antwort, "SPG_X_1") == ["https://ogd.x/SPG_X_1/a.pdf", "https://ogd.x/SPG_X_1/b.pdf"]
+    assert d.pdf_links(antwort, "SPG_X_99") == []

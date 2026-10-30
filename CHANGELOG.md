@@ -102,6 +102,10 @@ Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem
 - `waechter`: Antwortet das RIS nicht (es schickt gelegentlich «HTTP 503» und bittet um Pause), ist das ein Hinweis
   «nicht erreichbar – kein Abgleich in diesem Lauf» statt eines Abbruchs mit Traceback. Der Lauf endet weiter mit
   Exit 1, damit in der Mail steht, dass dieser Abgleich ausgefallen ist.
+- `download` holt die Dateiliste eines RIS-Dokuments über die **OGD-Schnittstelle des RIS** (data.bka.gv.at) und
+  die Dateien von ogd.ris.bka.gv.at statt vom Portal www.ris.bka.gv.at – das Portal beantwortet Anfragen aus
+  Rechenzentren mit dem unten genannten Bot-Schutz, die OGD-Schnittstelle ist der dokumentierte Weg für
+  maschinelle Abrufe. Dass beide Wege dieselben Bytes liefern, belegen die Prüfsummen im Register.
 - CI: Tests **und Release** laden die Quellen aus dem Zwischenspeicher und prüfen jede Datei per SHA-256 gegen das
   Register; frisch geladen wird nur, was neu ist oder fehlt. Grund: Das RIS beantwortet Anfragen aus Rechenzentren
   seit Ende Oktober 2026 mit einem Bot-Schutz («Security Check», HTTP 503) – auch der Wayback-Crawler erhält nur

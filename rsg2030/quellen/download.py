@@ -4,7 +4,11 @@
 - Herkunft «URL»: direkter Download (GÖG, Statistik Austria).
 - Herkunft «RIS»: alle PDF-Dateien des RIS-Dokuments (Verordnung + Anlagen) nach `<Datei>`-Ordner; HTML und RTF
   zeigen nur den Text des Hauptdokuments noch einmal (dessen PDF ist dabei), ohne die Anlagen;
-  Spalte «Praefix» unterscheidet mehrere Verordnungen desselben Landes (Kärnten).
+  Spalte «Praefix» unterscheidet mehrere Verordnungen desselben Landes (Kärnten). Die Dateiliste kommt von der
+  OGD-Schnittstelle des RIS (data.bka.gv.at), die Dateien von ogd.ris.bka.gv.at: Das RIS-Portal
+  (www.ris.bka.gv.at) beantwortet Anfragen aus Rechenzentren seit Ende Oktober 2026 mit einem Bot-Schutz
+  («Security Check», HTTP 503); die OGD-Schnittstelle ist der dokumentierte Weg für maschinelle Abrufe, und dass
+  beide Wege dieselben Bytes liefern, hält die Prüfsumme im Register fest.
 
 Rücksichtsvoll gegenüber RIS/goeg.at/statistik.at/Wayback Machine: eine Anfrage nach der anderen, mindestens
 `PAUSE_S` Sekunden Abstand (plus Zufall); bei HTTP 429/503 wird gewartet (Retry-After, sonst steigend) statt sofort
@@ -22,10 +26,9 @@ from __future__ import annotations
 import argparse
 import gzip
 import hashlib
-import html
+import json
 import logging
 import random
-import re
 import ssl
 import sys
 import time
@@ -44,12 +47,8 @@ from rsg2030.quellen import lade_quellen, pruefe
 log = logging.getLogger(__name__)
 
 RIS_URL = "https://www.ris.bka.gv.at"
+RIS_API = "https://data.bka.gv.at/ris/api/v2.6/Sonstige"
 REPO_URL = "https://github.com/maxpli/rsg-2030-verordnungen"
-
-LINK_RE = re.compile(
-    r'href="((?:https://www\.ris\.bka\.gv\.at)?/Dokumente/Spg/[^"]+\.pdf)"',
-    re.IGNORECASE,
-)
 
 
 try:  # Stammzertifikate unabhängig von der Python-Installation (python.org-Python auf macOS hat keine)
@@ -102,17 +101,35 @@ def abrufen(url: str, netz_versuche: int = 2) -> bytes:
     raise AssertionError("unreachable")
 
 
-def ris_links(dokumentnummer: str) -> list[str]:
-    page = abrufen(f"{RIS_URL}/Dokument.wxe?Abfrage=Spg&Dokumentnummer={dokumentnummer}").decode(
-        "utf-8", errors="replace"
-    )
+def _liste(x: object) -> list:
+    """Die OGD-Antwort lässt bei genau einem Element die Liste weg."""
+    return x if isinstance(x, list) else [x]
+
+
+def pdf_links(antwort: dict, dokumentnummer: str) -> list[str]:
+    """PDF-Adressen aus einer OGD-Antwort. Die Dokumentnummer wirkt in der Abfrage als Suche (viele Treffer);
+    gelesen wird nur das Dokument, dessen ID genau die Dokumentnummer ist."""
+    treffer = antwort["OgdSearchResult"]["OgdDocumentResults"].get("OgdDocumentReference", [])
     links: list[str] = []
-    for m in LINK_RE.finditer(page):
-        url = html.unescape(m.group(1))
-        url = url if url.startswith("http") else RIS_URL + url
-        if dokumentnummer in url and url not in links:
-            links.append(url)
+    for ref in _liste(treffer):
+        if ref["Data"]["Metadaten"]["Technisch"]["ID"] != dokumentnummer:
+            continue
+        for inhalt in _liste(ref["Data"]["Dokumentliste"]["ContentReference"]):
+            for content in _liste(inhalt["Urls"]["ContentUrl"]):
+                url = content["Url"]
+                if url.lower().endswith(".pdf") and url not in links:
+                    links.append(url)
     return links
+
+
+def ris_links(dokumentnummer: str) -> list[str]:
+    """PDF-Adressen eines RIS-Dokuments über die OGD-Schnittstelle (Begründung im Modul-Docstring)."""
+    antwort = json.loads(
+        abrufen(f"{RIS_API}?Applikation=Spg&Dokumentnummer={dokumentnummer}&DokumenteProSeite=OneHundred").decode(
+            "utf-8"
+        )
+    )
+    return pdf_links(antwort, dokumentnummer)
 
 
 def _speichern(url: str, ziel: Path, neu: bool, root: Path) -> bool:
