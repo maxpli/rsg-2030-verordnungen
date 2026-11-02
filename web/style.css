@@ -164,8 +164,11 @@ table.src-t { border-collapse: collapse; font-size: 13px; min-width: 100% }
 .src-t thead th { font-family: var(--f-cond); font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em;
   color: var(--muted); font-weight: 500; white-space: nowrap }
 .src-t tbody th { font-weight: 500; white-space: nowrap }
-.src-t td.num, .src-t .num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; text-align: right;
-  padding-right: 24px; white-space: nowrap }
+/* Ausrichtung je Spalte, nicht je Zelle: Sonst steht eine rechtsbündige Zahl unter einer linksbündigen
+   Überschrift, und die Überschrift scheint zur Nachbarspalte zu gehören. Spalte 2 = wie gedruckt, 3 = übernommen. */
+.src-t th:nth-child(2), .src-t td:nth-child(2),
+.src-t th:nth-child(3), .src-t td:nth-child(3) { text-align: right; padding-right: 24px; white-space: nowrap }
+.src-t .num { font-family: var(--f-mono); font-variant-numeric: tabular-nums }
 /* der Text wie gedruckt ist das Zitat, nicht unsere Zahl – deshalb hervorgehoben */
 .src-t .roh { color: var(--ink); font-weight: 500 }
 .src-t tfoot th, .src-t tfoot td { border-bottom: 0; padding-top: 8px; font-weight: 600 }

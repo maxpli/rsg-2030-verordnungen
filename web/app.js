@@ -289,7 +289,7 @@ function renderHerkunft() {
     const woher = eigene ? `<span class="t2">Spalte SON/IDB, Zeile «${esc(eigene)}»</span>` : "";
     return `<tr>
       <th scope="row">${esc(spalte)}${woher ? `<br>${woher}` : ""}</th>
-      <td class="num roh">${roh == null ? '<span class="t2">keine Zelle</span>' : esc(roh)}</td>
+      <td class="${roh == null ? "t2" : "num roh"}">${roh == null ? "keine Zelle" : esc(roh)}</td>
       <td class="num">${exakt(wert)}</td>
       <td title="${esc(lang)}">${esc(kurz)}${regel == null ? "" : ` <code>${esc(D.regeln[regel][0])}</code>`}</td>
     </tr>`;
