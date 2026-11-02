@@ -270,7 +270,7 @@ function renderHerkunft() {
     body.innerHTML = `<p class="t2">Diese Matrix weist für ${esc(f)} keinen Wert aus – also gibt es auch nichts herzuleiten.</p>`;
     return;
   }
-  const [qi, seite, zeilePdf, block] = m, [pdf, ris] = D.quellen[qi];
+  const [qi, seite, zeilePdf, block] = m, [pdf, ris, dateiUrl] = D.quellen[qi];
   const blockText = block === "aequivalent" ? ` · <span class="t2">Block der ÄAVE-Äquivalente</span>` : "";
   /* `zeile_pdf` ist die Zeilenbeschriftung wörtlich aus dem PDF. Sie fehlt in zwei Fällen, und beide sind eine
      Auskunft für sich: «manuell erfasst» = Bildseite ohne Textebene, leer = die Zeile ist im PDF nicht gedruckt
@@ -300,8 +300,8 @@ function renderHerkunft() {
   }).join("");
 
   body.innerHTML = `
-    <p class="src-q"><span class="nb">${esc(pdf)}</span>, <b>Seite ${seite}</b> · ${zeile(zeilePdf)}${blockText}
-      · ${link(ris, "Verordnung im RIS")}</p>
+    <p class="src-q"><span class="nb">${esc(pdf)}</span>, ${link(`${dateiUrl}#page=${seite}`, `<b>Seite ${seite}</b> öffnen`)}
+      · ${zeile(zeilePdf)}${blockText} · ${link(ris, "Verordnung im RIS")}</p>
     <div class="src-scroll"><table class="src-t">
       <thead><tr><th scope="col">Matrixspalte</th><th scope="col">wie gedruckt</th><th scope="col">übernommen</th><th scope="col">Herkunft</th></tr></thead>
       <tbody>${zellen}</tbody>

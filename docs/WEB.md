@@ -60,7 +60,9 @@ Patientenströme, innerhalb des Intervalls kein Unterschied.
 | Werte der Herkunft | exakt, mindestens eine Nachkommastelle wie in den Matrizen – anders als sonst auf der Seite, wo ÄAVE fürs Lesen auf eine Stelle gerundet sind. In dieser Ansicht soll der Wert im PDF wiederzufinden sein |
 | Zeile der Matrix | `Zeile_PDF_roh` wörtlich. Fehlt sie, ist das selbst eine Auskunft: «manuell erfasst» = Bildseite ohne Textebene, leer = die Zeile ist im PDF nicht gedruckt (der Wert entsteht erst aus einer Regel) |
 | Block der Matrix | bei Burgenland, Kärnten und der Steiermark steht «Block der ÄAVE-Äquivalente» dabei, und die Detailspalte sagt als Vorbehalt, dass nur dieser Block mit den anderen Ländern vergleichbar ist (Fallstrick 3). Ohne das stünde «ÄAVE-Ä» im Zitat der Zeilenbeschriftung unerklärt da |
-| Link auf die Quelle | die Seite des RIS-Dokuments (aus der Dokumentnummer in `quellen.csv`), dazu die Seitenzahl als Text. Kein Tiefenlink in die PDF-Datei: deren Adresse liefert die OGD-Schnittstelle je Lauf, ein eingefrorener Link verrottet still |
+| Link auf die Quelle | zwei Links: «Seite 11 öffnen» springt in die PDF-Datei auf dem OGD-Dateiserver (`#page=11`), «Verordnung im RIS» auf die Seite des Dokuments im Portal, mit Kundmachung. Beide Adressen sind aus `quellen.csv` abgeleitet (Dokumentnummer, Dateiname), nicht gespeichert |
+| Seitenzahl | steht **auch als Text** da, nicht nur im Link: `#page=` ist eine Übereinkunft der PDF-Betrachter, kein Standard des Web. Kennt ein Betrachter sie nicht, öffnet sich die Datei auf Seite 1 – dann muss die Zahl lesbar sein |
+| keine Markierung der Zahl im PDF | `#search=` markiert in den meisten Betrachtern nichts und in den übrigen oft die falsche Zelle: Der Rohtext einer gezeigten Zelle ist auf seiner PDF-Seite meist **nicht** eindeutig (nachzurechnen mit `python -m rsg2030.scripts.rohtext_eindeutig`; «-» steht auf einer Seite hunderte Mal). Eine falsche Markierung wäre schlechter als keine. Statt zu markieren, nennt die Seite Zeile und Spalte, in denen die Zahl steht |
 | Farben | Nachbarstufen müssen sich deutlich unterscheiden, auch bei Farbsehschwäche (Protanopie, Deuteranopie): Abstand ΔE (OKLab × 100) mindestens 8. Ein Test rechnet das aus den Farben der Seite nach |
 
 ## Entscheidungen
@@ -122,6 +124,7 @@ web/                  die Seite: index.html, app.js, style.css
 rsg2030/web.py        «python -m rsg2030 web»: Tabellen Versorgungsdichte und Planungsmatrizen → data.json,
                         Seite nach daten_ergebnis/web/; `baue_herkunft` baut den Herkunfts-Teil
 rsg2030/korrekturen.py  `regel_fuer_zelle`: welche Regel aus korrekturen.csv eine korrigierte Zelle erklärt
+rsg2030/scripts/rohtext_eindeutig.py   belegt, warum die Seite die Zahl im PDF nicht markiert
 tests/test_web.py     Kacheln, Fächer, Vorbehalte, Farben, data.json, Herkunft (siehe «Wer prüft was»)
 .github/workflows/webseite.yml   bauen und auf GitHub Pages veröffentlichen
 ```
@@ -159,7 +162,9 @@ dann nicht laden darf; dafür der kleine Server.
 | zwei Regeln mit demselben Namen verwechselt (Kärnten: `plus:6.3` ist in VR 22 eine Lücke, im Land ihre Folge) | Test: zwei Regeln gleichen Namens in verschiedenen Regionen müssen zu verschiedenen Begründungen führen |
 | Begründung passt nicht zu den gezeigten Zahlen (Regel auf main neuer als das Release) | die Prüfsumme: eine datenwirksame Regeländerung ohne neues Release passt nicht zu `erwartete_ausgaben.csv`, der Bau bricht ab |
 | unbekannte `Quelle` einer Zelle, für die die Seite keinen Text hat | Bau bricht ab; Test dafür |
-| RIS-Link führt ins Leere | Bau bricht ab, wenn ein PDF nicht als RSG-Verordnung in `quellen.csv` steht (Test dafür). Dass das Adressmuster stimmt, prüft ein Mensch im Browser: Das RIS-Portal antwortet Rechenzentren nicht, die CI kann es nicht aufrufen |
+| Link ins PDF führt ins Leere oder auf eine andere Fassung | `python -m rsg2030 waechter --quellen` (monatlich) lädt jede Verordnungs-PDF unter genau der verlinkten Adresse und vergleicht die Prüfsumme mit dem Register. Ohne das brächen alle Links auf einmal und still, denn die RIS-Prüfung sieht nur die Dokumentnummern |
+| PDF fehlt im Quellenregister | Bau bricht ab, wenn ein PDF nicht als RSG-Verordnung in `quellen.csv` steht; Test dafür |
+| Sprung auf die Seite greift im Browser nicht | ein Mensch vor der Veröffentlichung; die Seitenzahl steht als Text daneben, damit das kein Beinbruch ist. Das RIS-Portal antwortet Rechenzentren nicht, die CI kann es nicht aufrufen |
 | Region fehlt in der Kachelkarte oder zwei Regionen auf einem Feld | Test: `kacheln.csv` enthält genau die VR und Länder aus `oesg_regionen.csv`, jedes Feld einmal |
 | Fach fehlt, falscher Name oder falsches «Teil von» | Test: `faecher.csv` enthält genau die Richtwertzeilen mit Soll-Intervall; «Teil von» wie `ZUSCHNITT` in `oesg_methodik/faecher.py` |
 | Seite passt nicht mehr zur Tabelle (Spalte, Fach oder Region neu oder weg) | `python -m rsg2030 web` bricht mit Meldung ab; Tests dafür |

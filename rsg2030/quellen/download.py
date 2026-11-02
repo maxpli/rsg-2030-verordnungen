@@ -203,6 +203,8 @@ def download(neu: bool = False, root: Path | None = None) -> int:
                 log.warning(f"  WARNUNG: keine Dateien im RIS gefunden für {kennung}")
             for url in links:
                 name = Path(urllib.parse.unquote(url)).name
+                # Präfix, damit zwei Verordnungen eines Landes sich nicht überschreiben; den Weg zurück zum Namen
+                # beim Herausgeber geht `quellen.quell_dateiname`
                 geladen += _speichern(url, ordner / (f"{praefix}_{name}" if praefix else name), neu, root)
         except OSError as e:
             log.warning(f"  ✗ {kennung}: nicht erreichbar ({e})")

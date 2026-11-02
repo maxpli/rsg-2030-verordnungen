@@ -9,7 +9,9 @@ wird, entscheidet ein Mensch (docs/PIPELINE.md).
   Ebenso das geltende ÖSG-Gutachten: Eine neue Fassung kann Richtwerte, Regionen oder die Vorlage der Matrix ändern.
   Gesucht wird über die OGD-Schnittstelle des RIS (data.bka.gv.at; warum, steht in `rsg2030/quellen/download.py`);
   die Links in den Hinweisen zeigen weiter auf das Portal, denn die liest ein Mensch im Browser.
-- **Originale** (`--quellen`): jede URL-Quelle neu laden und die Prüfsumme mit dem Register vergleichen. Kein Raten:
+- **Originale** (`--quellen`): jede URL-Quelle neu laden und die Prüfsumme mit dem Register vergleichen; dazu jede
+  Verordnungs-PDF unter der Adresse, die die Webseite verlinkt (abgeleitet aus Dokumentnummer und Dateiname) – ändert
+  der OGD-Server sein Muster, brechen sonst alle Links der Seite still. Kein Raten:
   erkennt jeden Austausch unter derselben Adresse. Was unter *neuer* Adresse erscheint (neuer Prognose-Jahrgang,
   Regionale Gliederung oder Methodenband zu einem neuen ÖSG-Stand), erkennt es nicht – dafür die Termine in
   docs/PIPELINE.md.
@@ -38,7 +40,7 @@ from datetime import date
 import pandas as pd
 
 from rsg2030.protokoll import einrichten
-from rsg2030.quellen import ist_rsg_verordnung, lade_quellen, ris_dokument_url
+from rsg2030.quellen import OGD_HOST, ist_rsg_verordnung, lade_quellen, ogd_pdf_url, ris_dokument_url
 from rsg2030.quellen.download import RIS_API, _liste, abrufen, entpacke_archiv
 
 log = logging.getLogger(__name__)
@@ -140,6 +142,32 @@ def pruefe_originale(q: pd.DataFrame) -> list[str]:
     return hinweise
 
 
+# --- Adressen der Verordnungs-PDFs, auf die die Webseite verlinkt -------------------------------
+
+
+def pruefe_pdf_adressen(q: pd.DataFrame) -> list[str]:
+    """Jede Verordnungs-PDF unter ihrer abgeleiteten Adresse laden und mit dem Register vergleichen.
+
+    Die Webseite verlinkt diese Adressen mit Sprungziel (`quellen.ogd_pdf_url`, docs/WEB.md); sie entstehen aus
+    Dokumentnummer und Dateiname, nicht aus einer gespeicherten URL. Ändert der OGD-Server sein Muster, brechen alle
+    Links auf einmal – und zwar still, denn `pruefe_ris` sieht nur die Dokumentnummern.
+    """
+    ris = q[ist_rsg_verordnung(q)]
+    hinweise: list[str] = []
+    for _, r in ris.iterrows():
+        url = ogd_pdf_url(r["Kennung"], r["Datei"], r["Praefix"])
+        try:
+            daten = abrufen(url)
+        except OSError as e:
+            hinweise.append(f"{r['Datei']}: nicht unter {url} erreichbar ({e}) – Links der Webseite prüfen")
+            continue
+        if hashlib.sha256(daten).hexdigest() != r["SHA256"]:
+            hinweise.append(f"{r['Datei']}: unter {url} liegt eine andere Fassung als im Register")
+    if not hinweise:
+        log.info(f"  ✓ {len(ris)} Verordnungs-PDFs: unter der Adresse auf {OGD_HOST} wie im Register")
+    return hinweise
+
+
 # --- Archivkopien der URL-Quellen ---------------------------------------------------------------
 
 
@@ -176,7 +204,7 @@ def main(argv: list[str] | None = None) -> int:
     hinweise = (
         pruefe_ris(q)
         + pruefe_oesg(q)
-        + (pruefe_originale(q) if args.quellen else [])
+        + (pruefe_originale(q) + pruefe_pdf_adressen(q) if args.quellen else [])
         + (pruefe_archiv(q) if args.archiv else [])
     )
     for h in hinweise:

@@ -18,6 +18,7 @@ from oesg_methodik.faecher import ZAE, ZAE_QUELLE, ZUSCHNITT
 from oesg_methodik.richtwerte import lade_richtwerte
 from rsg2030.analyse_eingang import lade_matrix_long
 from rsg2030.korrekturen import REGEL_SPALTEN, lade_regeln
+from rsg2030.quellen import OGD_HOST
 from rsg2030.schema import matrix_long
 from rsg2030.web import WERT, baue_daten
 
@@ -237,7 +238,10 @@ def test_herkunft_nennt_die_spalten_des_zuschnitts():
     assert [a[0] for a in d["herkunft"]["41|PLAN|CH"]] == ["CH"], "KJC und PCH fehlen in dieser Matrix"
     quelle, seite, zeile, block = d["matrizen"]["41|PLAN"]
     assert (d["quellen"][quelle][0], seite, zeile, block) == (TEST_PDF, 11, "PLAN ÄAVE insgesamt", "haupt")
-    assert d["quellen"][quelle][1].startswith("https://www.ris.bka.gv.at/")
+    pdf, ris, datei_url = d["quellen"][quelle]
+    assert ris.startswith("https://www.ris.bka.gv.at/"), "Seite des Dokuments zum Nachlesen"
+    # Adresse der Datei ohne Sprungziel: «#page=» hängt die Seite erst in app.js an
+    assert datei_url == f"{OGD_HOST}/Dokumente/Spg/SPG_OB_RSG_V_20260311_5_2026/{pdf}"
 
 
 def test_herkunft_unterscheidet_regeln_mit_gleichem_namen():

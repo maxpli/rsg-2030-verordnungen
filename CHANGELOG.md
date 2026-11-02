@@ -12,8 +12,9 @@ Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem
 - **Die Seite zeigt zu jedem Wert, woher er kommt** (docs/WEB.md): PDF, Seite und die Zeile der Matrix wie gedruckt,
   je eingegangener Matrixspalte den Text wie gedruckt und den übernommenen Wert, dazu jede Korrekturregel mit Art und
   Begründung wörtlich aus `korrekturen.csv` und einen Link auf die Verordnung im RIS. Zugeklappt eine Zeile in einem
-  eigenen Panel unter Matrix und Detailspalte. `data.json` wächst dadurch von 135 auf 228 KB (über die Leitung von 44
-  auf 58 KB); die Seite rechnet nichts nach, sie zitiert.
+  eigenen Panel unter Matrix und Detailspalte. «Seite 11 öffnen» springt mit `#page=` in die Datei auf dem
+  OGD-Dateiserver; die Seitenzahl steht auch als Text da, weil nicht jeder PDF-Betrachter `#page=` kennt. `data.json`
+  wächst dadurch von 135 auf 229 KB (über die Leitung von 44 auf 58 KB); die Seite rechnet nichts nach, sie zitiert.
   Der Bau prüft Zelle für Zelle, dass die gezeigten Spalten den veröffentlichten Wert ergeben, und bricht sonst ab.
 - `python -m rsg2030 web` liest dafür **auch** `RSG_2030_Planungsmatrizen.csv` und prüft beide Tabellen gegen
   `erwartete_ausgaben.csv`; `webseite.yml` lädt beide aus dem Release und prüft sie gegen `SHA256SUMS.txt`.
@@ -25,9 +26,15 @@ Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem
   Long-CSV erklärt (die Long-CSV nennt je Zelle nur den Namen der Regel, nicht die Begründung).
 - Neu: `quellen.ris_dokument_url(kennung)` – Seite eines RIS-Dokuments im Portal, für Links, die ein Mensch öffnet.
   `quellen.download.RIS_URL` ist dafür entfallen (der Wächter baute diese Adresse bisher zweimal selbst).
+- Neu: `quellen.ogd_pdf_url(kennung, datei, praefix="", seite=None)`, `quellen.quell_dateiname(datei, praefix)` und
+  `quellen.OGD_HOST` – Adresse einer Verordnungs-PDF auf dem OGD-Dateiserver, mit Sprungziel. Geladen wird weiter
+  über die Schnittstelle (`download.ris_links`).
 
 **Befehle:**
 
+- `waechter --quellen` prüft zusätzlich jede Verordnungs-PDF unter der Adresse, die die Webseite verlinkt: Sie wird
+  aus Dokumentnummer und Dateiname abgeleitet, also brächen alle Links der Seite auf einmal und still, wenn der
+  OGD-Server sein Muster änderte – die RIS-Prüfung sieht nur die Dokumentnummern.
 - `waechter` sucht die geltenden Verordnungen und das ÖSG-Gutachten ebenfalls über die OGD-Schnittstelle (der Typ
   steht in den Metadaten der Treffer und wird aus der Antwort gefiltert; die Links in den Hinweisen zeigen weiter
   auf das Portal, denn die liest ein Mensch im Browser). Davor war der Montagslauf seit dem Bot-Schutz rot.

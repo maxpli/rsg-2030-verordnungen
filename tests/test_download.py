@@ -136,3 +136,38 @@ def test_pdf_links_nur_das_exakte_dokument():
     }
     assert d.pdf_links(antwort, "SPG_X_1") == ["https://ogd.x/SPG_X_1/a.pdf", "https://ogd.x/SPG_X_1/b.pdf"]
     assert d.pdf_links(antwort, "SPG_X_99") == []
+
+
+def test_adresse_beim_herausgeber_ohne_praefix():
+    """Der Download stellt mehreren Verordnungen eines Landes ein Präfix voran (Kärnten). Beim Herausgeber heißt die
+    Datei ohne – sonst zeigen die Links der Webseite ins Leere (docs/WEB.md, «Wer prüft was»)."""
+    from rsg2030.quellen import OGD_HOST, ogd_pdf_url, quell_dateiname
+
+    assert quell_dateiname("rsg_2030/kaernten/3_2026_2_Verordnung_RSG_Kaernten_V_2030_Anhang.pdf",
+                           "3_2026_2_Verordnung") == "RSG_Kaernten_V_2030_Anhang.pdf"  # fmt: skip
+    assert quell_dateiname("rsg_2030/wien/RSG_VO_Wien_2030_Anlage.pdf", "") == "RSG_VO_Wien_2030_Anlage.pdf"
+    # ein Präfix, das nicht am Anfang steht, wird nicht abgeschnitten
+    assert quell_dateiname("a/VO_2026_Anlage.pdf", "Anlage") == "VO_2026_Anlage.pdf"
+    assert (
+        ogd_pdf_url("SPG_X_RSG_V_1", "a/p_Datei.pdf", "p", 7)
+        == f"{OGD_HOST}/Dokumente/Spg/SPG_X_RSG_V_1/Datei.pdf#page=7"
+    )
+    assert ogd_pdf_url("SPG_X_RSG_V_1", "a/Datei.pdf") == f"{OGD_HOST}/Dokumente/Spg/SPG_X_RSG_V_1/Datei.pdf"
+
+
+def test_jede_rsg_verordnung_hat_eine_ableitbare_adresse():
+    """Für jede registrierte Verordnungs-PDF muss sich eine Adresse bilden lassen, und zwar genau eine je Datei."""
+    from rsg2030.quellen import ist_rsg_verordnung, lade_quellen, ogd_pdf_url
+
+    q = lade_quellen()
+    ris = q[ist_rsg_verordnung(q)]
+    adressen = [ogd_pdf_url(r["Kennung"], r["Datei"], r["Praefix"]) for _, r in ris.iterrows()]
+    assert len(set(adressen)) == len(ris), "zwei Dateien mit derselben Adresse"
+    assert all(a.endswith(".pdf") for a in adressen)
+    # keine Adresse trägt noch ein Präfix im Dateinamen («_Verordnung_» allein taugt nicht als Probe: Salzburg
+    # heißt beim Herausgeber «6._RSG_Verordnung_Salzburg_Anlage.pdf»)
+    praefixe = {p for p in ris["Praefix"] if p}
+    stehen_geblieben = [
+        name for a in adressen if any((name := a.rsplit("/", 1)[1]).startswith(f"{p}_") for p in praefixe)
+    ]
+    assert not stehen_geblieben, f"Präfix nicht abgeschnitten: {stehen_geblieben}"

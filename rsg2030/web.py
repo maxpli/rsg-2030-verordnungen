@@ -34,7 +34,7 @@ from rsg2030.analyse_eingang import lade_matrix_long
 from rsg2030.config import LONG_DATEI, VERSORGUNGSDICHTE_DATEI, ausgabe_dir
 from rsg2030.korrekturen import lade_regeln, regel_fuer_zelle
 from rsg2030.protokoll import einrichten, schreibe_laufprotokoll
-from rsg2030.quellen import ist_rsg_verordnung, lade_quellen, ris_dokument_url
+from rsg2030.quellen import ist_rsg_verordnung, lade_quellen, ogd_pdf_url, ris_dokument_url
 from rsg2030.schema import QUELLEN, massgeblicher_block, matrix_long
 
 log = logging.getLogger(__name__)
@@ -54,8 +54,9 @@ WERT = ["VD", "AAVE", "Bevoelkerung", "Jahr", "Lage_im_Intervall", "Position_im_
 HERKUNFT_ZEILE = "insgesamt"
 """Zeile der Tabelle Versorgungsdichte, deren Herkunft die Seite zeigt – die einzige, die sie darstellt."""
 
-QUELLE_ANGABE = ["pdf", "ris"]
-"""`quellen` in `data.json`: je Verordnungs-PDF Dateiname und Seite des RIS-Dokuments."""
+QUELLE_ANGABE = ["pdf", "ris", "datei_url"]
+"""`quellen` in `data.json`: je Verordnungs-PDF der Dateiname, die Seite des RIS-Dokuments (zum Nachlesen, mit
+Kundmachung) und die Adresse der Datei selbst (ohne Sprungziel; `#page=<Seite>` hängt die Seite an)."""
 MATRIX_ANGABE = ["quelle", "seite", "zeile_pdf", "block"]
 """`matrizen`: je Matrix und Abschnitt Index in `quellen`, Seite im PDF (1-basiert), die Beschriftung der Zeile
 «insgesamt», wie sie im PDF gedruckt ist (`Zeile_PDF_roh`), und der maßgebliche Block – `aequivalent` bei den
@@ -178,10 +179,16 @@ def _wert(spalte: str, v: object) -> object:
     return v.item() if hasattr(v, "item") else v
 
 
-def _ris_je_pdf() -> dict[str, str]:
-    """Dateiname eines Verordnungs-PDF → Seite seines RIS-Dokuments, zum Nachlesen im Browser."""
+def _adressen_je_pdf() -> dict[str, tuple[str, str]]:
+    """Dateiname eines Verordnungs-PDF → (Seite des RIS-Dokuments, Adresse der Datei selbst)."""
     q = lade_quellen()
-    return {Path(r["Datei"]).name: ris_dokument_url(r["Kennung"]) for _, r in q[ist_rsg_verordnung(q)].iterrows()}
+    return {
+        Path(r["Datei"]).name: (
+            ris_dokument_url(r["Kennung"]),
+            ogd_pdf_url(r["Kennung"], r["Datei"], r["Praefix"]),
+        )
+        for _, r in q[ist_rsg_verordnung(q)].iterrows()
+    }
 
 
 def _matrizen(long: pd.DataFrame) -> dict[tuple[str, str], pd.DataFrame]:
@@ -218,7 +225,7 @@ def baue_herkunft(insgesamt: pd.DataFrame, long: pd.DataFrame, regeln: pd.DataFr
     eindeutige Regel hat oder wenn PDF und Seite einer Matrix nicht eindeutig sind: Dann zeigte die Seite eine
     Herkunft, die nicht zu den Zahlen gehört.
     """
-    ris = _ris_je_pdf()
+    adressen = _adressen_je_pdf()
     pdfs: list[str] = []
     quellen: list[list[object]] = []
     matrizen: dict[str, list[object]] = {}
@@ -291,11 +298,11 @@ def baue_herkunft(insgesamt: pd.DataFrame, long: pd.DataFrame, regeln: pd.DataFr
                 raise ValueError(
                     f"{r.Region_ID} {r.Abschnitt}: PDF {datei} und Seite {seite} der Matrix nicht eindeutig"
                 )
-            if datei[0] not in ris:
+            if datei[0] not in adressen:
                 raise ValueError(f"{datei[0]} steht nicht als RSG-Verordnung in quellen.csv")
             if datei[0] not in pdfs:
                 pdfs.append(datei[0])
-                quellen.append([datei[0], ris[datei[0]]])
+                quellen.append([datei[0], *adressen[datei[0]]])
             insgesamt_zeile = _zelle(teil_zeilen, HERKUNFT_ZEILE, r.Fach)
             matrizen[schluessel] = [
                 pdfs.index(datei[0]),

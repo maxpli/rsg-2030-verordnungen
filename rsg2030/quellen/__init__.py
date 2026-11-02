@@ -27,9 +27,33 @@ RIS_PORTAL = "https://www.ris.bka.gv.at"
 (`quellen.download`): Das Portal beantwortet Anfragen aus Rechenzentren mit einem Bot-Schutz."""
 
 
+OGD_HOST = "https://ogd.ris.bka.gv.at"
+"""Dateiserver der OGD-Schnittstelle. Von hier lädt `quellen.download` die PDFs, und von hier sind sie auch für
+Leser:innen abrufbar – anders als das Portal ohne Bot-Schutz und mit `Accept-Ranges`, also seitenweise."""
+
+
 def ris_dokument_url(kennung: str) -> str:
     """Seite eines RIS-Dokuments im Portal (Applikation «Spg»), zum Nachlesen im Browser."""
     return f"{RIS_PORTAL}/Dokument.wxe?Abfrage=Spg&Dokumentnummer={kennung}"
+
+
+def quell_dateiname(datei: str, praefix: str = "") -> str:
+    """Name einer Datei beim Herausgeber: der Name aus `quellen.csv` ohne Ordner und ohne das Präfix, das der
+    Download mehreren Verordnungen eines Landes voranstellt (Gegenstück zu `download`, Spalte «Praefix»;
+    nötig bei Kärnten, das zwei RSG-Verordnungen hat)."""
+    name = Path(datei).name
+    return name.removeprefix(f"{praefix}_") if praefix else name
+
+
+def ogd_pdf_url(kennung: str, datei: str, praefix: str = "", seite: int | None = None) -> str:
+    """Adresse einer PDF-Datei auf dem OGD-Dateiserver, mit `seite` als Sprungziel (`#page=`).
+
+    Das Muster ist das, in dem die OGD-Schnittstelle ihre Dateien selbst ausliefert. Geladen wird trotzdem über die
+    Schnittstelle und nicht über dieses Muster (`download.ris_links`): Sie nennt alle Dateien eines Dokuments, auch
+    die, deren Namen wir nicht kennen. Dass das Muster noch stimmt, prüft der Wächter (`--quellen`).
+    """
+    sprung = f"#page={seite}" if seite else ""
+    return f"{OGD_HOST}/Dokumente/Spg/{kennung}/{quell_dateiname(datei, praefix)}{sprung}"
 
 
 def lade_quellen(path: Path = QUELLEN_CSV) -> pd.DataFrame:
