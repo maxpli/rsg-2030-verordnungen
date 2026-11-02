@@ -23,7 +23,7 @@ Komma als Trenner, Punkt als Dezimalzeichen.
 | ÄAVE spitalsambulant / extramural / insgesamt, IST → PLAN, absolut oder je 100.000 | Tabelle Versorgungsdichte |
 | ÄAVE in Primärversorgungseinheiten (AM, KIJU) | Tabelle Versorgungsdichte, Zeile `pve` |
 | Fächer ohne Richtwert (NCH, AN, STR, RAD, NUK, PMR, PAT, LAB, SON/IDB) und die Spalte `gesamt` | Tabelle Planungsmatrizen |
-| Planstellen und Sachleistungsstellen **im selben Fach-Zuschnitt wie die ÄAVE** (ZMK inkl. KFO, IM inkl. PUL …) | Tabelle Stellen |
+| Planstellen und Sachleistungsstellen **im ÖSG-Zuschnitt** – wie die ÄAVE (ZMK inkl. KFO, IM inkl. PUL …) | Tabelle Stellen |
 | Wahlärzt:innen, VGF, IST-Teilzeilen (niedergelassen, Ambulatorien), Faktoren, Stellen je **Matrixspalte** | Tabelle Planungsmatrizen – meist nur je Land sinnvoll, Spalte «Auswerten» der [Zeilen](#zeilen); Stellen: [Stellen lesen](#stellen-lesen) |
 | Woher eine Zahl kommt (PDF, Seite, Originaltext, Korrekturregel) | Tabelle Planungsmatrizen |
 
@@ -94,7 +94,7 @@ Jede beantwortet eine andere Frage; erst zusammen geben sie ein richtiges Bild.
 | Wo liegt sie, vergleichbar über Fächer und Regionen? | `Position_im_Intervall`: 0 = VDmin, 1 = VDmax | «… knapp unter der Untergrenze (Position −0,07).» |
 | Wie viel ist das in ÄAVE? | `AAVE_Abstand_Intervall`: 0 im Intervall, negativ = fehlt bis VDmin, positiv = über VDmax | «Bis zur Untergrenze fehlen 13,5 ÄAVE Sachleistung.» |
 
-Beispiele (PLAN 2030, Version 2026.1):
+Beispiele (PLAN 2030, Version 2026.2):
 
 | Region, Fach | VD | Soll-Intervall | Lage | Position | ÄAVE-Abstand | Was es heißt |
 |---|---:|---|---|---:|---:|---|

@@ -137,7 +137,11 @@ umlenken: `RSG2030_DATEN` (alles), einzeln `RSG2030_QUELLEN_DIR`, `RSG2030_EINGA
 
 ## Release
 
-Vor dem Tag in `CITATION.cff` `version`, `date-released` und bei jeder Referenz `date-accessed` setzen, beide Daten =
+Vor dem Tag die Version setzen: `pyproject.toml`, `CITATION.cff` und die Stellen der Doku, die eine Version nennen –
+README (Einbinden in anderen Projekten, Beispielausgabe, Beispielzahlen), `LIZENZ_DATEN.md` (Zitation), `docs/DATEN.md`
+(Beispielzahlen). Haben sich die Daten geändert, die Beispielzahlen dabei gegen die neuen Dateien halten.
+
+In `CITATION.cff` außerdem `date-released` und bei jeder Referenz `date-accessed` setzen, beide Daten =
 Tag des Release (`JJJJ-MM-TT`). Ohne Datum fehlt in der Zitation das Jahr. Abrufdatum ist der Tag des Release, weil
 der Release-Lauf jede Quelle frisch lädt und ihre Prüfsumme prüft; die Spalte `Abgerufen` im Register bleibt das Datum
 der geprüften Fassung. Fehlt etwas, bricht der Release-Lauf ab (Version oder Datum) bzw. die Testsuite

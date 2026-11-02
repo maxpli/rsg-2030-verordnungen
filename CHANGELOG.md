@@ -13,6 +13,16 @@ Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem
   steht in den Metadaten der Treffer und wird aus der Antwort gefiltert; die Links in den Hinweisen zeigen weiter
   auf das Portal, denn die liest ein Mensch im Browser). Davor war der Montagslauf seit dem Bot-Schutz rot.
 
+**Doku:**
+
+- `LIZENZ_DATEN.md` nennt `RSG_2030_Stellen.csv` (seit 2026.2 Teil des Datensatzes) jetzt ausdrücklich mit; der
+  Änderungshinweis von CC BY steht nun bei den Quellen, für die er gilt (Statistik Austria, ÖROK), nicht am Ende der
+  Liste hinter dem ÖSG.
+- Eine Zahl in docs/METHODIK.md (R4, Wirkung der KFO-Fußnote in OÖ) war falsch gerundet: die VD ZMK im PLAN ist 41,4,
+  nicht 41,5. Die Daten selbst sind unverändert.
+- `tests/test_zitation.py` prüft, dass README, `LIZENZ_DATEN.md` und docs/DATEN.md keine andere Version nennen als
+  `pyproject.toml`: Der Einbinde-Pin im README zeigte nach dem Release 2026.2 noch auf 2026.1.
+
 ## 2026.2 – Tabelle Stellen
 
 **Daten:**

@@ -276,7 +276,7 @@ So gelesen und übernommen:
   Steyr» (BL, VR 44). Die Fußnote beziffert beides nicht, also bleibt es draußen; ZMK in OÖ ist dort minimal zu
   niedrig (eine Stelle bzw. ein Notdienst gegenüber mehreren hundert ÄAVE). Eine Vorgriffstelle wird – allgemein,
   nicht aus den Unterlagen – im Vorgriff auf eine künftige Planstelle besetzt (z. B. überlappende Praxisübergabe).
-- Wirkung: OÖ ZMK BL IST 534,6 → 572,8 ÄAVE (VD 35,5 → 38,1), PLAN 606,6 → 644,8 (39,0 → 41,5); VR entsprechend.
+- Wirkung: OÖ ZMK BL IST 534,6 → 572,8 ÄAVE (VD 35,5 → 38,1), PLAN 606,6 → 644,8 (39,0 → 41,4); VR entsprechend.
   Bei den Stellen kommt je Träger-Zeile und in den gemeinsamen Sachleistungsstellen eine KFO-Zelle mit 32 dazu
   (BL IST ÖGK gesamt 1.520,1 → 1.552,1; PLAN gemeinsam 1.711,5 → 1.743,5).
 

@@ -37,18 +37,24 @@ aktuellen Release ([docs/WEB.md](docs/WEB.md)).
 
 ## Was herauskommt
 
+Wer die Matrizen nur nachsehen will, nimmt die Excel-Mappe: ein Blatt je Matrix wie im PDF, mit den
+dokumentierten Korrekturen. Gerechnet wird mit den CSV-Dateien – nur sie haben eine Version und eine Prüfsumme.
+
 | Datei | Inhalt |
 |---|---|
 | `RSG_2030_Planungsmatrizen.csv` | jede Zelle jeder Planungsmatrix: Region, IST/PLAN, Zeile, Fach, Wert – und woher der Wert kommt (PDF-Seite, Originaltext, ggf. Korrekturregel) |
+| `RSG_2030_Planungsmatrizen.xlsx` | dieselben Matrizen wie im PDF, ein Blatt je Matrix, dazu alle Prüfungen, Korrekturen und die Österreich-Summe – zum Lesen, nicht zum Weiterrechnen |
 | `RSG_2030_Versorgungsdichte.csv` | je Region × IST/PLAN × Zeile × Fach: ÄAVE im ÖSG-Zuschnitt, Bevölkerung, Versorgungsdichte; für «insgesamt» dazu das Soll-Intervall (ÖSG) und Lage, Position und ÄAVE-Abstand dazu |
-| `RSG_2030_Stellen.csv` | je Region × IST/PLAN × Stellen-Zeile × Fach: vertragsärztliche Planstellen und Sachleistungsstellen **im selben Fach-Zuschnitt wie die ÄAVE**, dazu der Maximalanteil vertragsärztlicher Planstellen |
-| `RSG_2030_Planungsmatrizen.xlsx` | zum Nachsehen: die Matrizen je Land, alle Prüfungen, Korrekturen, Österreich-Summe |
+| `RSG_2030_Stellen.csv` | je Region × IST/PLAN × Stellen-Zeile × Fach: vertragsärztliche Planstellen und Sachleistungsstellen im ÖSG-Zuschnitt, dazu der Maximalanteil vertragsärztlicher Planstellen |
 | `Pruefbericht.md` | alle Zahlen des Laufs: Zellen nach Herkunft, Prüfungen, Korrekturen, Stand der Freigabe |
 | `Laufprotokoll_*.json` | wann und womit die Dateien entstanden sind, mit Prüfsummen |
 
+Versorgungsdichte und Stellen schneiden die Fächer gleich zu (ÖSG-Zuschnitt: CH mit KJC und PCH, IM mit PUL,
+ZMK mit KFO; nur die ZAE gehören bei den Stellen nicht zu AM) – ein Fach bedeutet in beiden Tabellen dasselbe.
+Die Tabelle Planungsmatrizen bleibt bei den Fachspalten der Verordnung, wie gedruckt.
 Jede Spalte ist in [docs/DATEN.md](docs/DATEN.md) beschrieben.
 
-Beispiel aus der Versorgungsdichte, Version 2026.1 (Innere Medizin einschließlich Pulmologie,
+Beispiel aus der Versorgungsdichte, Version 2026.2 (Innere Medizin einschließlich Pulmologie,
 [docs/METHODIK.md](docs/METHODIK.md) R4; PLAN 2030, Zeile «insgesamt»):
 
 | Land | ÄAVE | Bevölkerung 1.1.2030 | Versorgungsdichte | Soll-Intervall (ÖSG) | Lage | Position | ÄAVE-Abstand |
@@ -89,10 +95,10 @@ python3.13 -m venv .venv
 aus, prüft sie und rechnet die Versorgungsdichte. Am Ende steht:
 
 ```
-   ✓ RSG_2030_Planungsmatrizen.csv entspricht Version 2026.1 (SHA-256 …)
+   ✓ RSG_2030_Planungsmatrizen.csv entspricht Version 2026.2 (SHA-256 …)
 FREIGEGEBEN
-   ✓ RSG_2030_Versorgungsdichte.csv entspricht Version 2026.1 (SHA-256 …)
-   ✓ RSG_2030_Stellen.csv entspricht Version 2026.1 (SHA-256 …)
+   ✓ RSG_2030_Versorgungsdichte.csv entspricht Version 2026.2 (SHA-256 …)
+   ✓ RSG_2030_Stellen.csv entspricht Version 2026.2 (SHA-256 …)
 ```
 
 Die Ergebnisse liegen dann in `daten_ergebnis/`, die Quellen in `daten_original/`. `alles` besteht aus drei
@@ -160,7 +166,7 @@ Ohne GitHub-Konto: E-Mail an [max.plischke@loesungswerk.at](mailto:max.plischke@
 
 Zwei Pakete: `oesg_methodik/` (die ÖSG-Regeln, unabhängig vom Datensatz) und `rsg2030/` (der Datensatz). Andere
 Projekte binden das Paket in einer festen Version ein:
-`rsg-2030-verordnungen @ git+https://github.com/maxpli/rsg-2030-verordnungen@2026.1` (Datenordner: Arbeitsordner
+`rsg-2030-verordnungen @ git+https://github.com/maxpli/rsg-2030-verordnungen@2026.2` (Datenordner: Arbeitsordner
 oder `RSG2030_DATEN`). Was in den veröffentlichten Dateien steht, bitte dort lesen, nicht mit Funktionen des Pakets
 nachrechnen. Vor dem Umstellen auf eine neue Version: Abschnitt «Schnittstelle» im [CHANGELOG](CHANGELOG.md) – dort
 steht, was sich an den importierbaren Namen geändert hat.
