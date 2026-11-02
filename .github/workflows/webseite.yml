@@ -1,7 +1,8 @@
 # Webseite (docs/WEB.md) bauen und auf GitHub Pages veröffentlichen.
-# Die Daten werden hier nicht neu erzeugt: Die Tabelle Versorgungsdichte kommt aus dem aktuellen Release und wird gegen
-# dessen SHA256SUMS.txt geprüft; «python -m rsg2030 web» prüft sie zusätzlich gegen rsg2030/erwartete_ausgaben.csv und
-# baut nur, wenn beides passt. Schlägt etwas fehl, bleibt die bisherige Seite online.
+# Die Daten werden hier nicht neu erzeugt: Die Tabelle Versorgungsdichte (zeigt die Seite) und die Tabelle
+# Planungsmatrizen (Herkunft je Wert) kommen aus dem aktuellen Release und werden gegen dessen SHA256SUMS.txt geprüft;
+# «python -m rsg2030 web» prüft beide zusätzlich gegen rsg2030/erwartete_ausgaben.csv und baut nur, wenn alles passt.
+# Schlägt etwas fehl, bleibt die bisherige Seite online.
 #
 # Auslöser:
 # - nach einem erfolgreichen Lauf von «Release». Das Ereignis «Release veröffentlicht» taugt dafür nicht: release.yml
@@ -50,7 +51,8 @@ jobs:
         run: pip install -c requirements.txt -e ".[dev]"
       - name: Tests der Seite
         run: pytest tests/test_web.py -m "not slow"
-      - name: Tabelle Versorgungsdichte aus dem aktuellen Release, gegen SHA256SUMS.txt geprüft
+      # Zwei Tabellen: die Versorgungsdichte zeigt die Seite, die Planungsmatrizen liefern die Herkunft je Wert
+      - name: Tabellen aus dem aktuellen Release, gegen SHA256SUMS.txt geprüft
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -58,8 +60,10 @@ jobs:
           echo "Aktuelles Release: $tag"
           mkdir -p daten_ergebnis
           cd daten_ergebnis
-          gh release download "$tag" --pattern RSG_2030_Versorgungsdichte.csv --pattern SHA256SUMS.txt --clobber
-          grep ' RSG_2030_Versorgungsdichte.csv$' SHA256SUMS.txt | sha256sum --check --strict
+          gh release download "$tag" --pattern RSG_2030_Versorgungsdichte.csv \
+            --pattern RSG_2030_Planungsmatrizen.csv --pattern SHA256SUMS.txt --clobber
+          grep -E ' (RSG_2030_Versorgungsdichte|RSG_2030_Planungsmatrizen)\.csv$' SHA256SUMS.txt \
+            | sha256sum --check --strict
       - name: Seite bauen
         run: python -m rsg2030 web
       - uses: actions/configure-pages@v6

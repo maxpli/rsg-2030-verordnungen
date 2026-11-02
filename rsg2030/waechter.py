@@ -38,8 +38,8 @@ from datetime import date
 import pandas as pd
 
 from rsg2030.protokoll import einrichten
-from rsg2030.quellen import ist_rsg_verordnung, lade_quellen
-from rsg2030.quellen.download import RIS_API, RIS_URL, _liste, abrufen, entpacke_archiv
+from rsg2030.quellen import ist_rsg_verordnung, lade_quellen, ris_dokument_url
+from rsg2030.quellen.download import RIS_API, _liste, abrufen, entpacke_archiv
 
 log = logging.getLogger(__name__)
 
@@ -91,10 +91,7 @@ def pruefe_ris(q: pd.DataFrame) -> list[str]:
         treffer = ris_dokumente()
     except OSError as e:
         return [_nicht_erreichbar("Verordnungen", e)]
-    hinweise = [
-        f"RIS: neue Verordnung/Änderung {k} – {RIS_URL}/Dokument.wxe?Abfrage=Spg&Dokumentnummer={k}"
-        for k in sorted(treffer - register)
-    ]
+    hinweise = [f"RIS: neue Verordnung/Änderung {k} – {ris_dokument_url(k)}" for k in sorted(treffer - register)]
     hinweise += [
         f"RIS: {k} ({land[k]}) nicht mehr gefunden – außer Kraft oder ersetzt?" for k in sorted(register - treffer)
     ]
@@ -112,7 +109,7 @@ def pruefe_oesg(q: pd.DataFrame) -> list[str]:
         return [_nicht_erreichbar("ÖSG", e)]
     hinweise = [
         f"RIS: neuer ÖSG {k} – Richtwerte, Regionen und Vorlage der Matrix prüfen (docs/PIPELINE.md) – "
-        f"{RIS_URL}/Dokument.wxe?Abfrage=Spg&Dokumentnummer={k}"
+        f"{ris_dokument_url(k)}"
         for k in sorted(treffer - register)
     ]
     hinweise += [f"RIS: ÖSG {k} gilt nicht mehr – ersetzt?" for k in sorted(register - treffer)]

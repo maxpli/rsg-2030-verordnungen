@@ -24,7 +24,7 @@ const esc = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replac
 const trunc = (t, n) => t.length > n ? t.slice(0, n - 1) + "…" : t;
 
 const STANDARD = { VR: "41", BL: "OÖ" };
-const S = { abschnitt: "PLAN", ebene: "VR", fach: "IM", region: STANDARD.VR, hatch: true };
+const S = { abschnitt: "PLAN", ebene: "VR", fach: "IM", region: STANDARD.VR, hatch: true, src: false };
 try { Object.assign(S, JSON.parse(localStorage.getItem("rsg-vd") || "{}")); } catch (e) { /* ohne gespeicherte Ansicht */ }
 const save = () => { try { localStorage.setItem("rsg-vd", JSON.stringify(S)); } catch (e) { /* egal */ } };
 
@@ -51,6 +51,7 @@ const pill = (w) => `<span class="pill"><i class="k-${klasse(w)}"></i>${lageText
 document.getElementById("eyebrow").textContent = `RSG-2030-Verordnungen · Release ${M.version}`;
 document.getElementById("footer").innerHTML = `
   <div>Quelle: <span class="nb">${esc(M.datei)}</span>, <a href="${M.repo}/releases/tag/${M.version}" target="_blank" rel="noopener">Release ${esc(M.version)}</a> von <a href="${M.repo}" target="_blank" rel="noopener">${esc(M.repo.replace("https://github.com/", ""))}</a> · SHA-256 <span class="num" style="word-break:break-all">${esc(M.sha256)}</span></div>
+  <div>Herkunft der Werte: <span class="nb">${esc(M.matrizen_datei)}</span> · SHA-256 <span class="num" style="word-break:break-all">${esc(M.matrizen_sha256)}</span></div>
   <div>Stand der Seite: <a href="${M.repo}/commit/${M.commit}" target="_blank" rel="noopener" class="num">${esc(M.commit.slice(0, 7))}</a> · Alle Vorbehalte: <a href="${DATEN_MD}" target="_blank" rel="noopener">docs/DATEN.md, Fallstricke</a> · Daten CC BY 4.0</div>`;
 
 /* Über diese Daten: der Weg von der Seite in den Datensatz. Alle Links auf das Release, aus dem die Daten der Seite
@@ -179,6 +180,9 @@ function vorbehalte(r, f, wI, wP) {
     out.push({ fallstrick: 4, text: `<b>KFO in Oberösterreich:</b> nur als Fußnote zu ZMK gedruckt, ein Wert je Region, per Korrekturregel übernommen.` });
   if (r.land === "OÖ" && S.abschnitt === "PLAN")
     out.push({ fallstrick: 8, text: `<b>OÖ PLAN spitalsambulant</b> ist laut Fußnote das fortgeschriebene IST 2022, kein neuer Plan.` });
+  const mx = D.matrizen[`${r.id}|${S.abschnitt}`];
+  if (mx && mx[3] === "aequivalent")
+    out.push({ fallstrick: 3, text: `<b>${esc(r.land_name)} plant in SVE</b>, nicht in ÄAVE. Gezeigt sind die ÄAVE-Äquivalente aus dem zweiten Block der Matrix (im PDF «ÄAVE-Ä»); nur die sind mit den anderen Ländern vergleichbar.` });
   if (r.land === "Wien")
     out.push({ fallstrick: 11, text: `<b>Wien</b> ist nicht Basis der Soll-Intervalle (Bundesdurchschnitt ohne Wien) und versorgt das Umland mit; Regionen mit Zentrumsfunktion liegen deshalb eher höher.` });
   if (klein(w))
@@ -234,6 +238,79 @@ function miniBar(wI, wP, fi, dg) {
   if (wI) s += `<circle class="s-ring" cx="${x(wI.vd)}" cy="16" r="5"/>`;
   if (wP) s += `<circle class="f-${klasse(wP)} dot-ring" cx="${x(wP.vd)}" cy="16" r="6"/><circle cx="${x(wP.vd)}" cy="16" r="6" fill="none" stroke="var(--ink)" stroke-width="1"/>`;
   return s + "</svg>";
+}
+
+/* Herkunft: woher der gezeigte Wert kommt (docs/WEB.md). Diese Ansicht **zitiert** die Tabelle Planungsmatrizen:
+   Der Text aus dem PDF (`roh`) wird nicht umformatiert, Werte stehen exakt da, und die Begründung einer
+   Korrekturregel steht wörtlich wie in korrekturen.csv. Nichts hier ist gerechnet; der Bau prüft, dass die
+   gezeigten Teile den veröffentlichten Wert ergeben. */
+const QUELLE = {
+  PDF: ["ausgelesen", "aus der Tabelle im PDF ausgelesen"],
+  manuell: ["von Hand erfasst", "von Hand aus dem Seitenbild erfasst – diese Seite hat keine Textebene"],
+  korrigiert: ["Korrekturregel", "steht so nicht im PDF – Regel und Begründung unten"],
+  abgeleitet: ["gerechnet", "nicht ausgewiesen, aus anderen Zeilen derselben Matrix gerechnet"],
+};
+/* exakt, nicht fürs Auge gerundet: hier geht es darum, den Wert im PDF wiederzufinden. Mindestens eine
+   Nachkommastelle, weil die Matrizen ÄAVE so drucken (91 wäre dort «91,0»). */
+const nfExakt = new Intl.NumberFormat("de-AT", { minimumFractionDigits: 1, maximumFractionDigits: 3 });
+const exakt = (x) => x == null ? "–" : nfExakt.format(x).replace("-", "−");
+
+const srcEl = document.getElementById("src");
+srcEl.addEventListener("toggle", () => { S.src = srcEl.open; save(); });
+
+function renderHerkunft() {
+  const r = regionById[S.region], f = S.fach, ab = S.abschnitt, fi = fachInfo[f];
+  const stand = ab === "IST" ? "IST" : "PLAN 2030";
+  document.getElementById("src-sel").textContent =
+    `${r.ebene === "VR" ? r.id + " " : ""}${titel(r)} · ${fi.name} · ${stand}`;
+  srcEl.open = !!S.src;
+  const body = document.getElementById("src-body");
+  const h = D.herkunft[`${r.id}|${ab}|${f}`], m = D.matrizen[`${r.id}|${ab}`], w = get(r.id, ab, f);
+  if (!h || !m) {
+    body.innerHTML = `<p class="t2">Diese Matrix weist für ${esc(f)} keinen Wert aus – also gibt es auch nichts herzuleiten.</p>`;
+    return;
+  }
+  const [qi, seite, zeilePdf, block] = m, [pdf, ris] = D.quellen[qi];
+  const blockText = block === "aequivalent" ? ` · <span class="t2">Block der ÄAVE-Äquivalente</span>` : "";
+  /* `zeile_pdf` ist die Zeilenbeschriftung wörtlich aus dem PDF. Sie fehlt in zwei Fällen, und beide sind eine
+     Auskunft für sich: «manuell erfasst» = Bildseite ohne Textebene, leer = die Zeile ist im PDF nicht gedruckt
+     (der Wert entsteht erst aus einer Regel). */
+  const zeile = (t) => t === "manuell erfasst"
+    ? `Zeile «ÄAVE insgesamt» <span class="t2">(Bildseite, von Hand erfasst)</span>`
+    : !t
+      ? `<span class="t2">Die Zeile «ÄAVE insgesamt» ist im PDF leer</span>`
+      : `Zeile <b>«${esc(t)}»</b>`;
+
+  const zellen = h.map(([spalte, roh, wert, quelle, regel, eigene]) => {
+    const [kurz, lang] = QUELLE[quelle] || [quelle, quelle];
+    const woher = eigene ? `<span class="t2">Spalte SON/IDB, Zeile «${esc(eigene)}»</span>` : "";
+    return `<tr>
+      <th scope="row">${esc(spalte)}${woher ? `<br>${woher}` : ""}</th>
+      <td class="num roh">${roh == null ? '<span class="t2">keine Zelle</span>' : esc(roh)}</td>
+      <td class="num">${exakt(wert)}</td>
+      <td title="${esc(lang)}">${esc(kurz)}${regel == null ? "" : ` <code>${esc(D.regeln[regel][0])}</code>`}</td>
+    </tr>`;
+  }).join("");
+
+  const genannt = [...new Set(h.map((e) => e[4]).filter((i) => i != null))];
+  const regeln = genannt.map((i) => {
+    const [name, art, grund] = D.regeln[i];
+    return `<div class="src-r"><p class="src-rh"><span class="src-art">${esc(art)}</span> <code>${esc(name)}</code></p>
+      <p>${esc(grund)}</p></div>`;
+  }).join("");
+
+  body.innerHTML = `
+    <p class="src-q"><span class="nb">${esc(pdf)}</span>, <b>Seite ${seite}</b> · ${zeile(zeilePdf)}${blockText}
+      · ${link(ris, "Verordnung im RIS")}</p>
+    <div class="src-scroll"><table class="src-t">
+      <thead><tr><th scope="col">Matrixspalte</th><th scope="col">wie gedruckt</th><th scope="col">übernommen</th><th scope="col">Herkunft</th></tr></thead>
+      <tbody>${zellen}</tbody>
+      <tfoot><tr><th scope="row">${esc(f)} im Zuschnitt «${esc(w.zuschnitt)}»</th><td></td><td class="num">${exakt(w.aave)}</td><td class="t2">ÄAVE der Tabelle</td></tr></tfoot>
+    </table></div>
+    ${regeln ? `<div class="src-rs">${regeln}
+      <p class="t2">Jede Abweichung vom PDF ist eine Regel mit Begründung; wie sie wirken: ${link(`${DOC}/docs/PIPELINE.md`, "docs/PIPELINE.md")}.</p></div>` : ""}
+    <p class="t2">«-» heißt in einer ÄAVE-Zeile 0, «n.v.» und leere Zellen heißen «kein Wert».
+      Alle Zellen aller 41 Matrizen mit Herkunft stehen in der ${link(`${REL}/RSG_2030_Planungsmatrizen.csv`, "Tabelle Planungsmatrizen")}.</p>`;
 }
 
 /* Positions-Plot */
@@ -334,7 +411,7 @@ function render() {
   document.getElementById("chk-hatch").checked = S.hatch;
   document.getElementById("h-strip").textContent = `Position im Soll-Intervall · ${S.fach}`;
   document.getElementById("h-map").textContent = `Kachelkarte · ${S.fach} · ${S.abschnitt === "IST" ? "IST" : "PLAN 2030"}`;
-  renderMatrix(); renderDetail(); renderStrip(); renderMap(); save();
+  renderMatrix(); renderDetail(); renderHerkunft(); renderStrip(); renderMap(); save();
 }
 let rt;
 addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { renderStrip(); renderMap(); }, 120); });

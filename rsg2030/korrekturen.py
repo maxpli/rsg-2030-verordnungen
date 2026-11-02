@@ -36,14 +36,14 @@ Werten die Summe der Rundungen der Summanden (wird von `checks.py` als Toleranz 
 from __future__ import annotations
 
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from pathlib import Path
 
 import pandas as pd
 
 from rsg2030.config import korrekturen_csv
 from rsg2030.matrix_extract import lese_zahl
-from rsg2030.schema import MATRIX
+from rsg2030.schema import GESAMT, MATRIX
 
 
 def halbe_einheit(roh: object) -> float:
@@ -92,6 +92,33 @@ def lade_regeln(path: Path | None = None) -> pd.DataFrame:
     if not path.is_file():
         return pd.DataFrame(columns=REGEL_SPALTEN, dtype=str)
     return pd.read_csv(path, dtype=str)
+
+
+def _rahmen_passt(regel: pd.Series, zelle: Mapping[str, object]) -> bool:
+    """Regel und Zelle passen in Regel, Matrix und Zeile zusammen – das Fach prüft `regel_fuer_zelle`."""
+    if regel["Regel"] != zelle["Regel"]:
+        return False
+    if any(regel[c] != "*" and regel[c] != str(zelle[c]) for c in MATRIX):
+        return False
+    return regel["Zeile_ID"] == "*" or zelle["Zeile_ID"] in regel["Zeile_ID"].split("+")
+
+
+def regel_fuer_zelle(regeln: pd.DataFrame, zelle: Mapping[str, object]) -> pd.Series | None:
+    """Regelzeile aus `korrekturen.csv`, die eine korrigierte Zelle der Long-CSV erklärt; None, wenn keine oder
+    mehrere passen (dann muss die aufrufende Stelle das melden – eine stillschweigend falsche Begründung wäre
+    schlimmer als keine).
+
+    Die Long-CSV nennt je Zelle nur den **Namen** der Regel, nicht ihre Begründung. Wer die Herkunft eines Werts
+    zeigt (die Webseite, docs/WEB.md), braucht beides. Die Zuordnung gehört hierher, weil nur hier steht, wie eine
+    Regel ihre Zellen wählt: `Zeile_ID` kann mehrere Zeilen mit «+» nennen (`zusatz`, `plus`), Matrix-Spalten und
+    `Fach` kennen «*», und `zusatz`/`plus` ändern die Spalte «gesamt» als Nebenwirkung der Fachspalte mit – deshalb
+    zählt für «gesamt» eine Regel auch dann, wenn ihr `Fach` ein anderes ist.
+    """
+    rahmen = [r for _, r in regeln.iterrows() if _rahmen_passt(r, zelle)]
+    passend = [r for r in rahmen if r["Fach"] in ("*", zelle["Fach"])]
+    if not passend and zelle["Fach"] == GESAMT:
+        passend = rahmen
+    return passend[0] if len(passend) == 1 else None
 
 
 def _auswahl(df: pd.DataFrame, rule: pd.Series) -> pd.Series:

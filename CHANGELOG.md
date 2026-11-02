@@ -7,6 +7,25 @@ Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem
 
 ## 2026.3 – in Arbeit
 
+**Webseite:**
+
+- **Die Seite zeigt zu jedem Wert, woher er kommt** (docs/WEB.md): PDF, Seite und die Zeile der Matrix wie gedruckt,
+  je eingegangener Matrixspalte den Text wie gedruckt und den übernommenen Wert, dazu jede Korrekturregel mit Art und
+  Begründung wörtlich aus `korrekturen.csv` und einen Link auf die Verordnung im RIS. Zugeklappt eine Zeile in einem
+  eigenen Panel unter Matrix und Detailspalte. `data.json` wächst dadurch von 135 auf 228 KB (über die Leitung von 44
+  auf 58 KB); die Seite rechnet nichts nach, sie zitiert.
+  Der Bau prüft Zelle für Zelle, dass die gezeigten Spalten den veröffentlichten Wert ergeben, und bricht sonst ab.
+- `python -m rsg2030 web` liest dafür **auch** `RSG_2030_Planungsmatrizen.csv` und prüft beide Tabellen gegen
+  `erwartete_ausgaben.csv`; `webseite.yml` lädt beide aus dem Release und prüft sie gegen `SHA256SUMS.txt`.
+  An den Daten ändert sich nichts – keine neue Prüfsumme, kein neues Release nötig.
+
+**Schnittstelle:**
+
+- Neu: `korrekturen.regel_fuer_zelle(regeln, zelle)` – welche Regel aus `korrekturen.csv` eine korrigierte Zelle der
+  Long-CSV erklärt (die Long-CSV nennt je Zelle nur den Namen der Regel, nicht die Begründung).
+- Neu: `quellen.ris_dokument_url(kennung)` – Seite eines RIS-Dokuments im Portal, für Links, die ein Mensch öffnet.
+  `quellen.download.RIS_URL` ist dafür entfallen (der Wächter baute diese Adresse bisher zweimal selbst).
+
 **Befehle:**
 
 - `waechter` sucht die geltenden Verordnungen und das ÖSG-Gutachten ebenfalls über die OGD-Schnittstelle (der Typ

@@ -22,6 +22,14 @@ from oesg_methodik.pfade import original_dir
 QUELLEN_CSV = Path(__file__).with_name("quellen.csv")
 # RIS-Dokumentnummer: SPG_<Land>_<RSG|OSG>_<V = Verordnung | G = Gutachten>_<Datum>_<Nummer>_<Jahr>
 RSG_VERORDNUNG_RE = r"SPG_[A-Z]+_RSG_V_"
+RIS_PORTAL = "https://www.ris.bka.gv.at"
+"""Das RIS-Portal – für Links, die ein Mensch im Browser öffnet. Geladen wird über die OGD-Schnittstelle
+(`quellen.download`): Das Portal beantwortet Anfragen aus Rechenzentren mit einem Bot-Schutz."""
+
+
+def ris_dokument_url(kennung: str) -> str:
+    """Seite eines RIS-Dokuments im Portal (Applikation «Spg»), zum Nachlesen im Browser."""
+    return f"{RIS_PORTAL}/Dokument.wxe?Abfrage=Spg&Dokumentnummer={kennung}"
 
 
 def lade_quellen(path: Path = QUELLEN_CSV) -> pd.DataFrame:

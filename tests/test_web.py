@@ -14,8 +14,11 @@ from conftest import ROOT
 
 from oesg_methodik import LAND_KURZ
 from oesg_methodik.bevoelkerung import lade_regionen
-from oesg_methodik.faecher import ZUSCHNITT
+from oesg_methodik.faecher import ZAE, ZAE_QUELLE, ZUSCHNITT
 from oesg_methodik.richtwerte import lade_richtwerte
+from rsg2030.analyse_eingang import lade_matrix_long
+from rsg2030.korrekturen import REGEL_SPALTEN, lade_regeln
+from rsg2030.schema import matrix_long
 from rsg2030.web import WERT, baue_daten
 
 WEB = ROOT / "web"
@@ -174,8 +177,117 @@ def kleine_tabelle() -> pd.DataFrame:
     return pd.DataFrame(zeilen)
 
 
-def baue(tabelle: pd.DataFrame, k: pd.DataFrame | None = None, f: pd.DataFrame | None = None) -> dict:
-    return baue_daten(tabelle, lade_regionen(), kacheln() if k is None else k, faecher() if f is None else f, META)
+def baue(tabelle: pd.DataFrame, k: pd.DataFrame | None = None, f: pd.DataFrame | None = None,
+         long: pd.DataFrame | None = None, regeln: pd.DataFrame | None = None) -> dict:  # fmt: skip
+    return baue_daten(
+        tabelle,
+        lade_regionen(),
+        kacheln() if k is None else k,
+        faecher() if f is None else f,
+        kleine_matrix() if long is None else long,
+        ohne_regeln() if regeln is None else regeln,
+        META,
+    )
+
+
+# Spalten der Testmatrix: je Fach müssen die Spalten des ÖSG-Zuschnitts genau die 10,0 ÄAVE von
+# `kleine_tabelle()` ergeben. Deshalb stehen in IM und ZMK 0,0 – die 10 liegen in PUL bzw. KFO, die der
+# Zuschnitt dazuzählt (IM = IM + PUL, ZMK = ZMK + KFO). KJC und PCH fehlen, wie in den meisten Matrizen.
+MATRIX_SPALTEN = {
+    "AM": 10.0, "KIJU": 10.0, "KJP": 10.0, "CH": 10.0, "IM": 0.0, "PUL": 10.0, "GGH": 10.0, "NEU": 10.0,
+    "PSY": 10.0, "DER": 10.0, "AU": 10.0, "HNO": 10.0, "URO": 10.0, "ORTR": 10.0, "MKG": 10.0, "ZMK": 0.0,
+    "KFO": 10.0,
+}  # fmt: skip
+TEST_PDF = "4.VO_RSG_OOe_2030_Anlage.pdf"
+"""Ein PDF, das in quellen.csv als RSG-Verordnung steht – sonst findet der Bau keine RIS-Adresse."""
+
+
+def kleine_matrix(**aendern: object) -> pd.DataFrame:
+    """Long-Zeilen zu `kleine_tabelle()`: Zeile «insgesamt» beider Matrizen, alles aus dem PDF gelesen."""
+    zeilen = []
+    for ebene, rid in (("VR", "41"), ("BL", "OÖ")):
+        for abschnitt, jahr in (("IST", 2022), ("PLAN", 2030)):
+            for fach, wert in MATRIX_SPALTEN.items():
+                zeilen.append(
+                    {
+                        "Land": "OÖ", "Ebene": ebene, "Region_ID": rid, "Block": "haupt", "Abschnitt": abschnitt,
+                        "Jahr": jahr, "Zeile_ID": "insgesamt", "Einheit": "ÄAVE", "Fach": fach, "Wert": wert,
+                        "Roh": f"{wert:.1f}".replace(".", ","), "Quelle": "PDF", "Regel": None,
+                        "Zeile_PDF_roh": f"{abschnitt} ÄAVE insgesamt", "PDF": TEST_PDF, "Seite": 11,
+                    }
+                )  # fmt: skip
+    return pd.DataFrame(zeilen).assign(**aendern)
+
+
+def ohne_regeln() -> pd.DataFrame:
+    return pd.DataFrame(columns=REGEL_SPALTEN, dtype=str)
+
+
+# --- Herkunft -------------------------------------------------------------------------------------------------------
+
+
+def test_herkunft_nennt_die_spalten_des_zuschnitts():
+    """Je Zelle die Matrixspalten, aus denen sie entstand – mit dem Text wie gedruckt."""
+    d = baue(kleine_tabelle())
+    assert len(d["herkunft"]) == len(d["werte"]), "jede gezeigte Zelle braucht ihre Herkunft"
+    assert d["herkunft"]["41|PLAN|IM"] == [
+        ["IM", "0,0", 0.0, "PDF", None, None],
+        ["PUL", "10,0", 10.0, "PDF", None, None],
+    ]
+    assert [a[0] for a in d["herkunft"]["41|PLAN|CH"]] == ["CH"], "KJC und PCH fehlen in dieser Matrix"
+    quelle, seite, zeile, block = d["matrizen"]["41|PLAN"]
+    assert (d["quellen"][quelle][0], seite, zeile, block) == (TEST_PDF, 11, "PLAN ÄAVE insgesamt", "haupt")
+    assert d["quellen"][quelle][1].startswith("https://www.ris.bka.gv.at/")
+
+
+def test_herkunft_unterscheidet_regeln_mit_gleichem_namen():
+    """Denselben Regelnamen kann es mehrfach geben, mit verschiedener Begründung (Kärnten: `plus:6.3` ist in VR 22
+    eine Lücke, im Land ihre Folge). Gemerkt wird deshalb die Regelzeile, nicht der Name – sonst stünde an einer
+    Zelle die Begründung der anderen."""
+    gleicher_name = pd.DataFrame(
+        [
+            {"Land": "OÖ", "Ebene": ebene, "Region_ID": rid, "Block": "haupt", "Abschnitt": "*",
+             "Zeile_ID": "insgesamt", "Fach": "AM", "Regel": "wert:10.0", "Art": art,
+             "Befund": "leere_summenzelle", "Begruendung": grund}
+            for ebene, rid, art, grund in (("VR", "41", "Lücke", "in der Region"), ("BL", "OÖ", "Folge", "im Land"))
+        ],
+        columns=REGEL_SPALTEN,
+    )  # fmt: skip
+    m = kleine_matrix()
+    m.loc[m["Fach"] == "AM", ["Quelle", "Regel"]] = ["korrigiert", "wert:10.0"]
+    d = baue(kleine_tabelle(), long=m, regeln=gleicher_name)
+    vr, bl = d["herkunft"]["41|PLAN|AM"][0][4], d["herkunft"]["OÖ|PLAN|AM"][0][4]
+    assert vr != bl, "beide Zellen zeigen auf dieselbe Regel"
+    assert d["regeln"][vr][1:] == ["Lücke", "in der Region"]
+    assert d["regeln"][bl][1:] == ["Folge", "im Land"]
+
+
+def test_herkunft_bricht_ab_wenn_die_teile_den_wert_nicht_ergeben():
+    """Die Probe, die alles trägt: zeigt die Seite andere Spalten, als in den Wert eingegangen sind, bricht der Bau ab."""
+    with pytest.raises(ValueError, match="ergibt 11.0, die Tabelle nennt 10.0"):
+        baue(kleine_tabelle(), long=kleine_matrix().assign(Wert=lambda m: m["Wert"].where(m["Fach"] != "PUL", 11.0)))
+
+
+def test_herkunft_bricht_ab_ohne_eindeutige_regel():
+    """Eine korrigierte Zelle ohne Begründung bleibt nicht stumm: lieber kein Bau als eine erfundene Herkunft."""
+    with pytest.raises(ValueError, match="keine eindeutige Korrekturregel"):
+        baue(kleine_tabelle(), long=kleine_matrix(Quelle="korrigiert", Regel="wert:10.0"))
+
+
+def test_herkunft_bricht_ab_wenn_die_matrix_auf_zwei_seiten_liegt():
+    m = kleine_matrix()
+    with pytest.raises(ValueError, match="nicht eindeutig"):
+        baue(kleine_tabelle(), long=m.assign(Seite=m["Seite"].where(m["Fach"] != "AM", 12)))
+
+
+def test_herkunft_bricht_ab_bei_unbekannter_quelle():
+    with pytest.raises(ValueError, match="unbekannte Quelle"):
+        baue(kleine_tabelle(), long=kleine_matrix(Quelle="geschätzt"))
+
+
+def test_herkunft_bricht_ab_wenn_das_pdf_nicht_im_register_steht():
+    with pytest.raises(ValueError, match="quellen.csv"):
+        baue(kleine_tabelle(), long=kleine_matrix(PDF="irgendwas.pdf"))
 
 
 def test_data_json_aufbau():
@@ -209,7 +321,7 @@ def test_data_json_gleich_tabelle():
     from rsg2030.versorgungsdichte import baue_versorgungsdichte
 
     tabelle = baue_versorgungsdichte()
-    d = baue(tabelle)
+    d = baue(tabelle, long=lade_matrix_long(), regeln=lade_regeln())
     ins = tabelle[tabelle["Zeile_ID"] == "insgesamt"]
     assert len(d["werte"]) == len(ins)
     for r in ins.to_dict("records"):
@@ -220,11 +332,44 @@ def test_data_json_gleich_tabelle():
     assert {(r["ebene"], r["id"]) for r in d["regionen"]} == set(zip(ins["Ebene"], ins["Region_ID"].astype(str)))
 
 
+@pytest.mark.slow
+def test_herkunft_zitiert_die_tabelle_planungsmatrizen():
+    """Die Herkunft ist ein Zitat, keine Darstellung: jeder Text steht zeichengleich in der Long-CSV, jede Regel so
+    in korrekturen.csv. Formatiert die Seite den Rohtext um, stünde dort etwas anderes als im Dokument."""
+    from rsg2030.versorgungsdichte import baue_versorgungsdichte
+
+    long, regeln = lade_matrix_long(), lade_regeln()
+    d = baue(baue_versorgungsdichte(), long=long, regeln=regeln)
+    zellen = {}
+    for (land, ebene, rid), _ in long.groupby(["Land", "Ebene", "Region_ID"]):
+        m = matrix_long(long, str(land), str(ebene), str(rid))
+        for z in m.itertuples():
+            zellen[(str(ebene), str(rid), z.Abschnitt, z.Zeile_ID, z.Fach)] = z
+
+    geprueft = 0
+    for schluessel, angaben in d["herkunft"].items():
+        rid, abschnitt, _ = schluessel.split("|")
+        ebene = "VR" if rid.isdigit() else "BL"
+        for spalte, roh, wert, quelle, _regel, _zeile in angaben:
+            zeile, fach = ZAE_QUELLE if spalte == ZAE else ("insgesamt", spalte)
+            z = zellen[(ebene, rid, abschnitt, zeile, fach)]
+            assert roh == (None if pd.isna(z.Roh) or z.Roh == "" else z.Roh), (schluessel, spalte)
+            assert wert == (None if pd.isna(z.Wert) else z.Wert), (schluessel, spalte)
+            assert quelle == z.Quelle, (schluessel, spalte)
+            geprueft += 1
+    assert geprueft == sum(len(a) for a in d["herkunft"].values())
+
+    for name, art, grund in d["regeln"]:
+        treffer = regeln[(regeln["Regel"] == name) & (regeln["Art"] == art) & (regeln["Begruendung"] == grund)]
+        assert len(treffer), f"Regel «{name}» steht nicht so in korrekturen.csv"
+
+
 # --- nichts von fremden Servern -------------------------------------------------------------------------------------
 
 
 def test_seite_laedt_nichts_von_fremden_servern():
-    """Schriften, Skripte und Stile kommen aus web/ selbst; Links (<a href>) auf GitHub sind erlaubt (Datenschutz)."""
+    """Schriften, Skripte und Stile kommen aus web/ selbst; Links (<a href>) auf GitHub und das RIS sind erlaubt:
+    Erst wer klickt, gibt seine IP-Adresse dorthin – anders als bei einer eingebundenen Datei (Datenschutz)."""
     html = (WEB / "index.html").read_text(encoding="utf-8")
     css = (WEB / "style.css").read_text(encoding="utf-8")
     js = (WEB / "app.js").read_text(encoding="utf-8")

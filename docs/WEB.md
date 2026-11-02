@@ -8,6 +8,10 @@ begründet («Darstellungsregeln», «Entscheidungen»). Die Vorbehalte kommen a
 urteilen nicht über sie hinaus. Anders als die Excel-Mappe, die die Matrizen so zeigt, wie sie gedruckt sind, liest die
 Seite die Zahlen also vor.
 
+Zu jedem gezeigten Wert sagt sie außerdem, **woher er kommt**: PDF, Seite, Zeile und Spalten der Matrix, der Text wie
+gedruckt und, wo korrigiert wurde, die Regel mit Begründung. Dieser Teil **zitiert** die Tabelle Planungsmatrizen und
+`korrekturen.csv` – er formuliert nichts um und rechnet nichts nach.
+
 **Veröffentlicht unter <https://maxpli.github.io/rsg-2030-verordnungen/>**, mit den Daten des aktuellen Release.
 Offene Punkte stehen in [offene_punkte.md](offene_punkte.md#webseite).
 
@@ -25,6 +29,7 @@ Versorgungsregionen und Bundesländern.
 | Detailspalte | eine Region und ein Fach: VD, ÄAVE, Bevölkerung, Lage, Position und ÄAVE-Abstand für IST und PLAN, ein Satz in Worten («Bis zur Untergrenze fehlen … ÄAVE Sachleistung») und die Vorbehalte, die für diese Zelle gelten |
 | Positions-Plot | ein Fach, alle Regionen: Position im Soll-Intervall, IST → PLAN, dazu der ÄAVE-Abstand |
 | Kachelkarte | jede Region als gleich große Kachel, grob nach Lage angeordnet, Landesgrenzen als Linien |
+| Herkunft («Woher kommt diese Zahl?») | zugeklappt: eine Zeile. Aufgeklappt: PDF, Seite und die Zeile der Matrix, wie sie gedruckt ist; je eingegangener Matrixspalte der Text wie gedruckt, der übernommene Wert und die Herkunft (ausgelesen / von Hand erfasst / Korrekturregel); bei den drei Ländern, die in SVE planen, dazu «Block der ÄAVE-Äquivalente»; darunter jede genannte Regel mit Art und Begründung, wörtlich aus `korrekturen.csv`; Link auf die Verordnung im RIS |
 | Über diese Daten | was der Datensatz außerdem enthält, Downloads, wie die Daten abgesichert sind, Zitieren und Fehler melden; alle Links auf das Release, aus dem die Daten der Seite stammen |
 
 Über allem steht dauerhaft, wie «unter» zu lesen ist (Fallstricke 1 und 11): ohne Wahlärzt:innen, ohne
@@ -34,6 +39,9 @@ Patientenströme, innerhalb des Intervalls kein Unterschied.
 
 - **Sie rechnet nichts nach ÖSG-Methode.** VD, Lage, Position und ÄAVE-Abstand kommen aus der Tabelle. Die Seite
   leitet daraus nur die Farbstufe ab (siehe unten) und zählt Zellen für den Anteilsbalken.
+- **Sie legt die Herkunft nicht aus.** Rohtexte, Zeilenbeschriftungen und Begründungen stehen da, wie sie in der
+  Verordnung bzw. in `korrekturen.csv` stehen. Dass die gezeigten Spalten genau die sind, aus denen der Wert entstand,
+  prüft der Bau (siehe «Wer prüft was»); summiert wird dafür nichts Neues.
 - **Keine Österreich-Werte** (Fallstrick 5) und keine Summen über Fächer (Fallstricke 4 und 10).
 - **Keine Daten von außerhalb** des Datensatzes und keine Bewertungen, die nicht in der Doku stehen.
 
@@ -48,6 +56,11 @@ Patientenströme, innerhalb des Intervalls kein Unterschied.
 | PUL und KFO | eigene Spalten, kursiv, als Teil von IM bzw. ZMK gekennzeichnet; im Anteilsbalken mitgezählt, weil der ÖSG beide mit eigenem Soll-Intervall bewertet (Textband S.38–39). Nicht über Fächer addieren (Fallstrick 4) |
 | Kein Wert | leere Zelle mit Strich (z. B. KFO in Wien und Vorarlberg, wo KFO in ZMK steckt) |
 | Positions-Plot | Achse von −1,5 bis 3; Werte darüber am Rand mit «›». Über dem Band zwei Zeilen: VDmin und VDmax als VD, darunter die Position −1 bis 3 (`Position_im_Intervall`). Je Zeile ein Maßstab, damit die Position nicht als VD gelesen wird; beide stehen oben, damit man sie auch bei 32 VR sieht |
+| Rohtext der Herkunft | unverändert, wie gedruckt («191,8», «-», «n.v.»); nie durch die Zahlformatierung der Seite. Was «-» und «n.v.» bedeuten, steht als Satz dabei (DATEN.md, «Zellbedeutung») |
+| Werte der Herkunft | exakt, mindestens eine Nachkommastelle wie in den Matrizen – anders als sonst auf der Seite, wo ÄAVE fürs Lesen auf eine Stelle gerundet sind. In dieser Ansicht soll der Wert im PDF wiederzufinden sein |
+| Zeile der Matrix | `Zeile_PDF_roh` wörtlich. Fehlt sie, ist das selbst eine Auskunft: «manuell erfasst» = Bildseite ohne Textebene, leer = die Zeile ist im PDF nicht gedruckt (der Wert entsteht erst aus einer Regel) |
+| Block der Matrix | bei Burgenland, Kärnten und der Steiermark steht «Block der ÄAVE-Äquivalente» dabei, und die Detailspalte sagt als Vorbehalt, dass nur dieser Block mit den anderen Ländern vergleichbar ist (Fallstrick 3). Ohne das stünde «ÄAVE-Ä» im Zitat der Zeilenbeschriftung unerklärt da |
+| Link auf die Quelle | die Seite des RIS-Dokuments (aus der Dokumentnummer in `quellen.csv`), dazu die Seitenzahl als Text. Kein Tiefenlink in die PDF-Datei: deren Adresse liefert die OGD-Schnittstelle je Lauf, ein eingefrorener Link verrottet still |
 | Farben | Nachbarstufen müssen sich deutlich unterscheiden, auch bei Farbsehschwäche (Protanopie, Deuteranopie): Abstand ΔE (OKLab × 100) mindestens 8. Ein Test rechnet das aus den Farben der Seite nach |
 
 ## Entscheidungen
@@ -83,7 +96,17 @@ Jede Entscheidung mit Grund, damit sie sich später nachvollziehen oder bewusst 
     Kennzahlen. Im selben Repo lassen sich die Vorbehalte im selben Commit nachziehen wie die Daten (Regel «Vorbehalte
     folgen den Daten» in CLAUDE.md). In ein eigenes Repo gehörte sie, sobald sie Daten von außerhalb, neue Kennzahlen
     oder Bewertungen über die Fallstricke hinaus zeigte.
-12. **Veröffentlichung aus dem Release.** Ein eigener Workflow (`webseite.yml`) baut die Seite nach jedem
+12. **Herkunft als eigenes Panel in voller Breite**, unter Matrix und Detailspalte, nicht in der Detailspalte.
+    Die Detailspalte klebt beim Scrollen (`position: sticky`); aufgeklappt wäre sie höher als der Bildschirm, und ihr
+    Ende nicht mehr erreichbar. In voller Breite liest die Begründung einer Regel in rund fünf statt zwölf Zeilen, und
+    wer von der Matrix zum Positions-Plot scrollt, geht an der Zeile vorbei. Zugeklappt kostet sie eine Zeile; der
+    Zustand bleibt gespeichert wie die Schraffur.
+13. **Begründungen aus `korrekturen.csv` im Repo**, nicht aus einer veröffentlichten Datei: Die Long-CSV nennt je
+    Zelle nur den Namen der Regel. Dass die Begründung zu den gezeigten Zahlen gehört, sichert die bestehende
+    Prüfsummen-Kontrolle – eine Regeländerung, die Daten ändert, passt nicht mehr zu `erwartete_ausgaben.csv`, und der
+    Bau bricht ab. Die Zuordnung Zelle → Regel steht in `rsg2030/korrekturen.py` (`regel_fuer_zelle`) und nicht in
+    `web.py`: Nur dort steht, wie eine Regel ihre Zellen wählt («+» in `Zeile_ID`, «*» in Matrix und Fach).
+14. **Veröffentlichung aus dem Release.** Ein eigener Workflow (`webseite.yml`) baut die Seite nach jedem
     erfolgreichen Lauf des Release-Workflows und wenn sich die Seite auf `main` ändert. Er rechnet die Daten nicht
     neu, sondern lädt die CSV des aktuellen Release und prüft sie gegen dessen `SHA256SUMS.txt`. Passt die Seite nicht
     zu den Daten (z. B. fehlende Spalte), bricht er ab, und die bisherige Seite bleibt. Die Fußzeile nennt Datenstand
@@ -96,33 +119,47 @@ web/                  die Seite: index.html, app.js, style.css
   fonts/                IBM Plex, selbst ausgeliefert (Lizenz SIL OFL, fonts/README.md)
   kacheln.csv           je Region Spalte und Zeile der Kachelkarte und die Beschriftung der Kachel (VR und BL)
   faecher.csv           Fächer in der Reihenfolge der Spalten, Name, «Teil von» (PUL → IM, KFO → ZMK)
-rsg2030/web.py        «python -m rsg2030 web»: Tabelle Versorgungsdichte → data.json, Seite nach daten_ergebnis/web/
-tests/test_web.py     Kacheln, Fächer, Vorbehalte, Farben, data.json (siehe «Wer prüft was»)
+rsg2030/web.py        «python -m rsg2030 web»: Tabellen Versorgungsdichte und Planungsmatrizen → data.json,
+                        Seite nach daten_ergebnis/web/; `baue_herkunft` baut den Herkunfts-Teil
+rsg2030/korrekturen.py  `regel_fuer_zelle`: welche Regel aus korrekturen.csv eine korrigierte Zelle erklärt
+tests/test_web.py     Kacheln, Fächer, Vorbehalte, Farben, data.json, Herkunft (siehe «Wer prüft was»)
 .github/workflows/webseite.yml   bauen und auf GitHub Pages veröffentlichen
 ```
 
 Die fertige Seite liegt wie alle Ergebnisse nicht in git. Die Seite lädt `data.json` und rechnet nichts nach; jede
-Angabe hat eine Quelle: Werte und Soll-Intervalle aus der Tabelle Versorgungsdichte, Namen der Regionen und Länder aus
-`oesg_regionen.csv`, Namen der Fächer aus `web/faecher.csv`, Lage der Kacheln aus `web/kacheln.csv`. Kopf und
-Fußzeile nennen Release, Prüfsumme und Commit aus `data.json`.
+Angabe hat eine Quelle: Werte und Soll-Intervalle aus der Tabelle Versorgungsdichte, Rohtexte, PDF, Seite und
+Zeilenbeschriftung aus der Tabelle Planungsmatrizen, Art und Begründung einer Regel aus `korrekturen.csv`, die Adresse
+der Verordnung aus der Dokumentnummer in `quellen/quellen.csv`, Namen der Regionen und Länder aus `oesg_regionen.csv`,
+Namen der Fächer aus `web/faecher.csv`, Lage der Kacheln aus `web/kacheln.csv`. Kopf und Fußzeile nennen Release,
+beide Prüfsummen und den Commit aus `data.json`.
 
 ## Selbst bauen und ansehen
 
 ```bash
-.venv/bin/python -m rsg2030 web                          # braucht daten_ergebnis/RSG_2030_Versorgungsdichte.csv
+.venv/bin/python -m rsg2030 web                          # braucht RSG_2030_Versorgungsdichte.csv und
+                                                         # RSG_2030_Planungsmatrizen.csv in daten_ergebnis/
 .venv/bin/python -m http.server -d daten_ergebnis/web    # dann http://localhost:8000 im Browser
 ```
 
-Die Tabelle entsteht mit `python -m rsg2030 alles`; es reicht auch die Datei des Release in `daten_ergebnis/`.
-Gebaut wird nur, wenn sie Byte für Byte der Version des Pakets entspricht (`rsg2030/erwartete_ausgaben.csv`): Nur
-dann stimmt «Release …» auf der Seite. Die Seite direkt als Datei zu öffnen geht nicht, weil der Browser `data.json`
+Die Tabellen entstehen mit `python -m rsg2030 alles`; es reichen auch die Dateien des Release in `daten_ergebnis/`.
+Gebaut wird nur, wenn **beide** Byte für Byte der Version des Pakets entsprechen (`rsg2030/erwartete_ausgaben.csv`):
+Nur dann stimmt «Release …» auf der Seite, und nur dann gehören die Begründungen aus `korrekturen.csv` zu den
+gezeigten Zahlen. Die Seite direkt als Datei zu öffnen geht nicht, weil der Browser `data.json`
 dann nicht laden darf; dafür der kleine Server.
 
 ## Wer prüft was
 
 | Was schiefgehen kann | Wer es findet |
 |---|---|
-| falsche oder veränderte Tabelle | `python -m rsg2030 web`: Prüfsumme gegen `erwartete_ausgaben.csv`; sonst wird nicht gebaut |
+| falsche oder veränderte Tabelle | `python -m rsg2030 web`: Prüfsumme beider Tabellen gegen `erwartete_ausgaben.csv`; sonst wird nicht gebaut |
+| die gezeigte Herkunft gehört nicht zum gezeigten Wert (Spalte fehlt oder eine zu viel) | `python -m rsg2030 web` bricht ab: Die Summe der gezeigten Teile muss den veröffentlichten ÄAVE-Wert ergeben, Zelle für Zelle; Test mit einer kleinen Matrix, in der ein Teil verstellt ist |
+| falsches PDF oder falsche Seite genannt | Bau bricht ab, wenn PDF und Seite der benutzten Zeilen je Matrix und Abschnitt nicht eindeutig sind; Test dafür |
+| Seite formatiert den Rohtext um und zeigt etwas anderes als das Dokument | Test (ganze Suite): jeder Rohtext, Wert und jede `Quelle` in `data.json` steht zeichengleich in der Tabelle Planungsmatrizen |
+| korrigierte Zelle ohne Begründung, oder falsche Regel zugeordnet | Bau bricht ab, wenn eine Zelle mit `Quelle = korrigiert` nicht genau eine Regel findet; Test (ganze Suite): jede genannte Regel steht mit dieser Art und Begründung in `korrekturen.csv` |
+| zwei Regeln mit demselben Namen verwechselt (Kärnten: `plus:6.3` ist in VR 22 eine Lücke, im Land ihre Folge) | Test: zwei Regeln gleichen Namens in verschiedenen Regionen müssen zu verschiedenen Begründungen führen |
+| Begründung passt nicht zu den gezeigten Zahlen (Regel auf main neuer als das Release) | die Prüfsumme: eine datenwirksame Regeländerung ohne neues Release passt nicht zu `erwartete_ausgaben.csv`, der Bau bricht ab |
+| unbekannte `Quelle` einer Zelle, für die die Seite keinen Text hat | Bau bricht ab; Test dafür |
+| RIS-Link führt ins Leere | Bau bricht ab, wenn ein PDF nicht als RSG-Verordnung in `quellen.csv` steht (Test dafür). Dass das Adressmuster stimmt, prüft ein Mensch im Browser: Das RIS-Portal antwortet Rechenzentren nicht, die CI kann es nicht aufrufen |
 | Region fehlt in der Kachelkarte oder zwei Regionen auf einem Feld | Test: `kacheln.csv` enthält genau die VR und Länder aus `oesg_regionen.csv`, jedes Feld einmal |
 | Fach fehlt, falscher Name oder falsches «Teil von» | Test: `faecher.csv` enthält genau die Richtwertzeilen mit Soll-Intervall; «Teil von» wie `ZUSCHNITT` in `oesg_methodik/faecher.py` |
 | Seite passt nicht mehr zur Tabelle (Spalte, Fach oder Region neu oder weg) | `python -m rsg2030 web` bricht mit Meldung ab; Tests dafür |

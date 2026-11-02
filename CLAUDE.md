@@ -17,7 +17,7 @@ Doku (maßgeblich für die Methodik – vor jeder Änderung am Verhalten lesen):
 - [docs/PRUEFUNG.md](docs/PRUEFUNG.md): Prüfkonzept (5 Ebenen), was jede belegt und was nicht
 - [docs/PIPELINE.md](docs/PIPELINE.md): Betrieb: Schritte des Laufs, Eingaben, Syntax der Korrekturregeln, neue Verordnung aufnehmen
 - [docs/offene_punkte.md](docs/offene_punkte.md): offene Entscheidungen und Aufgaben
-- [docs/WEB.md](docs/WEB.md): Webseite: Darstellung der Tabelle Versorgungsdichte mit Lesehilfen, Regeln, Entscheidungen, wer was prüft
+- [docs/WEB.md](docs/WEB.md): Webseite: Darstellung der Tabelle Versorgungsdichte mit Lesehilfen und Herkunft je Wert, Regeln, Entscheidungen, wer was prüft
 
 ## Regeln für die Doku
 
@@ -58,7 +58,7 @@ python3.13 -m venv .venv && .venv/bin/pip install -c requirements.txt -e ".[dev]
 .venv/bin/python -m rsg2030 daten        # auslesen, korrigieren, prüfen → FREIGEGEBEN / NICHT FREIGEGEBEN, ✓/✗ gegen veröffentlicht
 .venv/bin/python -m rsg2030 versorgungsdichte  # ÄAVE im ÖSG-Zuschnitt, VD, Lage zum Soll-Intervall, ✓/✗ gegen veröffentlicht
 .venv/bin/python -m rsg2030 waechter     # neue Verordnungen im RIS? --quellen: Originale ersetzt? --archiv: Archivkopien richtig? nur Hinweise
-.venv/bin/python -m rsg2030 web          # Webseite zur Tabelle Versorgungsdichte → daten_ergebnis/web/ (docs/WEB.md; nicht in «alles»)
+.venv/bin/python -m rsg2030 web          # Webseite: Tabelle Versorgungsdichte + Herkunft je Wert → daten_ergebnis/web/ (docs/WEB.md; nicht in «alles»)
 
 .venv/bin/python -m pytest -m "not slow"  # ~5 s, ohne Quelldateien
 .venv/bin/python -m pytest                # ~2,5 min, braucht daten_original/
@@ -96,7 +96,8 @@ rsg2030/              der Datensatz; __main__.py ruft die main() der Module auf
   stellen.py            Long-CSV → oesg_methodik → RSG_2030_Stellen.csv (Stellen im selben Zuschnitt)
   abgleich.py           Ausgaben gegen erwartete_ausgaben.csv (✓/✗ am Ende eines Laufs)
   protokoll.py          Logging, Laufprotokoll_<schritt>.json
-  web.py                «web»: Tabelle Versorgungsdichte → data.json + Seite aus web/ (nur bei passender Prüfsumme)
+  web.py                «web»: Tabellen Versorgungsdichte und Planungsmatrizen (Herkunft je Wert) → data.json +
+                          Seite aus web/ (nur bei passenden Prüfsummen)
   eingaben/2026/        von Hand gepflegte Eingaben: seiten, korrekturen, bekannte_abweichungen, manuell.xlsx, fussnoten.csv, zweitlesung/, freigabe.xlsx
 tests/                pytest; Fixture `pipeline` = baue_pipeline() einmal je Testlauf
 web/                  Webseite (kein Python): index.html, app.js, style.css, kacheln.csv, faecher.csv (docs/WEB.md)

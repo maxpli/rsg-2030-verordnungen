@@ -46,7 +46,6 @@ from rsg2030.quellen import lade_quellen, pruefe
 
 log = logging.getLogger(__name__)
 
-RIS_URL = "https://www.ris.bka.gv.at"
 RIS_API = "https://data.bka.gv.at/ris/api/v2.6/Sonstige"
 REPO_URL = "https://github.com/maxpli/rsg-2030-verordnungen"
 

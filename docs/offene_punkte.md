@@ -174,8 +174,13 @@ Was an der Webseite ([WEB.md](WEB.md)) noch offen ist.
 1. **Weitere Zeilen der Tabelle Versorgungsdichte zeigen?** Heute nur `insgesamt`. Möglich wären `spitalsambulant` und
    `extramural` (Aufteilung, ohne Soll-Intervall; Fallstrick 10), `pve` (nur AM und KIJU, im PLAN Mindestwert) und die
    Veränderung IST → PLAN. Offen ist, was davon die Seite tragen soll, ohne unübersichtlich zu werden.
-2. **Herkunft je Wert zeigen?** In der Detailspalte «Woher kommen diese ÄAVE?»: PDF, Seite, Originaltext und, wo
-   korrigiert wurde, die Regel – aus der Tabelle Planungsmatrizen. Das zeigte, was den Datensatz ausmacht, braucht aber
-   die zweite, große Tabelle in der Seite, mit eigenen Tests. Ebenso denkbar: eine Ansicht der Matrizen selbst.
-3. **Test im Browser:** Seite lädt ohne Fehler, keine seitliche Verschiebung bei Handy-Breite. Bis dahin prüft das ein
-   Mensch.
+2. **Fußnoten der Matrixseite zeigen?** Die Herkunft je Wert steht jetzt auf der Seite ([WEB.md](WEB.md)), die
+   Fußnoten des Blattes nicht: Sie stehen im Verzeichnis `fussnoten.csv`, das kein Release-Asset ist. Entweder wird es
+   eines (dann hat es eine Prüfsumme wie die übrigen Dateien), oder die Seite liest es aus dem Repo wie
+   `korrekturen.csv`. Offen ist auch, welche Fußnoten zu einer Zelle gehören – heute entscheidet das ein Mensch für die
+   Vorbehalte, nicht eine Regel.
+3. **Eine Ansicht der Matrizen selbst?** Heute zeigt die Seite je Zelle die Spalten, aus denen sie entstand, nicht die
+   Matrix als Ganzes. Die gibt es als Excel-Mappe; ob die Seite sie auch zeigen soll, ist offen – sie wäre dann ein
+   zweiter Leser derselben Sache.
+4. **Test im Browser:** Seite lädt ohne Fehler, keine seitliche Verschiebung bei Handy-Breite, die Aufklappzeile der
+   Herkunft bricht das Layout nicht. Bis dahin prüft das ein Mensch.

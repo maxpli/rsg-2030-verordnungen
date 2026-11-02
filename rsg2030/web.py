@@ -28,9 +28,14 @@ from pathlib import Path
 import pandas as pd
 
 from oesg_methodik.bevoelkerung import lade_regionen
+from oesg_methodik.faecher import ZAE, ZAE_QUELLE, teile
 from rsg2030.abgleich import gleiche_ab, paketversion
-from rsg2030.config import VERSORGUNGSDICHTE_DATEI, ausgabe_dir
+from rsg2030.analyse_eingang import lade_matrix_long
+from rsg2030.config import LONG_DATEI, VERSORGUNGSDICHTE_DATEI, ausgabe_dir
+from rsg2030.korrekturen import lade_regeln, regel_fuer_zelle
 from rsg2030.protokoll import einrichten, schreibe_laufprotokoll
+from rsg2030.quellen import ist_rsg_verordnung, lade_quellen, ris_dokument_url
+from rsg2030.schema import QUELLEN, massgeblicher_block, matrix_long
 
 log = logging.getLogger(__name__)
 
@@ -45,6 +50,22 @@ SPALTEN = [
 
 WERT = ["VD", "AAVE", "Bevoelkerung", "Jahr", "Lage_im_Intervall", "Position_im_Intervall", "AAVE_Abstand_Intervall", "Zuschnitt"]  # fmt: skip
 """Reihenfolge der Angaben je Zelle in `data.json` (`werte`); app.js liest sie in derselben Reihenfolge."""
+
+HERKUNFT_ZEILE = "insgesamt"
+"""Zeile der Tabelle Versorgungsdichte, deren Herkunft die Seite zeigt – die einzige, die sie darstellt."""
+
+QUELLE_ANGABE = ["pdf", "ris"]
+"""`quellen` in `data.json`: je Verordnungs-PDF Dateiname und Seite des RIS-Dokuments."""
+MATRIX_ANGABE = ["quelle", "seite", "zeile_pdf", "block"]
+"""`matrizen`: je Matrix und Abschnitt Index in `quellen`, Seite im PDF (1-basiert), die Beschriftung der Zeile
+«insgesamt», wie sie im PDF gedruckt ist (`Zeile_PDF_roh`), und der maßgebliche Block – `aequivalent` bei den
+Ländern, die in SVE planen (docs/DATEN.md, Fallstrick 3)."""
+HERKUNFT_ANGABE = ["spalte", "roh", "wert", "quelle", "regel", "zeile_pdf"]
+"""`herkunft`: je eingegangener Matrixspalte die Spalte, der Text wie gedruckt (`Roh`), der Wert nach Korrektur,
+die `Quelle` (PDF | manuell | korrigiert | abgeleitet), der Index in `regeln` und – nur wo die Angabe aus einer
+anderen Zeile als «insgesamt» kommt (ZAE) – deren Beschriftung im PDF."""
+REGEL_ANGABE = ["regel", "art", "begruendung"]
+"""`regeln`: je genannter Korrekturregel Name, Art und Begründung, wörtlich aus `korrekturen.csv`."""
 
 
 def web_dir() -> Path:
@@ -157,13 +178,142 @@ def _wert(spalte: str, v: object) -> object:
     return v.item() if hasattr(v, "item") else v
 
 
+def _ris_je_pdf() -> dict[str, str]:
+    """Dateiname eines Verordnungs-PDF → Seite seines RIS-Dokuments, zum Nachlesen im Browser."""
+    q = lade_quellen()
+    return {Path(r["Datei"]).name: ris_dokument_url(r["Kennung"]) for _, r in q[ist_rsg_verordnung(q)].iterrows()}
+
+
+def _matrizen(long: pd.DataFrame) -> dict[tuple[str, str], pd.DataFrame]:
+    """(Ebene, Region_ID) → Zeilen der maßgeblichen Matrix (`schema.matrix_long`: SVE-Länder: Block der
+    ÄAVE-Äquivalente) – dieselbe Auswahl wie in `analyse_eingang`, sonst zeigte die Seite die Herkunft eines
+    anderen Werts."""
+    out = {}
+    for (land, ebene, rid), _ in long.groupby(["Land", "Ebene", "Region_ID"], sort=False):
+        out[(str(ebene), str(rid))] = matrix_long(long, str(land), str(ebene), str(rid))
+    return out
+
+
+def _text(v: object) -> str | None:
+    """Zelltext für JSON: fehlend und leer werden None (die Seite entscheidet, wie sie das schreibt)."""
+    if v is None or (isinstance(v, float) and math.isnan(v)):
+        return None
+    return str(v) or None
+
+
+def _zelle(zeilen: pd.DataFrame, zeile_id: str, fach: str) -> pd.Series | None:
+    """Zelle einer Matrix; None, wenn die Matrix sie nicht hat (z. B. KFO ohne eigene Spalte)."""
+    hit = zeilen[(zeilen["Zeile_ID"] == zeile_id) & (zeilen["Fach"] == fach)]
+    return hit.iloc[0] if len(hit) else None
+
+
+def baue_herkunft(insgesamt: pd.DataFrame, long: pd.DataFrame, regeln: pd.DataFrame) -> dict[str, object]:
+    """`quellen`, `matrizen`, `herkunft` und `regeln` für `data.json`: woher jeder gezeigte ÄAVE-Wert kommt.
+
+    Je Zelle der Zeile «insgesamt» die Matrixspalten, aus denen sie im ÖSG-Zuschnitt entstand
+    (`oesg_methodik.faecher.teile`; die ZAE aus der Zeile spitalsambulant, `ZAE_QUELLE`), jede mit dem Text wie
+    gedruckt (`Roh`), ihrer `Quelle` und – wo korrigiert wurde – der Regel mit Begründung.
+
+    Bricht ab, wenn die Teile den veröffentlichten Wert nicht ergeben, wenn eine korrigierte Zelle keine
+    eindeutige Regel hat oder wenn PDF und Seite einer Matrix nicht eindeutig sind: Dann zeigte die Seite eine
+    Herkunft, die nicht zu den Zahlen gehört.
+    """
+    ris = _ris_je_pdf()
+    pdfs: list[str] = []
+    quellen: list[list[object]] = []
+    matrizen: dict[str, list[object]] = {}
+    herkunft: dict[str, list[list[object]]] = {}
+    regel_angaben: list[list[object]] = []
+    # Zeile in korrekturen.csv → Platz in `regel_angaben`. Nicht der Regelname als Schlüssel: Denselben Namen kann
+    # es mehrfach geben, mit verschiedener Begründung (Kärnten, `plus:6.3`: in VR 22 eine Lücke, im Land ihre Folge).
+    regel_platz: dict[object, int] = {}
+    zeilen_je_matrix = _matrizen(long)
+
+    def regel_index(zelle: pd.Series) -> int:
+        """Platz der Regel in `regeln`; legt sie beim ersten Vorkommen an."""
+        r = regel_fuer_zelle(regeln, zelle)
+        if r is None:
+            raise ValueError(
+                f"keine eindeutige Korrekturregel für {zelle['Land']} {zelle['Ebene']} {zelle['Region_ID']} "
+                f"{zelle['Abschnitt']} {zelle['Zeile_ID']} {zelle['Fach']} (Regel «{zelle['Regel']}»): "
+                "passt korrekturen.csv noch zu den Daten?"
+            )
+        if r.name not in regel_platz:
+            regel_platz[r.name] = len(regel_angaben)
+            regel_angaben.append([str(r["Regel"]), str(r["Art"]), str(r["Begruendung"])])
+        return regel_platz[r.name]
+
+    for r in insgesamt.itertuples():
+        if (r.Ebene, r.Region_ID) not in zeilen_je_matrix:
+            raise ValueError(
+                f"{r.Ebene} {r.Region_ID} steht in der Tabelle Versorgungsdichte, aber nicht in der Tabelle "
+                "Planungsmatrizen: passen die beiden Dateien zusammen?"
+            )
+        zeilen = zeilen_je_matrix[(r.Ebene, r.Region_ID)]
+        teil_zeilen = zeilen[zeilen["Abschnitt"] == r.Abschnitt]
+        angaben: list[list[object]] = []
+        teile_werte: list[float] = []
+        for spalte in teile(r.Fach, HERKUNFT_ZEILE):
+            aus_zeile = ZAE_QUELLE[0] if spalte == ZAE else HERKUNFT_ZEILE
+            zelle = _zelle(teil_zeilen, aus_zeile, ZAE_QUELLE[1] if spalte == ZAE else spalte)
+            if zelle is None:
+                continue
+            if zelle["Quelle"] not in QUELLEN:
+                raise ValueError(f"unbekannte Quelle «{zelle['Quelle']}» in {r.Region_ID} {r.Abschnitt} {spalte}")
+            wert = zelle["Wert"]
+            if pd.notna(wert):
+                teile_werte.append(float(wert))
+            angaben.append(
+                [
+                    spalte,
+                    _text(zelle["Roh"]),
+                    float(wert) if pd.notna(wert) else None,
+                    str(zelle["Quelle"]),
+                    regel_index(zelle) if _text(zelle["Regel"]) else None,
+                    _text(zelle["Zeile_PDF_roh"]) if aus_zeile != HERKUNFT_ZEILE else None,
+                ]
+            )
+        if not angaben:
+            raise ValueError(f"keine Herkunft für {r.Region_ID} {r.Abschnitt} {r.Fach}: passt die Seite zu den Daten?")
+        summe = round(sum(teile_werte), 6)  # wie `faecher.summe_im_zuschnitt`: ohne Runden blieben Gleitkomma-Reste
+        if abs(summe - float(r.AAVE)) > 1e-6:
+            raise ValueError(
+                f"Herkunft von {r.Region_ID} {r.Abschnitt} {r.Fach} ergibt {summe}, die Tabelle nennt {r.AAVE}: "
+                "die gezeigten Spalten sind nicht die, aus denen der Wert entstand"
+            )
+        herkunft[f"{r.Region_ID}|{r.Abschnitt}|{r.Fach}"] = angaben
+
+        schluessel = f"{r.Region_ID}|{r.Abschnitt}"
+        if schluessel not in matrizen:
+            benutzt = teil_zeilen[teil_zeilen["Zeile_ID"].isin([HERKUNFT_ZEILE, ZAE_QUELLE[0]])]
+            datei, seite = sorted(set(benutzt["PDF"].dropna())), sorted(set(benutzt["Seite"].dropna()))
+            if len(datei) != 1 or len(seite) != 1:
+                raise ValueError(
+                    f"{r.Region_ID} {r.Abschnitt}: PDF {datei} und Seite {seite} der Matrix nicht eindeutig"
+                )
+            if datei[0] not in ris:
+                raise ValueError(f"{datei[0]} steht nicht als RSG-Verordnung in quellen.csv")
+            if datei[0] not in pdfs:
+                pdfs.append(datei[0])
+                quellen.append([datei[0], ris[datei[0]]])
+            insgesamt_zeile = _zelle(teil_zeilen, HERKUNFT_ZEILE, r.Fach)
+            matrizen[schluessel] = [
+                pdfs.index(datei[0]),
+                int(seite[0]),
+                _text(insgesamt_zeile["Zeile_PDF_roh"]) if insgesamt_zeile is not None else None,
+                massgeblicher_block(zeilen),
+            ]
+    return {"quellen": quellen, "matrizen": matrizen, "herkunft": herkunft, "regeln": regel_angaben}
+
+
 def baue_daten(tabelle: pd.DataFrame, regionen: pd.DataFrame, kacheln: pd.DataFrame, faecher: pd.DataFrame,
-               meta: dict[str, str]) -> dict[str, object]:  # fmt: skip
-    """Inhalt von `data.json`: Zeile «insgesamt» der Tabelle Versorgungsdichte, wie sie ist."""
+               long: pd.DataFrame, regeln: pd.DataFrame, meta: dict[str, str]) -> dict[str, object]:  # fmt: skip
+    """Inhalt von `data.json`: Zeile «insgesamt» der Tabelle Versorgungsdichte, wie sie ist, dazu die Herkunft
+    jedes Werts aus der Tabelle Planungsmatrizen (`baue_herkunft`)."""
     fehlt = [s for s in SPALTEN if s not in tabelle.columns]
     if fehlt:
         raise ValueError(f"Tabelle Versorgungsdichte ohne Spalten {fehlt}: passt die Seite noch zu den Daten?")
-    insgesamt = tabelle[tabelle["Zeile_ID"] == "insgesamt"]
+    insgesamt = tabelle[tabelle["Zeile_ID"] == HERKUNFT_ZEILE]
     if insgesamt.empty:
         raise ValueError("Tabelle Versorgungsdichte ohne Zeile «insgesamt»")
     if insgesamt["Lage_im_Intervall"].isna().any():
@@ -177,15 +327,18 @@ def baue_daten(tabelle: pd.DataFrame, regionen: pd.DataFrame, kacheln: pd.DataFr
         "faecher": _faecher(insgesamt, faecher),
         "regionen": _regionen(insgesamt, regionen, kacheln),
         "werte": werte,
+        **baue_herkunft(insgesamt, long, regeln),
     }
 
 
-def baue_seite(tabelle_csv: Path, ziel: Path) -> Path:
+def baue_seite(tabelle_csv: Path, long_csv: Path, ziel: Path) -> Path:
     """Seite bauen; gibt den Pfad von `data.json` zurück."""
     meta = {
         "datei": tabelle_csv.name,
         "version": paketversion(),
         "sha256": hashlib.sha256(tabelle_csv.read_bytes()).hexdigest(),
+        "matrizen_datei": long_csv.name,
+        "matrizen_sha256": hashlib.sha256(long_csv.read_bytes()).hexdigest(),
         "commit": seiten_commit(),
         "repo": repo_url(),
     }
@@ -194,6 +347,8 @@ def baue_seite(tabelle_csv: Path, ziel: Path) -> Path:
         lade_regionen(),
         pd.read_csv(web_dir() / "kacheln.csv", dtype=str),
         pd.read_csv(web_dir() / "faecher.csv", dtype=str),
+        lade_matrix_long(long_csv),
+        lade_regeln(),
         meta,
     )
     if ziel.exists():
@@ -218,20 +373,21 @@ def main(argv: list[str] | None = None) -> int:
         prog="python -m rsg2030 web",
         description="Webseite zur Tabelle Versorgungsdichte nach daten_ergebnis/web/ bauen (docs/WEB.md)",
     ).parse_args(argv)
-    tabelle = ausgabe_dir() / VERSORGUNGSDICHTE_DATEI
-    if not tabelle.is_file():
-        log.error(f"❌ {tabelle} fehlt: erst «python -m rsg2030 alles» oder die Datei des Release dorthin legen")
-        return 1
-    if gleiche_ab(tabelle) is not True:
-        log.error(f"❌ {tabelle.name} ist nicht die Version {paketversion()}: Seite nicht gebaut")
-        return 1
+    tabelle, long = ausgabe_dir() / VERSORGUNGSDICHTE_DATEI, ausgabe_dir() / LONG_DATEI
+    for datei in (tabelle, long):
+        if not datei.is_file():
+            log.error(f"❌ {datei} fehlt: erst «python -m rsg2030 alles» oder die Datei des Release dorthin legen")
+            return 1
+        if gleiche_ab(datei) is not True:
+            log.error(f"❌ {datei.name} ist nicht die Version {paketversion()}: Seite nicht gebaut")
+            return 1
     try:
-        daten = baue_seite(tabelle, ziel_dir())
+        daten = baue_seite(tabelle, long, ziel_dir())
     except (ValueError, KeyError, FileNotFoundError) as e:
         log.error(f"❌ Seite nicht gebaut: {e}")
         return 1
     log.info(f"Seite gebaut: {daten.parent} (Ansehen: python -m http.server -d {daten.parent})")
-    schreibe_laufprotokoll(ausgabe_dir(), "web", [daten], {"Tabelle": tabelle.name})
+    schreibe_laufprotokoll(ausgabe_dir(), "web", [daten], {"Tabelle": tabelle.name, "Matrizen": long.name})
     return 0
 
 
