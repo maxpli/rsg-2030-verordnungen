@@ -395,3 +395,14 @@ def test_links_auf_das_release_der_daten_nicht_auf_latest():
     js = (WEB / "app.js").read_text(encoding="utf-8")
     assert "releases/download/${M.version}" in js
     assert "releases/latest" not in js
+
+
+def test_externe_links_schicken_keinen_referrer():
+    """Jeder Link nach außen trägt `noreferrer`: Die IP-Adresse geht beim Klick ohnehin zum Ziel, von welcher Seite
+    jemand kam braucht es nicht (wie bei den selbst ausgelieferten Schriften). Nebenbei die sichere Seite, falls ein
+    Server fremde Referer je sperrt."""
+    js = (WEB / "app.js").read_text(encoding="utf-8")
+    anker = re.findall(r"<a href=[^>]*>", js)
+    assert anker, "keine Links gefunden – prüft dieser Test noch, was er soll?"
+    ohne = [a for a in anker if "noreferrer" not in a]
+    assert not ohne, f"Link ohne noreferrer: {ohne}"

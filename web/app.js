@@ -50,14 +50,17 @@ const pill = (w) => `<span class="pill"><i class="k-${klasse(w)}"></i>${lageText
 /* Kopf und Fußzeile: Datenstand und Stand der Seite */
 document.getElementById("eyebrow").textContent = `RSG-2030-Verordnungen · Release ${M.version}`;
 document.getElementById("footer").innerHTML = `
-  <div>Quelle: <span class="nb">${esc(M.datei)}</span>, <a href="${M.repo}/releases/tag/${M.version}" target="_blank" rel="noopener">Release ${esc(M.version)}</a> von <a href="${M.repo}" target="_blank" rel="noopener">${esc(M.repo.replace("https://github.com/", ""))}</a> · SHA-256 <span class="num" style="word-break:break-all">${esc(M.sha256)}</span></div>
+  <div>Quelle: <span class="nb">${esc(M.datei)}</span>, <a href="${M.repo}/releases/tag/${M.version}" target="_blank" rel="noopener noreferrer">Release ${esc(M.version)}</a> von <a href="${M.repo}" target="_blank" rel="noopener noreferrer">${esc(M.repo.replace("https://github.com/", ""))}</a> · SHA-256 <span class="num" style="word-break:break-all">${esc(M.sha256)}</span></div>
   <div>Herkunft der Werte: <span class="nb">${esc(M.matrizen_datei)}</span> · SHA-256 <span class="num" style="word-break:break-all">${esc(M.matrizen_sha256)}</span></div>
-  <div>Stand der Seite: <a href="${M.repo}/commit/${M.commit}" target="_blank" rel="noopener" class="num">${esc(M.commit.slice(0, 7))}</a> · Alle Vorbehalte: <a href="${DATEN_MD}" target="_blank" rel="noopener">docs/DATEN.md, Fallstricke</a> · Daten CC BY 4.0</div>`;
+  <div>Stand der Seite: <a href="${M.repo}/commit/${M.commit}" target="_blank" rel="noopener noreferrer" class="num">${esc(M.commit.slice(0, 7))}</a> · Alle Vorbehalte: <a href="${DATEN_MD}" target="_blank" rel="noopener noreferrer">docs/DATEN.md, Fallstricke</a> · Daten CC BY 4.0</div>`;
 
 /* Über diese Daten: der Weg von der Seite in den Datensatz. Alle Links auf das Release, aus dem die Daten der Seite
    stammen (nicht «latest»), damit Downloads und Doku zu den gezeigten Zahlen passen. */
 const REL = `${M.repo}/releases/download/${M.version}`, DOC = `${M.repo}/blob/${M.version}`;
-const link = (href, text) => `<a href="${href}" target="_blank" rel="noopener">${text}</a>`;
+/* noreferrer: Die IP-Adresse geht beim Klick ohnehin zum Ziel, von welcher Seite jemand kam braucht es nicht –
+   dieselbe Haltung wie die selbst ausgelieferten Schriften. Nebenbei die sichere Seite, falls ein Server fremde
+   Referer je sperrt; ohne Referer antwortet das RIS, so lädt auch «python -m rsg2030 download». */
+const link = (href, text) => `<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`;
 document.getElementById("about").innerHTML = `
   <h2 id="h-about">Über diese Daten</h2>
   <p>Diese Seite zeigt einen Ausschnitt aus dem Datensatz <b>RSG 2030 – Planungsmatrizen der Verordnungen</b>: die Zeile «insgesamt» der Tabelle Versorgungsdichte. Der Datensatz enthält außerdem jede Zelle aller 41 Planungsmatrizen (9 Bundesländer, 32 Versorgungsregionen), auch Planstellen, Wahlärzt:innen und Fächer ohne Richtwert. Zu jedem Wert steht dort, woher er kommt: PDF, Seite, Originaltext und, wo korrigiert wurde, die Regel mit Begründung.</p>
@@ -221,7 +224,7 @@ function renderDetail() {
     </div>
     <div class="minibar">${miniBar(wI, wP, fi, dg)}</div>
     <div class="say">${satz(first[0], first[1])}${satz(second[0], second[1])}</div>
-    <ul class="cav">${vorbehalte(r, f, wI, wP).map((v) => `<li>${v.text} <a href="${DATEN_MD}" target="_blank" rel="noopener">Fallstrick ${v.fallstrick}</a></li>`).join("")}</ul>`;
+    <ul class="cav">${vorbehalte(r, f, wI, wP).map((v) => `<li>${v.text} <a href="${DATEN_MD}" target="_blank" rel="noopener noreferrer">Fallstrick ${v.fallstrick}</a></li>`).join("")}</ul>`;
 }
 function miniBar(wI, wP, fi, dg) {
   const W = 320, H = 46, x0 = 12, x1 = W - 12;

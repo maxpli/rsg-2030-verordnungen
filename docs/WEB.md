@@ -171,6 +171,6 @@ dann nicht laden darf; dafür der kleine Server.
 | Zahl auf der Seite weicht von der Tabelle ab | Test (ganze Suite): `data.json` gegen die Tabelle |
 | ein Vorbehalt verweist auf einen Fallstrick, den es nicht mehr gibt | Test: jeder Vorbehalt nennt seinen Fallstrick, und den gibt es in DATEN.md |
 | Farbstufen nicht unterscheidbar | Test: Abstände benachbarter Stufen aus `style.css` nachgerechnet, normal und bei Protanopie und Deuteranopie, hell und dunkel; dunkle Farben gleich, ob über die Systemeinstellung oder den Schalter |
-| Seite lädt etwas von fremden Servern (z. B. Schriften von Google: IP-Adresse jeder Besucherin dorthin) | Test: keine Schriften, Skripte oder Stile von außen; jede Schrift der CSS liegt in `web/fonts/` |
+| Seite gibt etwas an fremde Server (z. B. Schriften von Google: IP-Adresse jeder Besucherin dorthin) | Tests: keine Schriften, Skripte oder Stile von außen, jede Schrift der CSS liegt in `web/fonts/`; jeder Link nach außen trägt `noreferrer`, gibt also nicht weiter, von welcher Seite jemand kam |
 | Seite lädt nicht, Fehler im Skript, Seite am Handy breiter als der Bildschirm | ein Mensch vor der Veröffentlichung; später ein Test im Browser |
 | ein Vorbehalt ist fachlich falsch oder missverständlich formuliert | der Herausgeber |
