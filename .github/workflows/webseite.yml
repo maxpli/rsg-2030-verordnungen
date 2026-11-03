@@ -9,7 +9,7 @@
 #   veröffentlicht mit dem GITHUB_TOKEN, und solche Ereignisse starten absichtlich keine weiteren Workflows.
 # - wenn sich die Seite auf main ändert (dann mit den Daten des aktuellen Release; kein neues Release nötig)
 # - auf Knopfdruck
-name: Dashboard
+name: Webseite
 
 on:
   workflow_run:

@@ -1,7 +1,7 @@
 # RSG 2030 – Planungsmatrizen der Verordnungen
 
 [![Tests](https://github.com/maxpli/rsg-2030-verordnungen/actions/workflows/tests.yml/badge.svg)](https://github.com/maxpli/rsg-2030-verordnungen/actions/workflows/tests.yml)
-[![Dashboard](https://github.com/maxpli/rsg-2030-verordnungen/actions/workflows/webseite.yml/badge.svg)](https://maxpli.github.io/rsg-2030-verordnungen/)
+[![Webseite](https://github.com/maxpli/rsg-2030-verordnungen/actions/workflows/webseite.yml/badge.svg)](https://maxpli.github.io/rsg-2030-verordnungen/)
 [![Daten: CC BY 4.0](https://img.shields.io/badge/Daten-CC%20BY%204.0-lightgrey.svg)](LIZENZ_DATEN.md)
 [![Code: MIT](https://img.shields.io/badge/Code-MIT-blue.svg)](LICENSE)
 [![Python 3.13](https://img.shields.io/badge/Python-3.13-blue.svg)](.python-version)
@@ -25,7 +25,7 @@ aus dem öffentlichen Code und den öffentlichen Quellen; Lauf und Protokoll sin
 auch selbst ([Selbst erzeugen](#selbst-erzeugen)) und sieht am Ende, ob das Ergebnis Byte für Byte der
 veröffentlichten Version entspricht.
 
-**Zum Nachsehen im Browser:** [Dashboard](https://maxpli.github.io/rsg-2030-verordnungen/)
+**Zum Nachsehen im Browser:** [Webseite zur Tabelle Versorgungsdichte](https://maxpli.github.io/rsg-2030-verordnungen/)
 – je Versorgungsregion und Fach, ob die Sachleistung unter, im oder über dem Soll-Intervall liegt, mit den Daten des
 aktuellen Release ([docs/WEB.md](docs/WEB.md)).
 
