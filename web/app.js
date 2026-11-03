@@ -22,6 +22,8 @@ const sgn = (x, d = 1) => x == null ? "–" : (x > 0 ? "+" : "") + fmt(x, d);
 const vdDig = (f) => (f.max < 2 ? 2 : 1);
 const esc = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
 const trunc = (t, n) => t.length > n ? t.slice(0, n - 1) + "…" : t;
+/* Prüfsumme gekürzt wie in der Konsole; die vollen Werte stehen im Release (docs/WEB.md) */
+const sha12 = (h) => esc(String(h).slice(0, 12)) + "…";
 
 const STANDARD = { VR: "41", BL: "OÖ" };
 const S = { abschnitt: "PLAN", ebene: "VR", fach: "IM", region: STANDARD.VR, hatch: true, src: false };
@@ -50,8 +52,7 @@ const pill = (w) => `<span class="pill"><i class="k-${klasse(w)}"></i>${lageText
 /* Kopf und Fußzeile: Datenstand, Stand der Seite und wer sie erstellt hat (docs/WEB.md, Entscheidung 15) */
 document.getElementById("eyebrow").textContent = `RSG-2030-Verordnungen · Release ${M.version}`;
 document.getElementById("footer").innerHTML = `
-  <div>Quelle: <span class="nb">${esc(M.datei)}</span>, <a href="${M.repo}/releases/tag/${M.version}" target="_blank" rel="noopener noreferrer">Release ${esc(M.version)}</a> von <a href="${M.repo}" target="_blank" rel="noopener noreferrer">${esc(M.repo.replace("https://github.com/", ""))}</a> · SHA-256 <span class="num" style="word-break:break-all">${esc(M.sha256)}</span></div>
-  <div>Herkunft der Werte: <span class="nb">${esc(M.matrizen_datei)}</span> · SHA-256 <span class="num" style="word-break:break-all">${esc(M.matrizen_sha256)}</span></div>
+  <div>Quelle: <a href="${M.repo}/releases/tag/${M.version}" target="_blank" rel="noopener noreferrer">Release ${esc(M.version)}</a> von <a href="${M.repo}" target="_blank" rel="noopener noreferrer">${esc(M.repo.replace("https://github.com/", ""))}</a>, zwei Tabellen: die Werte aus <span class="nb">${esc(M.datei)}</span> (SHA-256 <span class="num">${sha12(M.sha256)}</span>), die Herkunft je Wert aus <span class="nb">${esc(M.matrizen_datei)}</span> (<span class="num">${sha12(M.matrizen_sha256)}</span>). Volle Prüfsummen: <a href="${M.repo}/releases/download/${M.version}/SHA256SUMS.txt" target="_blank" rel="noopener noreferrer">SHA256SUMS.txt</a></div>
   <div>Stand der Seite: <a href="${M.repo}/commit/${M.commit}" target="_blank" rel="noopener noreferrer" class="num">${esc(M.commit.slice(0, 7))}</a> · Alle Vorbehalte: <a href="${DATEN_MD}" target="_blank" rel="noopener noreferrer">docs/DATEN.md, Fallstricke</a> · Daten CC BY 4.0</div>
   <div>Erstellt von Max Plischke, <a href="https://loesungswerk.at/rsg-2030" target="_blank" rel="noopener noreferrer">Lösungswerk</a>, ohne Auftrag. Inoffizielle Aufbereitung amtlicher Daten; maßgeblich sind die Verordnungen im RIS. Angaben ohne Gewähr, Fehler bitte melden. · <a href="https://loesungswerk.at/impressum" target="_blank" rel="noopener noreferrer">Impressum</a> · <a href="https://loesungswerk.at/datenschutz" target="_blank" rel="noopener noreferrer">Datenschutz</a></div>`;
 

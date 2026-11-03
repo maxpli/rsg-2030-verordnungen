@@ -63,6 +63,7 @@ Patientenströme, innerhalb des Intervalls kein Unterschied.
 | Link auf die Quelle | zwei Links: «Seite 11 öffnen» springt in die PDF-Datei auf dem OGD-Dateiserver (`#page=11`), «Verordnung im RIS» auf die Seite des Dokuments im Portal, mit Kundmachung. Beide Adressen sind aus `quellen.csv` abgeleitet (Dokumentnummer, Dateiname), nicht gespeichert |
 | Seitenzahl | steht **auch als Text** da, nicht nur im Link: `#page=` ist eine Übereinkunft der PDF-Betrachter, kein Standard des Web. Kennt ein Betrachter sie nicht, öffnet sich die Datei auf Seite 1 – dann muss die Zahl lesbar sein |
 | keine Markierung der Zahl im PDF | `#search=` markiert in den meisten Betrachtern nichts und in den übrigen oft die falsche Zelle: Der Rohtext einer gezeigten Zelle ist auf seiner PDF-Seite meist **nicht** eindeutig (nachzurechnen mit `python -m rsg2030.scripts.rohtext_eindeutig`; «-» steht auf einer Seite hunderte Mal). Eine falsche Markierung wäre schlechter als keine. Statt zu markieren, nennt die Seite Zeile und Spalte, in denen die Zahl steht |
+| Prüfsummen der Fußzeile | eine Zeile für beide Tabellen, das Release einmal genannt – sie kommen aus demselben. Die Prüfsummen auf zwölf Zeichen gekürzt wie in der Konsole, dahinter `SHA256SUMS.txt` des Release. Zwölf Zeichen sagen, **welche** Datei gezeigt wird; **belegen** kann die Seite sie nicht – eine Prüfsumme neben den Daten, die sie prüfen soll, ist kein Beweis. Der Beleg liegt im Release und in `erwartete_ausgaben.csv`, und dafür braucht man den Link, nicht die Zeichen auf der Seite. Zweimal 64 Zeichen kosteten am Handy vier Zeilen |
 | Farben | Nachbarstufen müssen sich deutlich unterscheiden, auch bei Farbsehschwäche (Protanopie, Deuteranopie): Abstand ΔE (OKLab × 100) mindestens 8. Ein Test rechnet das aus den Farben der Seite nach |
 
 ## Entscheidungen
@@ -146,8 +147,9 @@ Angabe hat eine Quelle: Werte und Soll-Intervalle aus der Tabelle Versorgungsdic
 Zeilenbeschriftung aus der Tabelle Planungsmatrizen, Art und Begründung einer Regel aus `korrekturen.csv`, die Adresse
 der Verordnung aus der Dokumentnummer in `quellen/quellen.csv`, Namen der Regionen und Länder aus `oesg_regionen.csv`,
 Namen der Fächer aus `web/faecher.csv`, Lage der Kacheln aus `web/kacheln.csv`. Kopf und Fußzeile nennen Release,
-beide Prüfsummen und den Commit aus `data.json`. Wer die Seite erstellt hat, die Vorbehalte dazu und die Links
-auf Impressum und Datenschutz sind fester Text der Seite, keine Angabe aus den Daten (Entscheidung 15).
+beide Prüfsummen (gekürzt, siehe Darstellungsregeln) und den Commit aus `data.json`. Wer die Seite erstellt hat,
+die Vorbehalte dazu und die Links auf Impressum und Datenschutz sind fester Text der Seite, keine Angabe aus den
+Daten (Entscheidung 15).
 
 ## Selbst bauen und ansehen
 
