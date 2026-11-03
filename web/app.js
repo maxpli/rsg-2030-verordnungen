@@ -318,13 +318,14 @@ function renderHerkunft() {
 
 /* Positions-Plot */
 const stripEl = document.getElementById("strip");
+const stripFussEl = document.getElementById("strip-fuss");
 function renderStrip() {
   const f = S.fach, fi = fachInfo[f], dg = vdDig(fi);
   const regs = regionen().map((r) => ({ r, i: get(r.id, "IST", f), p: get(r.id, "PLAN", f) }));
   const key = (o) => { const w = S.abschnitt === "IST" ? o.i : o.p; return w ? w.pos : Infinity; };
   regs.sort((a, b) => key(a) - key(b));
   const W = Math.max(320, stripEl.clientWidth), narrow = W < 560;
-  const LW = narrow ? 120 : 190, RW = 58, top = 48, rh = 21, bot = top + regs.length * rh, H = bot + 30;
+  const LW = narrow ? 120 : 190, RW = 58, top = 48, rh = 21, bot = top + regs.length * rh, H = bot + 8;
   const X0 = LW + 8, X1 = W - RW - 8, LO = -1.5, HI = 3;
   const x = (p) => X0 + (Math.max(LO, Math.min(HI, p)) - LO) / (HI - LO) * (X1 - X0);
   let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" role="img" aria-label="Position im Soll-Intervall je Region, ${f}">`;
@@ -348,8 +349,11 @@ function renderStrip() {
     for (const ww of [o.i, o.p]) if (ww && ww.pos > HI) s += `<text class="muted" x="${x(HI) + 8}" y="${y + 4}" font-size="11">›</text>`;
     s += `<text class="mono ${w && w.lage === "im" ? "muted" : ""}" x="${X1 + RW}" y="${y + 4}" font-size="11.5" text-anchor="end">${w ? (w.lage === "im" ? "0" : sgn(w.abst)) : "–"}</text></g>`;
   });
-  s += `<text class="muted" x="${(X0 + X1) / 2}" y="${H - 6}" font-size="11" text-anchor="middle">Position im Intervall: 0 = VDmin, 1 = VDmax, Schritt = eine Intervallbreite${regs.some((o) => (o.i && o.i.pos > HI) || (o.p && o.p.pos > HI)) ? " · › Wert über 3, abgeschnitten" : ""}</text>`;
   stripEl.innerHTML = s + "</svg>";
+  /* Die Lesehilfe steht als Text unter dem Bild, nicht als <text> darin: SVG-Text bricht nicht um und wäre am Handy
+     an beiden Enden abgeschnitten. */
+  stripFussEl.textContent = "Position im Intervall: 0 = VDmin, 1 = VDmax, Schritt = eine Intervallbreite"
+    + (regs.some((o) => (o.i && o.i.pos > HI) || (o.p && o.p.pos > HI)) ? " · › Wert über 3, abgeschnitten" : "");
 }
 stripEl.addEventListener("click", (e) => { const g = e.target.closest(".row"); if (g) pick(g.dataset.r, null, "#strip .row.sel"); });
 stripEl.addEventListener("pointermove", (e) => {
@@ -416,7 +420,17 @@ function render() {
   document.getElementById("h-map").textContent = `Kachelkarte · ${S.fach} · ${S.abschnitt === "IST" ? "IST" : "PLAN 2030"}`;
   renderMatrix(); renderDetail(); renderHerkunft(); renderStrip(); renderMap(); save();
 }
-let rt;
-addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { renderStrip(); renderMap(); }, 120); });
+/* Nur neu zeichnen, wenn die Breite sich wirklich geändert hat (Fenster, Ausrichtung). iOS meldet «resize» auch,
+   wenn beim Scrollen bloß die Adressleiste ein- und ausfährt; die beiden SVGs mitten im Scrollen auszutauschen
+   zeichnet Safari nur halb fertig – einzelne Namen und Zahlen fehlen dann, bis die Seite sich wieder bewegt. */
+const svgBreiten = () => `${stripEl.clientWidth}|${mapEl.clientWidth}`;
+let rt, gezeichnetBei = "";
+addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => {
+  if (svgBreiten() === gezeichnetBei) return;
+  gezeichnetBei = svgBreiten();
+  renderStrip(); renderMap();
+}, 120); });
 render();
+/* erst nach dem ersten Zeichnen messen: vorher ist die Seite kurz, ohne Scrollbalken und damit breiter */
+gezeichnetBei = svgBreiten();
 }

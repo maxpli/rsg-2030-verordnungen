@@ -19,6 +19,14 @@ Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem
 - `python -m rsg2030 web` liest dafür **auch** `RSG_2030_Planungsmatrizen.csv` und prüft beide Tabellen gegen
   `erwartete_ausgaben.csv`; `webseite.yml` lädt beide aus dem Release und prüft sie gegen `SHA256SUMS.txt`.
   An den Daten ändert sich nichts – keine neue Prüfsumme, kein neues Release nötig.
+- **Am Handy fehlten im Positions-Plot und in der Kachelkarte einzelne Namen und Zahlen.** iOS meldet eine
+  Größenänderung auch, wenn beim Scrollen bloß die Adressleiste ein- und ausfährt; die Seite baute beide Grafiken
+  dann mitten im Scrollen neu auf, und Safari zeichnete sie nur halb fertig. Jetzt zeichnet sie nur neu, wenn sich
+  die Breite wirklich ändert (docs/WEB.md, Punkt 9).
+- **Am Handy unterstrich iOS Regionsnamen gestrichelt** und fing das Tippen ab: Die Datenerkennung las Zeilen wie
+  «61 Graz» als Adresse. Die Seite schaltet sie jetzt ab (`format-detection`).
+- **Die Lesehilfe unter dem Positions-Plot war am Handy an beiden Enden abgeschnitten.** Sie stand als Beschriftung
+  in der Grafik, und Text in einer Grafik bricht nicht um; jetzt steht sie als Text darunter.
 
 **Schnittstelle:**
 

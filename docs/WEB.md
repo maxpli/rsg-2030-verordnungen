@@ -55,7 +55,7 @@ Patientenströme, innerhalb des Intervalls kein Unterschied.
 | Schraffur | `AAVE_Abstand_Intervall` kleiner als 1 ÄAVE (Fallstrick 6) |
 | PUL und KFO | eigene Spalten, kursiv, als Teil von IM bzw. ZMK gekennzeichnet; im Anteilsbalken mitgezählt, weil der ÖSG beide mit eigenem Soll-Intervall bewertet (Textband S.38–39). Nicht über Fächer addieren (Fallstrick 4) |
 | Kein Wert | leere Zelle mit Strich (z. B. KFO in Wien und Vorarlberg, wo KFO in ZMK steckt) |
-| Positions-Plot | Achse von −1,5 bis 3; Werte darüber am Rand mit «›». Über dem Band zwei Zeilen: VDmin und VDmax als VD, darunter die Position −1 bis 3 (`Position_im_Intervall`). Je Zeile ein Maßstab, damit die Position nicht als VD gelesen wird; beide stehen oben, damit man sie auch bei 32 VR sieht |
+| Positions-Plot | Achse von −1,5 bis 3; Werte darüber am Rand mit «›». Über dem Band zwei Zeilen: VDmin und VDmax als VD, darunter die Position −1 bis 3 (`Position_im_Intervall`). Je Zeile ein Maßstab, damit die Position nicht als VD gelesen wird; beide stehen oben, damit man sie auch bei 32 VR sieht. Die Lesehilfe («0 = VDmin, 1 = VDmax …») steht als Text unter dem Bild, nicht als Beschriftung darin: Text in einer Grafik bricht nicht um und wäre am Handy an beiden Enden abgeschnitten |
 | Rohtext der Herkunft | unverändert, wie gedruckt («191,8», «-», «n.v.»); nie durch die Zahlformatierung der Seite. Was «-» und «n.v.» bedeuten, steht als Satz dabei (DATEN.md, «Zellbedeutung») |
 | Werte der Herkunft | exakt, mindestens eine Nachkommastelle wie in den Matrizen – anders als sonst auf der Seite, wo ÄAVE fürs Lesen auf eine Stelle gerundet sind. In dieser Ansicht soll der Wert im PDF wiederzufinden sein |
 | Zeile der Matrix | `Zeile_PDF_roh` wörtlich. Fehlt sie, ist das selbst eine Auskunft: «manuell erfasst» = Bildseite ohne Textebene, leer = die Zeile ist im PDF nicht gedruckt (der Wert entsteht erst aus einer Regel) |
@@ -91,7 +91,12 @@ Jede Entscheidung mit Grund, damit sie sich später nachvollziehen oder bewusst 
 8. **Anteilsbalken.** Auf einen Blick soll stimmen, wie viel der Matrix im Intervall liegt; ohne Balken zieht die
    farbige Hälfte alle Aufmerksamkeit auf sich.
 9. **Handy.** Kein Tooltip (ohne Maus bliebe er stehen); ein Tippen springt zur Detailspalte, ein Knopf führt zurück;
-   die Werkzeugleiste klebt nicht oben, weil sie umgebrochen ein Drittel des Bildschirms belegte.
+   die Werkzeugleiste klebt nicht oben, weil sie umgebrochen ein Drittel des Bildschirms belegte. Positions-Plot und
+   Kachelkarte werden nur neu gezeichnet, wenn sich ihre Breite ändert: iOS meldet eine Größenänderung auch, wenn
+   beim Scrollen bloß die Adressleiste ein- und ausfährt. Baute die Seite die Grafiken dabei neu auf, zeichnete
+   Safari sie nur halb fertig, und einzelne Namen und Zahlen fehlten, bis man die Seite wieder bewegte. Die
+   Datenerkennung von iOS ist abgeschaltet (`format-detection`): Sie las Zeilen wie «61 Graz» als Adresse,
+   unterstrich sie gestrichelt und fing das Tippen auf die Zeile ab.
 10. **Kachelkarte:** Steiermark direkt unter Ober- und Niederösterreich, Kärnten unter Salzburg und Steiermark,
     Osttirol abgesetzt neben Kärnten. Wo das Raster nicht reicht, liegt eine Nachbarschaft ungenau.
 11. **Im Datensatz-Repo statt in einem eigenen.** Die Seite stellt den Datensatz dar und bildet keine neuen

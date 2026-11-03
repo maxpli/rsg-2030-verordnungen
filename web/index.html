@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- iOS erkennt sonst Zeilen wie «61 Graz» als Adresse, unterstreicht sie gestrichelt und fängt das Tippen ab -->
+<meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
 <title>RSG 2030 Versorgungsdichte</title>
 <meta name="description" content="ÄAVE der Sachleistung aus den Planungsmatrizen der RSG-2030-Verordnungen je 100.000 Einwohner:innen, je Versorgungsregion und Fach, verglichen mit dem Versorgungsdichte-Soll-Intervall des ÖSG.">
 <link rel="icon" href="data:,">
@@ -56,6 +58,7 @@
     <section class="panel" aria-labelledby="h-strip">
       <div class="panel-head"><h2 id="h-strip">Position im Soll-Intervall</h2><p class="sub">○ IST → ● PLAN 2030 · sortiert nach gewähltem Stand · rechts: ÄAVE-Abstand</p></div>
       <div id="strip"></div>
+      <p class="sub" id="strip-fuss" style="margin-top:10px"></p>
     </section>
     <section class="panel" aria-labelledby="h-map">
       <div class="panel-head"><h2 id="h-map">Kachelkarte</h2><p class="sub">jede Region gleich groß, grob nach Lage angeordnet · Linien: Landesgrenzen</p></div>
