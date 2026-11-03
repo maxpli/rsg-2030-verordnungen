@@ -184,3 +184,11 @@ Was an der Webseite ([WEB.md](WEB.md)) noch offen ist.
    zweiter Leser derselben Sache.
 4. **Test im Browser:** Seite lädt ohne Fehler, keine seitliche Verschiebung bei Handy-Breite, die Aufklappzeile der
    Herkunft bricht das Layout nicht. Bis dahin prüft das ein Mensch.
+5. **Spaltenköpfe und Legende beim Scrollen am Handy?** Die Matrix hat 17 Fachspalten, am Handy sind etwa acht
+   davon gleichzeitig zu sehen; Kopfzeile und Farblegende stehen einmal oben und sind nach wenigen Zeilen aus dem
+   Bild. Wer durch die Regionen scrollt oder seitlich zu den hinteren Fächern geht, sieht ein Raster ohne
+   Beschriftung. `position: sticky` am Tabellenkopf hilft nicht ohne Weiteres: Die Matrix scrollt seitlich
+   (`overflow-x: auto`) und wird dadurch auch senkrecht zum eigenen Scrollbereich, an dem nichts kleben kann.
+   Möglich wären eine feste Höhe mit eigenem Scrollbereich (also Scrollen im Scrollen) oder eine Kopfzeile, die
+   sich je Bundesland wiederholt. Offen ist auch, wie weit es die Matrix am Handy braucht: Wer einen Wert nachsieht,
+   tippt die Zelle an und liest Fach und Region im Klartext in der Detailspalte.
