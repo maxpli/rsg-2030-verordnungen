@@ -118,6 +118,13 @@ Jede Entscheidung mit Grund, damit sie sich später nachvollziehen oder bewusst 
     neu, sondern lädt die CSV des aktuellen Release und prüft sie gegen dessen `SHA256SUMS.txt`. Passt die Seite nicht
     zu den Daten (z. B. fehlende Spalte), bricht er ab, und die bisherige Seite bleibt. Die Fußzeile nennt Datenstand
     (Release, Prüfsumme) und Stand der Seite (Commit). Für Änderungen an der Seite braucht es kein neues Release.
+15. **Wer die Seite erstellt hat, steht in der Fußzeile**, mit den Vorbehalten im selben Satz: ohne Auftrag,
+    inoffizielle Aufbereitung amtlicher Daten – maßgeblich sind die Verordnungen im RIS –, Angaben ohne Gewähr,
+    Fehler bitte melden. Die Seite liegt unter einer eigenen Adresse, nicht beim Repo; wer sie ohne das README
+    öffnet, muss sie dort einordnen können. Dazu die Links auf Impressum und Datenschutz, die eine veröffentlichte
+    Seite braucht. Mehr nicht: kein Logo, kein Werbetext, keine Kennzahl und kein Urteil, das nicht in der Doku
+    steht. Die drei Links trägt die Fußzeile wie alle anderen mit `noreferrer`, und die Seite lädt weiterhin nichts
+    von fremden Servern («Wer prüft was»). Derselbe Satz steht im README («Versionen und Zitieren»).
 
 ## Aufbau
 
@@ -139,7 +146,8 @@ Angabe hat eine Quelle: Werte und Soll-Intervalle aus der Tabelle Versorgungsdic
 Zeilenbeschriftung aus der Tabelle Planungsmatrizen, Art und Begründung einer Regel aus `korrekturen.csv`, die Adresse
 der Verordnung aus der Dokumentnummer in `quellen/quellen.csv`, Namen der Regionen und Länder aus `oesg_regionen.csv`,
 Namen der Fächer aus `web/faecher.csv`, Lage der Kacheln aus `web/kacheln.csv`. Kopf und Fußzeile nennen Release,
-beide Prüfsummen und den Commit aus `data.json`.
+beide Prüfsummen und den Commit aus `data.json`. Wer die Seite erstellt hat, die Vorbehalte dazu und die Links
+auf Impressum und Datenschutz sind fester Text der Seite, keine Angabe aus den Daten (Entscheidung 15).
 
 ## Selbst bauen und ansehen
 
@@ -177,5 +185,6 @@ dann nicht laden darf; dafür der kleine Server.
 | ein Vorbehalt verweist auf einen Fallstrick, den es nicht mehr gibt | Test: jeder Vorbehalt nennt seinen Fallstrick, und den gibt es in DATEN.md |
 | Farbstufen nicht unterscheidbar | Test: Abstände benachbarter Stufen aus `style.css` nachgerechnet, normal und bei Protanopie und Deuteranopie, hell und dunkel; dunkle Farben gleich, ob über die Systemeinstellung oder den Schalter |
 | Seite gibt etwas an fremde Server (z. B. Schriften von Google: IP-Adresse jeder Besucherin dorthin) | Tests: keine Schriften, Skripte oder Stile von außen, jede Schrift der CSS liegt in `web/fonts/`; jeder Link nach außen trägt `noreferrer`, gibt also nicht weiter, von welcher Seite jemand kam |
+| Link auf Lösungswerk, Impressum oder Datenschutz führt ins Leere | der Herausgeber: Die drei Adressen führen auf die eigene Website. Kein Test ruft sie auf, denn weder die Seite noch ihr Bau sollen fremde Server befragen |
 | Seite lädt nicht, Fehler im Skript, Seite am Handy breiter als der Bildschirm | ein Mensch vor der Veröffentlichung; später ein Test im Browser |
 | ein Vorbehalt ist fachlich falsch oder missverständlich formuliert | der Herausgeber |
