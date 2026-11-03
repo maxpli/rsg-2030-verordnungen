@@ -153,6 +153,8 @@ Ohne GitHub-Konto: E-Mail an [max.plischke@loesungswerk.at](mailto:max.plischke@
   (Richtwerte, Regionen), die ÖSG-Dateien selbst werden nur verlinkt. Die Lizenz jeder Quelldatei steht im Register.
   Die Schriften der Webseite (`web/fonts/`, IBM Plex) stehen unter der SIL Open Font License 1.1
   ([web/fonts/OFL.txt](web/fonts/OFL.txt)).
+- Erstellt von Max Plischke, [Lösungswerk](https://loesungswerk.at/rsg-2030), ohne Auftrag. Inoffizielle
+  Aufbereitung amtlicher Daten; maßgeblich sind die Verordnungen im RIS. Angaben ohne Gewähr, Fehler bitte melden.
 
 ## Für Entwickler:innen
 
