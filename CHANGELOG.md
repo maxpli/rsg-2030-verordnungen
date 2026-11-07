@@ -26,6 +26,25 @@ Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem
 
 **Webseite:**
 
+- **Falscher Vorbehalt bei ZMK in Wien und Vorarlberg behoben.** Dort stand «KFO in Oberösterreich: nur als Fußnote
+  zu ZMK gedruckt … per Korrekturregel übernommen», weil die Bedingung in `app.js` auch auf den Zuschnitt-Text «KFO
+  nicht getrennt ausgewiesen» passte. In Wien und Vorarlberg ist KFO aber laut Fußnote bzw. Textteil **in ZMK
+  enthalten**, nur nicht einzeln gezeigt (docs/DATEN.md, Fallstrick 4); betroffen waren alle 14 ZMK-Zellen dieser beiden Länder. Jetzt sind es zwei
+  getrennte Vorbehalte, und ein Test bindet jeden an den Zuschnitt-Text, der ihn trägt.
+- **Auch ohne Wert führt die Herkunft in die Quelle.** Die Klappe «Woher kommt diese Zahl?» sagte bei einer Zelle
+  ohne Wert nur, es gebe nichts herzuleiten – ohne PDF und Seite. Genau dort will man aber nachsehen, dass in der
+  Matrix wirklich nichts steht. Jetzt nennt sie immer PDF, Seite und die Verordnung im RIS und dazu den Grund: Fach
+  steckt im Elternfach (KFO in Wien und Vorarlberg), Matrix hat die Spalte nicht (Kärnten, MKG) oder Zelle leer.
+  Betrifft 20 Zellen.
+- **Neuer Vorbehalt an Wiens ZMK-Zellen:** Fußnote (5) rechnet neben der Kieferorthopädie auch «Zahnbehandler +
+  Dentisten» zu ZMK; die anderen acht Länder sagen dazu nichts (docs/DATEN.md, Fallstrick 4;
+  docs/offene_punkte.md). Die Seite sagt das jetzt an den acht betroffenen Zellen, statt es nur in der Doku zu
+  haben.
+- **Der Wert in Worten und die Vorbehalte stehen nur noch einmal**, in `rsg2030/darstellung.py` statt in `app.js`
+  (docs/WEB.md, «Der Satz und die Vorbehalte stehen einmal»). `data.json` enthält die Texte einmal und je Zelle,
+  welche gelten; die Seite setzt ein. Vorarbeit für die statischen Seiten, die dieselben Texte brauchen. `data.json`
+  wächst dadurch von 229 auf 328 KB (über die Leitung von 58 auf 66 KB). An den Daten ändert sich nichts.
+
 - **Die Seite zeigt zu jedem Wert, woher er kommt** (docs/WEB.md): PDF, Seite und die Zeile der Matrix wie gedruckt,
   je eingegangener Matrixspalte den Text wie gedruckt und den übernommenen Wert, dazu jede Korrekturregel mit Art und
   Begründung wörtlich aus `korrekturen.csv` und einen Link auf die Verordnung im RIS. Zugeklappt eine Zeile in einem

@@ -169,40 +169,21 @@ mxEl.addEventListener("pointermove", (e) => {
 });
 mxEl.addEventListener("pointerleave", hideTip);
 
-/* Detailspalte. Jeder Vorbehalt nennt seinen Fallstrick in docs/DATEN.md (geprüft in tests/test_web.py). */
-function vorbehalte(r, f, wI, wP) {
-  const out = [], w = S.abschnitt === "IST" ? wI : wP, fi = fachInfo[f];
-  if (fi.teil_von) out.push({ fallstrick: 4, text: `<b>Teil von ${fi.teil_von}.</b> ${f} steckt schon in ${fi.teil_von} und hat zusätzlich ein eigenes Soll-Intervall. Nicht addieren.` });
-  const am = get(r.id, S.abschnitt, "AM");
-  if ((f === "AM" || f === "IM") && am && /ZAE nicht getrennt/.test(am.zuschnitt))
-    out.push({ fallstrick: 4, text: `<b>ZAE nicht getrennt ausgewiesen.</b> Die zentrale ambulante Erstversorgung steckt hier in den Fachspalten, vor allem IM. AM ist zu niedrig, IM zu hoch.` });
-  if (wI && wP && (f === "AM" || f === "IM")) {
-    const ai = get(r.id, "IST", "AM"), ap = get(r.id, "PLAN", "AM");
-    if (ai && ap && /ZAE nicht getrennt/.test(ai.zuschnitt) !== /ZAE nicht getrennt/.test(ap.zuschnitt))
-      out.push({ fallstrick: 10, text: `<b>IST → PLAN enthält eine Umbuchung</b> der ZAE von den Fachspalten nach AM, nicht nur Wachstum oder Abbau.` });
-  }
-  if (w && /Korrekturregel|KFO nicht getrennt/.test(w.zuschnitt))
-    out.push({ fallstrick: 4, text: `<b>KFO in Oberösterreich:</b> nur als Fußnote zu ZMK gedruckt, ein Wert je Region, per Korrekturregel übernommen.` });
-  if (r.land === "OÖ" && S.abschnitt === "PLAN")
-    out.push({ fallstrick: 8, text: `<b>OÖ PLAN spitalsambulant</b> ist laut Fußnote das fortgeschriebene IST 2022, kein neuer Plan.` });
-  const mx = D.matrizen[`${r.id}|${S.abschnitt}`];
-  if (mx && mx[3] === "aequivalent")
-    out.push({ fallstrick: 3, text: `<b>${esc(r.land_name)} plant in SVE</b>, nicht in ÄAVE. Gezeigt sind die ÄAVE-Äquivalente aus dem zweiten Block der Matrix (im PDF «ÄAVE-Ä»); nur die sind mit den anderen Ländern vergleichbar.` });
-  if (r.land === "Wien")
-    out.push({ fallstrick: 11, text: `<b>Wien</b> ist nicht Basis der Soll-Intervalle (Bundesdurchschnitt ohne Wien) und versorgt das Umland mit; Regionen mit Zentrumsfunktion liegen deshalb eher höher.` });
-  if (klein(w))
-    out.push({ fallstrick: 6, text: `<b>Weniger als 1 ÄAVE vom Intervall entfernt.</b> Lage und Position sind hier nicht belastbar.` });
-  if (S.ebene === "VR")
-    out.push({ fallstrick: 11, text: `<b>Ohne Patientenströme.</b> Regionen mit Zentrumsfunktion liegen eher höher, ihr Umland eher tiefer.` });
-  if (S.abschnitt === "IST")
-    out.push({ fallstrick: 11, text: `<b>IST an der Norm 2030 gemessen.</b> Das zeigt den Abstand zur Norm 2030, keine Verletzung im IST-Jahr. IST-Jahr dieses Landes: ${wI ? wI.jahr : "–"}.` });
-  return out;
+/* Detailspalte. Satz und Vorbehalte kommen aus data.json, erzeugt von rsg2030/darstellung.py – damit dieselbe
+   Zelle hier und auf den statischen Seiten denselben Text bekommt (docs/WEB.md). Die Texte stehen dort einmal,
+   mit Platzhaltern {0}, {1} …; eingesetzt wird nur, was die Daten liefern, und das wird escaped. */
+const fill = (vorlage, args) => String(vorlage).replace(/\{(\d+)\}/g, (_, i) => esc(args[i] == null ? "" : args[i]));
+function vorbehalte(r, f, ab) {
+  return (D.vorbehalte[`${r.id}|${ab}|${f}`] || []).map(([kennung, ...args]) => {
+    const v = D.vorbehalt_texte[kennung];
+    if (!v) throw new Error(`data.json: Vorbehalt «${kennung}» ohne Text`);
+    return { fallstrick: v[0], text: fill(v[1], args) };
+  });
 }
 function satz(w, label) {
-  if (!w) return `<p>${label}: kein Wert.</p>`;
-  if (w.lage === "im") return `<p>${label}: <b>im Soll-Intervall</b>.</p>`;
-  if (w.lage === "unter") return `<p>${label}: Bis zur Untergrenze fehlen <b class="num">${fmt(-w.abst)}</b> ÄAVE Sachleistung.</p>`;
-  return `<p>${label}: <b class="num">${fmt(w.abst)}</b> ÄAVE über der Obergrenze.</p>`;
+  const lage = !w || !w.lage ? "kein" : w.lage;
+  const abstand = w && (lage === "unter" || lage === "über") ? fmt(lage === "unter" ? -w.abst : w.abst) : "";
+  return fill(D.satz_vorlagen[lage], [label, abstand]);
 }
 function renderDetail() {
   const r = regionById[S.region], f = S.fach, fi = fachInfo[f], dg = vdDig(fi);
@@ -226,7 +207,7 @@ function renderDetail() {
     </div>
     <div class="minibar">${miniBar(wI, wP, fi, dg)}</div>
     <div class="say">${satz(first[0], first[1])}${satz(second[0], second[1])}</div>
-    <ul class="cav">${vorbehalte(r, f, wI, wP).map((v) => `<li>${v.text} <a href="${DATEN_MD}" target="_blank" rel="noopener noreferrer">Fallstrick ${v.fallstrick}</a></li>`).join("")}</ul>`;
+    <ul class="cav">${vorbehalte(r, f, S.abschnitt).map((v) => `<li>${v.text} <a href="${DATEN_MD}" target="_blank" rel="noopener noreferrer">Fallstrick ${v.fallstrick}</a></li>`).join("")}</ul>`;
 }
 function miniBar(wI, wP, fi, dg) {
   const W = 320, H = 46, x0 = 12, x1 = W - 12;
@@ -271,12 +252,21 @@ function renderHerkunft() {
   srcEl.open = !!S.src;
   const body = document.getElementById("src-body");
   const h = D.herkunft[`${r.id}|${ab}|${f}`], m = D.matrizen[`${r.id}|${ab}`], w = get(r.id, ab, f);
-  if (!h || !m) {
-    body.innerHTML = `<p class="t2">Diese Matrix weist für ${esc(f)} keinen Wert aus – also gibt es auch nichts herzuleiten.</p>`;
+  if (!m) {
+    body.innerHTML = `<p class="t2">Zu dieser Matrix liegt keine Herkunft vor.</p>`;
     return;
   }
   const [qi, seite, zeilePdf, block] = m, [pdf, ris, dateiUrl] = D.quellen[qi];
-  const blockText = block === "aequivalent" ? ` · <span class="t2">Block der ÄAVE-Äquivalente</span>` : "";
+  /* Die Quellenzeile steht auch dann da, wenn es keinen Wert gibt: Nur so kann man nachsehen, dass in der Matrix
+     wirklich nichts steht (docs/WEB.md, «Kein Wert»). */
+  const quelle = (zeileText) => `<p class="src-q"><span class="nb">${esc(pdf)}</span>, ${link(`${dateiUrl}#page=${seite}`, `<b>Seite ${seite}</b> öffnen`)}`
+    + `${zeileText}${block === "aequivalent" ? ` · <span class="t2">Block der ÄAVE-Äquivalente</span>` : ""} · ${link(ris, "Verordnung im RIS")}</p>`;
+  if (!h) {
+    const g = D.kein_wert[`${r.id}|${ab}|${f}`];
+    const grund = g ? fill(D.kein_wert_texte[g[0]], g.slice(1)) : `Diese Matrix weist für ${esc(f)} keinen Wert aus.`;
+    body.innerHTML = quelle("") + `<p class="t2">${grund}</p>`;
+    return;
+  }
   /* `zeile_pdf` ist die Zeilenbeschriftung wörtlich aus dem PDF. Sie fehlt in zwei Fällen, und beide sind eine
      Auskunft für sich: «manuell erfasst» = Bildseite ohne Textebene, leer = die Zeile ist im PDF nicht gedruckt
      (der Wert entsteht erst aus einer Regel). */
@@ -304,9 +294,7 @@ function renderHerkunft() {
       <p>${esc(grund)}</p></div>`;
   }).join("");
 
-  body.innerHTML = `
-    <p class="src-q"><span class="nb">${esc(pdf)}</span>, ${link(`${dateiUrl}#page=${seite}`, `<b>Seite ${seite}</b> öffnen`)}
-      · ${zeile(zeilePdf)}${blockText} · ${link(ris, "Verordnung im RIS")}</p>
+  body.innerHTML = quelle(` · ${zeile(zeilePdf)}`) + `
     <div class="src-scroll"><table class="src-t">
       <thead><tr><th scope="col">Matrixspalte</th><th scope="col">wie gedruckt</th><th scope="col">übernommen</th><th scope="col">Herkunft</th></tr></thead>
       <tbody>${zellen}</tbody>

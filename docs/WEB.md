@@ -55,6 +55,7 @@ Patientenströme, innerhalb des Intervalls kein Unterschied.
 | Schraffur | `AAVE_Abstand_Intervall` kleiner als 1 ÄAVE (Fallstrick 6) |
 | PUL und KFO | eigene Spalten, kursiv, als Teil von IM bzw. ZMK gekennzeichnet; im Anteilsbalken mitgezählt, weil der ÖSG beide mit eigenem Soll-Intervall bewertet (Textband S.38–39). Nicht über Fächer addieren (Fallstrick 4) |
 | Kein Wert | leere Zelle mit Strich (z. B. KFO in Wien und Vorarlberg, wo KFO in ZMK steckt) |
+| Kein Wert: Herkunft trotzdem | Die Klappe «Woher kommt diese Zahl?» nennt **auch ohne Wert** PDF, Seite und die Verordnung im RIS – nur so lässt sich nachsehen, dass in der Matrix wirklich nichts steht. Dazu ein Satz, woran es liegt: das Fach steckt im Elternfach (Zuschnitt sagt «… nicht getrennt ausgewiesen»), die Matrix hat die Spalte nicht (Kärnten, MKG – Fallstrick 13) oder die Zelle ist leer. Die Texte stehen in `darstellung.py` (`KEIN_WERT`), die Zuordnung je Zelle in `data.json` |
 | Positions-Plot | Achse von −1,5 bis 3; Werte darüber am Rand mit «›». Über dem Band zwei Zeilen: VDmin und VDmax als VD, darunter die Position −1 bis 3 (`Position_im_Intervall`). Je Zeile ein Maßstab, damit die Position nicht als VD gelesen wird; beide stehen oben, damit man sie auch bei 32 VR sieht. Die Lesehilfe («0 = VDmin, 1 = VDmax …») steht als Text unter dem Bild, nicht als Beschriftung darin: Text in einer Grafik bricht nicht um und wäre am Handy an beiden Enden abgeschnitten |
 | Rohtext der Herkunft | unverändert, wie gedruckt («191,8», «-», «n.v.»); nie durch die Zahlformatierung der Seite. Was «-» und «n.v.» bedeuten, steht als Satz dabei (DATEN.md, «Zellbedeutung») |
 | Werte der Herkunft | exakt, mindestens eine Nachkommastelle wie in den Matrizen – anders als sonst auf der Seite, wo ÄAVE fürs Lesen auf eine Stelle gerundet sind. In dieser Ansicht soll der Wert im PDF wiederzufinden sein |
@@ -65,6 +66,25 @@ Patientenströme, innerhalb des Intervalls kein Unterschied.
 | keine Markierung der Zahl im PDF | `#search=` markiert in den meisten Betrachtern nichts und in den übrigen oft die falsche Zelle: Der Rohtext einer gezeigten Zelle ist auf seiner PDF-Seite meist **nicht** eindeutig (nachzurechnen mit `python -m rsg2030.scripts.rohtext_eindeutig`; «-» steht auf einer Seite hunderte Mal). Eine falsche Markierung wäre schlechter als keine. Statt zu markieren, nennt die Seite Zeile und Spalte, in denen die Zahl steht |
 | Prüfsummen der Fußzeile | eine Zeile für beide Tabellen, das Release einmal genannt – sie kommen aus demselben. Die Prüfsummen auf zwölf Zeichen gekürzt wie in der Konsole, dahinter `SHA256SUMS.txt` des Release. Zwölf Zeichen sagen, **welche** Datei gezeigt wird; **belegen** kann die Seite sie nicht – eine Prüfsumme neben den Daten, die sie prüfen soll, ist kein Beweis. Der Beleg liegt im Release und in `erwartete_ausgaben.csv`, und dafür braucht man den Link, nicht die Zeichen auf der Seite. Zweimal 64 Zeichen kosteten am Handy vier Zeilen |
 | Farben | Nachbarstufen müssen sich deutlich unterscheiden, auch bei Farbsehschwäche (Protanopie, Deuteranopie): Abstand ΔE (OKLab × 100) mindestens 8. Ein Test rechnet das aus den Farben der Seite nach |
+
+## Der Satz und die Vorbehalte stehen einmal
+
+Zu jeder Zelle gehören zwei Texte, die nicht aus den Daten kommen, sondern Festlegungen der Darstellung sind: **der
+Wert in Worten** («Bis zur Untergrenze fehlen … ÄAVE Sachleistung») und die **Vorbehalte**, die für diese Zelle
+gelten. Beide stehen in [`rsg2030/darstellung.py`](../rsg2030/darstellung.py) – einmal, für jede Darstellung des
+Datensatzes:
+
+- `web.py` schreibt die Texte nach `data.json` (`vorbehalt_texte`, `satz_vorlagen`) und dazu je Zelle, **welche**
+  Vorbehalte gelten (`vorbehalte`, Kennung und Argumente); `app.js` setzt nur noch ein.
+- Die statischen Seiten nehmen dieselben Funktionen direkt.
+
+Warum nicht in `app.js`, wo sie standen: Vorbehalte folgen den Daten (CLAUDE.md). Ändert sich die Lesart einer
+Fußnote, muss ein Text an einer Stelle nachgezogen werden, nicht an zwei – zwei Kopien laufen auseinander, und
+niemand merkt es. Nicht mitgewandert sind Farbstufen, Schraffur und Zahlformate: Die statischen Seiten haben keine
+Farben, und jede Darstellung formatiert Zahlen selbst. Geteilt ist nur, was wörtlich gleich sein muss.
+
+Die Texte enthalten HTML und Platzhalter (`{0}`, `{1}` …). Eingesetzt wird nur, was aus den Daten kommt (Name des
+Landes, IST-Jahr, Fach), und das wird maskiert.
 
 ## Entscheidungen
 
@@ -134,6 +154,7 @@ web/                  die Seite: index.html, app.js, style.css
   fonts/                IBM Plex, selbst ausgeliefert (Lizenz SIL OFL, fonts/README.md)
   kacheln.csv           je Region Spalte und Zeile der Kachelkarte und die Beschriftung der Kachel (VR und BL)
   faecher.csv           Fächer in der Reihenfolge der Spalten, Name, «Teil von» (PUL → IM, KFO → ZMK)
+rsg2030/darstellung.py  der Wert in Worten und die Vorbehalte je Zelle – einmal für jede Darstellung (siehe oben)
 rsg2030/web.py        «python -m rsg2030 web»: Tabellen Versorgungsdichte und Planungsmatrizen → data.json,
                         Seite nach daten_ergebnis/web/; `baue_herkunft` baut den Herkunfts-Teil
 rsg2030/korrekturen.py  `regel_fuer_zelle`: welche Regel aus korrekturen.csv eine korrigierte Zelle erklärt
@@ -185,6 +206,9 @@ dann nicht laden darf; dafür der kleine Server.
 | Seite passt nicht mehr zur Tabelle (Spalte, Fach oder Region neu oder weg) | `python -m rsg2030 web` bricht mit Meldung ab; Tests dafür |
 | Zahl auf der Seite weicht von der Tabelle ab | Test (ganze Suite): `data.json` gegen die Tabelle |
 | ein Vorbehalt verweist auf einen Fallstrick, den es nicht mehr gibt | Test: jeder Vorbehalt nennt seinen Fallstrick, und den gibt es in DATEN.md |
+| Vorbehalt oder Satz stehen doppelt (Python **und** app.js) und laufen auseinander | Test: kein Text aus `darstellung.py` kommt in `app.js` vor |
+| eine Zelle ohne Wert hat keinen Grund und keinen Sprung in die Quelle | Test: zu jeder Zelle ohne Wert gibt es einen Grund und einen Matrix-Eintrag mit PDF und Seite |
+| ein Platzhalter bleibt leer, «{0}» steht auf der Seite | Test: je Zelle passen die Argumente zu den Platzhaltern des Textes, und keines ist leer |
 | Farbstufen nicht unterscheidbar | Test: Abstände benachbarter Stufen aus `style.css` nachgerechnet, normal und bei Protanopie und Deuteranopie, hell und dunkel; dunkle Farben gleich, ob über die Systemeinstellung oder den Schalter |
 | Seite gibt etwas an fremde Server (z. B. Schriften von Google: IP-Adresse jeder Besucherin dorthin) | Tests: keine Schriften, Skripte oder Stile von außen, jede Schrift der CSS liegt in `web/fonts/`; jeder Link nach außen trägt `noreferrer`, gibt also nicht weiter, von welcher Seite jemand kam |
 | Link auf Lösungswerk, Impressum oder Datenschutz führt ins Leere | der Herausgeber: Die drei Adressen führen auf die eigene Website. Kein Test ruft sie auf, denn weder die Seite noch ihr Bau sollen fremde Server befragen |

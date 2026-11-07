@@ -32,6 +32,7 @@ from oesg_methodik.faecher import ZAE, ZAE_QUELLE, teile
 from rsg2030.abgleich import gleiche_ab, paketversion
 from rsg2030.analyse_eingang import lade_matrix_long
 from rsg2030.config import LONG_DATEI, VERSORGUNGSDICHTE_DATEI, ausgabe_dir
+from rsg2030.darstellung import KEIN_WERT, SATZ, VORBEHALTE, Zelle, kein_wert, vorbehalte
 from rsg2030.korrekturen import lade_regeln, regel_fuer_zelle
 from rsg2030.protokoll import einrichten, schreibe_laufprotokoll
 from rsg2030.quellen import ist_rsg_verordnung, lade_quellen, ogd_pdf_url, ris_dokument_url
@@ -65,6 +66,10 @@ HERKUNFT_ANGABE = ["spalte", "roh", "wert", "quelle", "regel", "zeile_pdf"]
 """`herkunft`: je eingegangener Matrixspalte die Spalte, der Text wie gedruckt (`Roh`), der Wert nach Korrektur,
 die `Quelle` (PDF | manuell | korrigiert | abgeleitet), der Index in `regeln` und – nur wo die Angabe aus einer
 anderen Zeile als «insgesamt» kommt (ZAE) – deren Beschriftung im PDF."""
+VORBEHALT_ANGABE = ["kennung", "argumente"]
+"""`vorbehalte`: je Zelle (Region, Abschnitt, Fach) die Kennungen der Vorbehalte in der Reihenfolge, in der sie
+gezeigt werden, jede mit den Argumenten ihrer Platzhalter – `[kennung, arg0, arg1, …]`. Die Texte stehen einmal
+unter `vorbehalt_texte`, die Auswahl trifft `rsg2030.darstellung` (für Dashboard und statische Seiten gleich)."""
 REGEL_ANGABE = ["regel", "art", "begruendung"]
 """`regeln`: je genannter Korrekturregel Name, Art und Begründung, wörtlich aus `korrekturen.csv`."""
 
@@ -313,6 +318,86 @@ def baue_herkunft(insgesamt: pd.DataFrame, long: pd.DataFrame, regeln: pd.DataFr
     return {"quellen": quellen, "matrizen": matrizen, "herkunft": herkunft, "regeln": regel_angaben}
 
 
+def _zelle_fuer_darstellung(werte: dict[str, list[object]], rid: str, abschnitt: str, fach: str) -> Zelle | None:
+    """Zelle aus `werte` (Reihenfolge `WERT`) für `rsg2030.darstellung`; None, wenn die Region das Fach nicht hat."""
+    w = werte.get(f"{rid}|{abschnitt}|{fach}")
+    if w is None:
+        return None
+    lage, abstand, zuschnitt, jahr = w[4], w[6], w[7], w[3]
+    return Zelle(
+        lage=str(lage) if lage is not None else None,
+        aave_abstand=float(abstand) if isinstance(abstand, int | float) else None,
+        zuschnitt=str(zuschnitt) if zuschnitt is not None else None,
+        jahr=int(jahr) if isinstance(jahr, int | float) else None,
+    )
+
+
+def _vorbehalte(
+    werte: dict[str, list[object]],
+    faecher: list[dict[str, object]],
+    regionen: list[dict[str, object]],
+    matrizen: dict[str, list[object]],
+) -> dict[str, list[list[object]]]:
+    """Je Zelle die Vorbehalte, die für sie gelten (`rsg2030.darstellung.vorbehalte`)."""
+    teil_von = {str(f["id"]): f["teil_von"] for f in faecher}
+    out: dict[str, list[list[object]]] = {}
+    for r in regionen:
+        rid, ebene = str(r["id"]), str(r["ebene"])
+        am = {ab: _zelle_fuer_darstellung(werte, rid, ab, "AM") for ab in ("IST", "PLAN")}
+        ist = _zelle_fuer_darstellung(werte, rid, "IST", "AM")
+        for abschnitt in ("IST", "PLAN"):
+            matrix = matrizen.get(f"{rid}|{abschnitt}")
+            for fach in teil_von:
+                zelle = _zelle_fuer_darstellung(werte, rid, abschnitt, fach)
+                if zelle is None:
+                    continue
+                vb = vorbehalte(
+                    fach=fach,
+                    teil_von=None if teil_von[fach] is None else str(teil_von[fach]),
+                    abschnitt=abschnitt,
+                    ebene=ebene,
+                    land=str(r["land"]),
+                    land_name=str(r["land_name"]),
+                    block=str(matrix[3]) if matrix is not None else None,
+                    zelle=zelle,
+                    am_ist=am["IST"],
+                    am_plan=am["PLAN"],
+                    ist_jahr=ist.jahr if ist is not None else None,
+                )
+                out[f"{rid}|{abschnitt}|{fach}"] = [[kennung, *args] for kennung, args in vb]
+    return out
+
+
+def _fehlende(
+    werte: dict[str, list[object]],
+    faecher: list[dict[str, object]],
+    regionen: list[dict[str, object]],
+    long: pd.DataFrame,
+) -> dict[str, list[object]]:
+    """Je Zelle **ohne** Wert, warum sie keinen hat (`rsg2030.darstellung.kein_wert`).
+
+    Die Darstellung soll auch dann PDF und Seite nennen: Nur so kann man nachsehen, dass in der Matrix wirklich
+    nichts steht (docs/WEB.md, «Kein Wert»)."""
+    teil_von = {str(f["id"]): f["teil_von"] for f in faecher}
+    spalten_je_land = {str(land): set(g["Fach"]) for land, g in long.groupby("Land")}
+    out: dict[str, list[object]] = {}
+    for r in regionen:
+        rid, land = str(r["id"]), str(r["land"])
+        for abschnitt in ("IST", "PLAN"):
+            for fach, eltern in teil_von.items():
+                if f"{rid}|{abschnitt}|{fach}" in werte:
+                    continue
+                zelle = _zelle_fuer_darstellung(werte, rid, abschnitt, str(eltern)) if eltern else None
+                kennung, args = kein_wert(
+                    fach=fach,
+                    teil_von=None if eltern is None else str(eltern),
+                    zuschnitt_elternfach=zelle.zuschnitt if zelle else None,
+                    spalte_in_matrix=fach in spalten_je_land.get(land, set()),
+                )
+                out[f"{rid}|{abschnitt}|{fach}"] = [kennung, *args]
+    return out
+
+
 def baue_daten(tabelle: pd.DataFrame, regionen: pd.DataFrame, kacheln: pd.DataFrame, faecher: pd.DataFrame,
                long: pd.DataFrame, regeln: pd.DataFrame, meta: dict[str, str]) -> dict[str, object]:  # fmt: skip
     """Inhalt von `data.json`: Zeile «insgesamt» der Tabelle Versorgungsdichte, wie sie ist, dazu die Herkunft
@@ -329,12 +414,23 @@ def baue_daten(tabelle: pd.DataFrame, regionen: pd.DataFrame, kacheln: pd.DataFr
         f"{r['Region_ID']}|{r['Abschnitt']}|{r['Fach']}": [_wert(s, r[s]) for s in WERT]
         for r in insgesamt.to_dict("records")
     }
+    faecher_liste = _faecher(insgesamt, faecher)
+    regionen_liste = _regionen(insgesamt, regionen, kacheln)
+    herkunft = baue_herkunft(insgesamt, long, regeln)
+    matrizen = herkunft["matrizen"]
+    assert isinstance(matrizen, dict)
     return {
         "meta": meta,
-        "faecher": _faecher(insgesamt, faecher),
-        "regionen": _regionen(insgesamt, regionen, kacheln),
+        "faecher": faecher_liste,
+        "regionen": regionen_liste,
         "werte": werte,
-        **baue_herkunft(insgesamt, long, regeln),
+        # Texte einmal, Auswahl je Zelle – dieselbe Schicht wie die statischen Seiten (rsg2030/darstellung.py)
+        "vorbehalt_texte": {k: [v.fallstrick, v.text] for k, v in VORBEHALTE.items()},
+        "satz_vorlagen": SATZ,
+        "vorbehalte": _vorbehalte(werte, faecher_liste, regionen_liste, matrizen),
+        "kein_wert_texte": KEIN_WERT,
+        "kein_wert": _fehlende(werte, faecher_liste, regionen_liste, long),
+        **herkunft,
     }
 
 

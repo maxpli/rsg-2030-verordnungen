@@ -17,6 +17,7 @@ from oesg_methodik.bevoelkerung import lade_regionen
 from oesg_methodik.faecher import ZAE, ZAE_QUELLE, ZUSCHNITT
 from oesg_methodik.richtwerte import lade_richtwerte
 from rsg2030.analyse_eingang import lade_matrix_long
+from rsg2030.darstellung import KEIN_WERT, VORBEHALTE, Zelle, platzhalter, satz, vorbehalte
 from rsg2030.korrekturen import REGEL_SPALTEN, lade_regeln
 from rsg2030.quellen import OGD_HOST
 from rsg2030.schema import matrix_long
@@ -74,11 +75,80 @@ def fallstricke_in_daten_md() -> set[int]:
 
 
 def test_jeder_vorbehalt_nennt_einen_fallstrick_den_es_gibt():
+    """Jeder Vorbehalt verweist auf einen Fallstrick, den docs/DATEN.md wirklich hat."""
+    vorhanden = fallstricke_in_daten_md()
+    for kennung, v in VORBEHALTE.items():
+        assert v.fallstrick in vorhanden, f"Vorbehalt «{kennung}» nennt Fallstrick {v.fallstrick}, den es nicht gibt"
+
+
+def test_die_texte_stehen_nur_in_python():
+    """Die Texte dürfen nicht noch einmal in app.js stehen – sonst laufen Dashboard und Seiten auseinander."""
     js = (WEB / "app.js").read_text(encoding="utf-8")
-    teil = js.split("function vorbehalte(", 1)[1].split("\nfunction ", 1)[0]
-    genannt = [int(n) for n in re.findall(r"fallstrick: (\d+)", teil)]
-    assert len(genannt) == teil.count("out.push("), "ein Vorbehalt ohne Fallstrick"
-    assert set(genannt) <= fallstricke_in_daten_md(), "Vorbehalt verweist auf einen Fallstrick, den es nicht gibt"
+    for kennung, v in VORBEHALTE.items():
+        anfang = v.text.split("<b>", 1)[-1].split("</b>", 1)[0][:20]
+        assert anfang not in js, f"Vorbehalt «{kennung}» steht auch in app.js"
+    assert "Bis zur Untergrenze fehlen" not in js, "der Satz in Worten steht auch in app.js"
+
+
+def test_jeder_vorbehalt_bekommt_die_argumente_seiner_platzhalter():
+    """Zu jedem Platzhalter im Text gibt es ein Argument – sonst stünde «{0}» auf der Seite."""
+    daten = baue(kleine_tabelle())
+    for schluessel, liste in daten["vorbehalte"].items():
+        for kennung, *args in liste:
+            erwartet = platzhalter(VORBEHALTE[kennung].text)
+            assert erwartet == set(range(len(args))), f"{schluessel}: «{kennung}» braucht {erwartet}, hat {args}"
+            assert all(a for a in args), f"{schluessel}: «{kennung}» mit leerem Argument"
+
+
+def test_jede_zelle_ohne_wert_hat_grund_und_quelle():
+    """Auch ohne Wert muss die Darstellung sagen, woran es liegt, und in die Quelle springen können."""
+    daten = baue(kleine_tabelle())
+    faecher = [str(f["id"]) for f in daten["faecher"]]
+    for r in daten["regionen"]:
+        for abschnitt in ("IST", "PLAN"):
+            for fach in faecher:
+                schluessel = f"{r['id']}|{abschnitt}|{fach}"
+                if schluessel in daten["werte"]:
+                    continue
+                grund = daten["kein_wert"].get(schluessel)
+                assert grund, f"{schluessel}: kein Wert und kein Grund"
+                kennung, *args = grund
+                assert set(range(len(args))) == platzhalter(KEIN_WERT[kennung]), f"{schluessel}: {kennung} {args}"
+                assert f"{r['id']}|{abschnitt}" in daten["matrizen"], f"{schluessel}: keine Matrix mit PDF und Seite"
+
+
+def test_satz_in_worten():
+    """Der Satz nennt den ÄAVE-Abstand ohne Vorzeichen und sagt, in welche Richtung er fehlt."""
+    assert "im Soll-Intervall" in satz(Zelle("im", 0.0, "PSY", 2030), "PLAN 2030")
+    assert 'Bis zur Untergrenze fehlen <b class="num">3,4</b>' in satz(Zelle("unter", -3.4, "PSY", 2030), "PLAN")
+    assert '<b class="num">2,5</b> ÄAVE über der Obergrenze' in satz(Zelle("über", 2.5, "PSY", 2030), "PLAN")
+    assert "kein Wert" in satz(None, "IST 2022")
+
+
+def test_kfo_vorbehalt_trennt_korrekturregel_von_nicht_getrennt():
+    """Oberösterreich (Fußnote, Korrekturregel) und Wien/Vorarlberg (in ZMK enthalten) sind zwei Befunde."""
+
+    def fuer(land: str, land_name: str, zuschnitt: str) -> dict[str, tuple[str, ...]]:
+        return dict(
+            vorbehalte(
+                fach="ZMK",
+                teil_von=None,
+                abschnitt="PLAN",
+                ebene="BL",
+                land=land,
+                land_name=land_name,
+                block="haupt",
+                zelle=Zelle("im", 0.0, zuschnitt, 2030),
+                am_ist=None,
+                am_plan=None,
+                ist_jahr=2022,
+            )
+        )
+
+    ooe = fuer("OÖ", "Oberösterreich", "ZMK + KFO (KFO nicht in der Tabelle, per Korrekturregel)")
+    wien = fuer("Wien", "Wien", "ZMK (KFO nicht getrennt ausgewiesen)")
+    assert "kfo_korrekturregel" in ooe and "kfo_nicht_getrennt" not in ooe
+    assert "kfo_nicht_getrennt" in wien and "kfo_korrekturregel" not in wien
 
 
 # --- Farben ---------------------------------------------------------------------------------------------------------
@@ -334,6 +404,38 @@ def test_data_json_gleich_tabelle():
             soll = r[spalte]
             assert wert == (int(soll) if spalte in ("Bevoelkerung", "Jahr") else soll), (r["Region_ID"], spalte)
     assert {(r["ebene"], r["id"]) for r in d["regionen"]} == set(zip(ins["Ebene"], ins["Region_ID"].astype(str)))
+
+
+@pytest.mark.slow
+def test_kfo_vorbehalt_genau_wo_die_spalte_fehlt():
+    """«KFO nicht getrennt ausgewiesen» steht genau an den Zellen, deren Zuschnitt das sagt – und nur dort.
+
+    Trennt die beiden KFO-Befunde: Wien und Vorarlberg führen KFO in ZMK (Fußnote bzw. Textteil),
+    Oberösterreich übernimmt es per Korrekturregel aus einer Fußnote (docs/DATEN.md, Fallstrick 4).
+    """
+    from rsg2030.versorgungsdichte import baue_versorgungsdichte
+
+    tabelle = baue_versorgungsdichte()
+    d = baue(tabelle, long=lade_matrix_long(), regeln=lade_regeln())
+    ins = tabelle[tabelle["Zeile_ID"] == "insgesamt"]
+
+    def zellen(kennung: str) -> set[str]:
+        return {k for k, liste in d["vorbehalte"].items() if any(v[0] == kennung for v in liste)}
+
+    def laut_zuschnitt(text: str) -> set[str]:
+        treffer = ins[ins["Zuschnitt"].str.contains(text, regex=False, na=False)]
+        return {f"{r.Region_ID}|{r.Abschnitt}|{r.Fach}" for r in treffer.itertuples()}
+
+    assert zellen("kfo_nicht_getrennt") == laut_zuschnitt("KFO nicht getrennt ausgewiesen")
+    assert zellen("kfo_korrekturregel") == laut_zuschnitt("per Korrekturregel")
+    laender = {ins.loc[ins["Region_ID"] == k.split("|")[0], "Land"].iloc[0] for k in zellen("kfo_nicht_getrennt")}
+    assert laender == {"Wien", "Vorarlberg"}
+
+    # Was außer KFO noch in ZMK steckt, sagt nur Wiens Fußnote (5) – der Vorbehalt gilt deshalb nur dort
+    wien_zmk = {
+        f"{r.Region_ID}|{r.Abschnitt}|{r.Fach}" for r in ins.itertuples() if r.Land == "Wien" and r.Fach == "ZMK"
+    }
+    assert zellen("wien_zmk_breiter") == wien_zmk
 
 
 @pytest.mark.slow
