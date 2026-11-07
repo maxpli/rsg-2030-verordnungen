@@ -40,3 +40,6 @@ Textband;78;Standardversorgungseinheiten (SVE) verwendet, so ist auf Ebene des B
 Textband;227;Ärztliche ambulante Versorgungseinheit (ÄAVE): Messgröße für das durchschnittliche ärztliche Leistungsvolumen;Glossar: ÄAVE (R2a)
 Textband;235;Standardversorgungseinheit (SVE): Messgröße für das durchschnittliche ärztliche Leistungsvolumen (differenziert;Glossar: SVE (R6)
 Textband;236;Privatordination führen. Die Fachrichtungszuordnung erfolgt über ein in der (Zahn-)Ärzteliste definiertes Erstfach;Glossar: Wahlärzt:innen (R1)
+Tabellenband;239;"URO PCH(2) PUL ORTR(3) MKG ZMK STR RAD NUK PMR PAT LAB";Vorlage hat eine PUL-Spalte, aber keine KFO-Spalte: hinter ZMK folgt direkt STR (R4)
+Textband;76;"hat in Struktur und Aufbau dem Anhang 9 zu entsprechen und kann um weitere bundeslandspezifische Planungsgrößen und Zusatzinformationen ergänzt werden";Ergänzungen und Fußnoten-Klarstellungen der Länder sind zulässig (R4)
+Textband;12;"KFO Kieferorthopädie";KFO steht im Textband nur im Abkürzungsverzeichnis, nicht als Fachbereich der Vorlage (R4)

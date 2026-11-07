@@ -235,6 +235,15 @@ Bitte vor jeder Auswertung lesen.
     ([METHODIK.md](METHODIK.md#bekannte-grenzen-und-offene-fragen), Punkt 7); die VD
     und die Position im Soll-Intervall dieser beiden Regionen tragen diese Unschärfe.
 
+13. **Ein Fach kann in einem Land ganz fehlen.** Die ÖSG-Vorlage gibt die Fachspalten vor, aber ein Land kann sie
+    ergänzen oder weglassen (Textband S.76; [METHODIK.md](METHODIK.md), R4). Für die Kennzahlen heißt das:
+    **Kärnten druckt keine MKG-Spalte** – Mund-, Kiefer- und Gesichtschirurgie fehlt dort in allen drei Matrizen
+    (Land, VR 21, VR 22), in IST und PLAN, ohne Fußnote. In der Tabelle Versorgungsdichte gibt es für Kärnten also
+    keine MKG-Zeile; ein Ländervergleich für MKG umfasst 8 von 9 Ländern. Ebenso fehlt die Spalte STR
+    (Strahlentherapie) in Burgenland, Kärnten, Salzburg und Tirol – STR hat keinen Richtwert und kommt in den
+    Kennzahlen nicht vor. Dass ein Fach fehlt, ist in den Kennzahlen daran zu sehen, dass die Zeile nicht da ist
+    (nicht an einer 0): Welche Fächer je Land fehlen, nennt der Prüfbericht («Spalten gegen die ÖSG-Vorlage»).
+
 ---
 
 ## `RSG_2030_Planungsmatrizen.csv`
@@ -315,7 +324,9 @@ Vorsatz `ist_`/`plan_`).
 | `slst_zus_oegk/_svs/_bvaeb` | Stellen | PLAN | zusätzliche trägerspezifische Sachleistungsstellen; `slst_zus_oegk` ist in allen Matrizen 0 oder «-» | nur je Träger und Land; [Stellen lesen](#stellen-lesen) |
 | `…_max_vaep_prozent` | Prozent | PLAN | zur jeweils vorigen Stellen-Zeile (`vaep` kurz für **v**ertrags**ä**rztliche **P**lanstellen): **wie viele dieser Stellen höchstens als Kassenpraxis** (vertragsärztliche Planstelle, niedergelassen) besetzt werden dürfen; der Rest ist für Ärzt:innen in Ambulatorien vorgesehen. 100 % = alle dürfen Kassenpraxis sein, 0 % = alle im Ambulatorium (Tabellenband S.232: Sachleistungsstellen «umfassen Planstellen für niedergelassene VertragsärztInnen und der geplanten ärztlichen Vollzeitäquivalente in Ambulatorien … Davon ist jeweils der Maximalanteil für vertragsärztliche Planstellen in Prozent auszuweisen»). gesamt = mit den Stellen gewichtetes Mittel der Fach-% | nur je Land, nie summieren |
 | `umr_spitalsambulant`, `umr_niedergelassen`, `umr_selbst_amb`, `umr_kassen_amb`, `umr_wahl` | Faktor | IST/PLAN | Umrechnungsfaktoren SVE → ÄAVE (nur Block `aequivalent`), je Teilzeile: Name = `umr_` + Zeile_ID der Teilzeile; Abschnitt und Jahr laut Überschrift der Faktoren: meist «IST 2022», Steiermark BL «PLAN 2030» | nur Beleg (Rechenweg SVE → ÄAVE-Äquivalente) |
-| `extramural_inkl_wahl`, `gastpat_*`, `slst_gesamt` | | | Wien-spezifische Zeilen | nur Beleg |
+| `extramural_inkl_wahl` | ÄAVE | IST | nur Wien: «ÄAVE Summe extramural inkl. WahlärztInnen» = `extramural` + `wahl` (bis auf Wiens Ganzzahl-Rundung). **Nicht** die Basis der Kennzahlen: Die Tabelle Versorgungsdichte zählt nur die Sachleistung ([METHODIK.md](METHODIK.md), R1; Fallstrick 1) | nur Beleg – nicht mit `extramural` anderer Länder vergleichen |
+| `gastpat_spitalsambulant`, `gastpat_extramural` | ÄAVE | PLAN | nur Wien: «- davon für inländische Gastpatient*innen (spitalsambulant)» bzw. «(extramural)», je **Teilmenge** der Zeile darüber. Die einzige Stelle in allen 41 Matrizen, an der ein Land die Mitversorgung von außerhalb beziffert – die Versorgungsdichte teilt sonst durch die Wohnbevölkerung der Region (Fallstrick 11) | Teilmenge – nicht addieren und nicht abziehen; nur Wien |
+| `slst_gesamt`, `slst_gesamt_max_vaep_prozent` | Stellen, Prozent | PLAN | nur Wien: «PLAN Sachleistungsstellen 2030 gesamt» – in allen 27 Fachspalten genau `slst_gemeinsam` + die drei `slst_zus_*` (nachgerechnet in `tests/test_stellen.py`) | nur Beleg |
 
 Reihenfolge wie in der ÖSG-Vorlage (Tabellenband S.239). «Auswerten»: *Länder vergleichen* = gleich definiert in
 allen Ländern (Fallstricke beachten) · *nur je Land* = Definition oder Ausfüllung unterscheidet sich zwischen Ländern ·

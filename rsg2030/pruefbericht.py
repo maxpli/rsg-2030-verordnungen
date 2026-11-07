@@ -14,6 +14,7 @@ import pandas as pd
 
 from rsg2030.abgleich import paketversion
 from rsg2030.manuell import manuelle_matrizen
+from rsg2030.vorlage import spalten_abweichung
 
 if TYPE_CHECKING:
     from rsg2030.freigabe import FreigabeStand
@@ -35,6 +36,27 @@ def _tabelle(df: pd.DataFrame) -> list[str]:
         for r in df.itertuples(index=False)
     ]
     return [kopf, trenner, *zeilen]
+
+
+def _vorlage_spalten(long: pd.DataFrame) -> list[str]:
+    """Je Land die Fachspalten gegen die ÖSG-Vorlage (Tabellenband S.239).
+
+    Ergänzen und Weglassen erlaubt der ÖSG (Textband S.76), aber ein fehlendes Fach fehlt auch in den Kennzahlen –
+    ohne diese Zeile sieht das niemand, der nur die Ausgaben liest (docs/DATEN.md, Fallstrick 13).
+    """
+    # Nicht über _tabelle: die richtet alles nach der ersten Spalte rechts aus, was für Text schlecht liest
+    return [
+        "",
+        "**Spalten gegen die ÖSG-Vorlage** (Tabellenband S.239); Ergänzungen und Weglassen sind laut Textband S.76",
+        "zulässig – ein weggelassenes Fach fehlt aber auch in den Kennzahlen (docs/DATEN.md, Fallstrick 13).",
+        "",
+        "| Land | Abweichung |",
+        "|---|---|",
+        *[
+            f"| {land} | {spalten_abweichung(set(g['Fach'])) or 'genau wie die Vorlage'} |"
+            for land, g in long.groupby("Land", sort=False)
+        ],
+    ]
 
 
 def _zweitlesung(p: PipelineErgebnis) -> list[str]:
@@ -82,6 +104,8 @@ def bericht(p: PipelineErgebnis, fg: FreigabeStand | None, ergebnis: str) -> str
                 columns=["", "Anzahl"],
             )
         ),
+        "",
+        *_vorlage_spalten(long),
         "",
         "## 2. Zweitlesung",
         "",

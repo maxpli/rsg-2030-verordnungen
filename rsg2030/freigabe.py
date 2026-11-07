@@ -205,7 +205,7 @@ def _spalten(p: PipelineErgebnis) -> pd.DataFrame:
                 dict(
                     Land=name,
                     PDF=g["PDF"].iloc[0],
-                    Zuordnung=f"Spalten anders als in der ÖSG-Vorlage – {abweichung}",
+                    Zuordnung=f"Spalten anders als in der ÖSG-Vorlage (laut Textband S.76 zulässig) – {abweichung}",
                     Vorkommen=g["wo"].iloc[0] + (f" (und {len(g) - 1} weitere Kopfzeilen)" if len(g) > 1 else ""),
                     Darunter=g["Darunter"].iloc[0],
                     Schluessel=f"{name}|Vorlage",

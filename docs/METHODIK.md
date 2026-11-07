@@ -178,6 +178,23 @@ Wer Österreich-Werte braucht, rechnet sie in der eigenen Analyse und legt dort 
 ZMK STR RAD NUK PMR PAT LAB SON/IDB(5) gesamt»), ohne die Fußnotenzeichen; dazu KFO, das sechs Länder als eigene Spalte
 führen. Was die Fußnoten der Vorlage bedeuten: [DATEN.md](DATEN.md#fußnoten).
 
+**Die Vorlage hat keine KFO-Spalte** – anders als bei PUL. Auf der Richtwertseite (Textband S.39) sind PUL und KFO
+dieselbe Art Zeile, je eine Unterzeile «- davon …» mit eigenem Soll-Intervall; in der Vorlage hat PUL eine eigene
+Spalte, KFO nicht. Auf der Vorlagenseite (Tabellenband S.239) kommen «KFO» und «kieferorthopädisch» überhaupt nicht
+vor: nicht als Spalte, nicht als Zeile und nicht in den Fußnoten, die es für andere Teilmengen gibt («davon in
+Akut-Ordinationen EVA», «davon in Unfallchirurgie (UC)», «zugeordnet zu CH»). Hinter ZMK folgt direkt STR. Begründet
+wird das in keinem der drei Bände (Textband: KFO nur im Abkürzungsverzeichnis S.12, in der Richtwerttabelle S.39 und
+zweimal im Leistungsteil zur Gratiszahnspange; Methodenband: keine Nennung).
+
+**Dass die Länder KFO trotzdem unterschiedlich ausweisen durften, sagt der ÖSG selbst** (Textband S.76): «Die RSG-PM
+hat in Struktur und Aufbau dem Anhang 9 zu entsprechen und kann um weitere bundeslandspezifische Planungsgrößen und
+Zusatzinformationen ergänzt werden. Im jeweiligen RSG können Klarstellungen zur RSG-PM hinsichtlich der Darstellung in
+Fußnoten getroffen werden.» Beide Wege wurden benutzt: sechs Länder ergänzten eine KFO-Spalte, Wien und Vorarlberg
+stellten per Fußnote bzw. Textteil klar, dass KFO in ZMK steckt, Oberösterreich nennt es in einer Fußnote mit einem
+Wert je Region (Tabelle unten). Die Uneinheitlichkeit ist also kein Formfehler der Länder, sondern die Folge einer
+Vorlage, die für einen Richtwert keine Zelle vorsieht und das Ergänzen ausdrücklich erlaubt
+(«Bekannte Grenzen» 8).
+
 **Zuschnitt für den Richtwert.** Die Richtwerttabelle (Textband S.39) schneidet manche Fächer anders zu als die
 Spalten der Matrix. Für den Vergleich zählen die Kennzahlen die Spalten so zusammen, wie der Richtwert sie enthält:
 
@@ -191,7 +208,7 @@ Spalten der Matrix. Für den Vergleich zählen die Kennzahlen die Spalten so zus
 | ZMK | ZMK + KFO | Unterzeile «- davon mit kieferorthopädischem Schwerpunkt»; KFO je Land siehe unten |
 | KFO | KFO | eigenes Soll-Intervall der Unterzeile (2,8–5,1); nur wo KFO eine eigene Spalte hat oder aus der Fußnote kommt (OÖ) |
 | KJP | KJP | Richtwert «in Anlehnung an die Bedarfsplanungsrichtlinie in Deutschland» (Fußnote 1) |
-| KIJU, GGH, NEU, PSY, DER, AU, HNO, URO, MKG | gleichnamige Spalte | |
+| KIJU, GGH, NEU, PSY, DER, AU, HNO, URO, MKG | gleichnamige Spalte | **MKG: Kärnten druckt keine MKG-Spalte** – dort fehlt das Fach in allen drei Matrizen und damit in den Kennzahlen, ohne Fußnote ([DATEN.md](DATEN.md#fallstricke), Fallstrick 13) |
 | KJC, NCH, PCH | – | kein Richtwert («*»); KJC und PCH gehen in CH ein, NCH «in Regiomed nicht berücksichtigt» (Vorlage, Fußnote (1)) |
 | RAD, LAB, NUK, PAT, PMR | – | keine Richtwerte, nicht im Regiomed-Modell (Textband S.39; Methodenband S.26) |
 | AN, STR, SON/IDB | – | keine Richtwertzeile; SON/IDB spitalsambulant geht als ZAE in AM ein (R5) |
@@ -652,6 +669,17 @@ Fehlt ein Wert, bleibt die Zeile weg und wird nicht geschätzt. Spalten:
    die VD der beiden Regionen trägt diese Unschärfe ([DATEN.md](DATEN.md#fallstricke), Fallstrick 12).
 
 ---
+
+8. **KFO: Richtwert ohne Zelle in der Vorlage.** Der ÖSG setzt für die Unterzeile «- davon mit kieferorthopädischem
+   Schwerpunkt» ein Soll-Intervall (2,8–5,1; Textband S.39), seine Vorlage der RSG-Planungsmatrix sieht dafür aber
+   keine Spalte vor (Tabellenband S.239, R4). Eine bundesweit gleich erhobene KFO-Zahl gibt es deshalb nicht: Sechs
+   Länder ergänzten eine Spalte, Wien und Vorarlberg führen KFO in ZMK und sagen es in einer Fußnote bzw. im
+   Textteil, Oberösterreich nennt einen Wert je Region in einer Fußnote (R4, Tabelle «ZMK und KFO je Land»). Beides
+   ist nach Textband S.76 zulässig. Das ist eine Grenze des ÖSG, nicht unserer Daten – wir geben je Zelle in der
+   Spalte `Zuschnitt` an, wie der Wert zustande kam. Offen bleibt eine Frage, die daran hängt: **was außer KFO noch
+   in ZMK steckt.** Wien schreibt es in seine Fußnote (5) – «ZMK: Zahn-, Mund- und Kieferheilkunde + Zahnbehandler +
+   Dentisten» –, die anderen acht Länder sagen dazu nichts. Der ZMK-Wert kann zwischen den Ländern also
+   unterschiedlich breit abgegrenzt sein ([offene_punkte.md](offene_punkte.md), «Steiermark»).
 
 ## Pflege
 

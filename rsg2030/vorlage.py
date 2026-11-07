@@ -10,6 +10,10 @@ Regel 1 und 3):
 - **Spalten:** Ein Spaltenkopf, der ohne Fußnotenzeichen genau seine Fachspalte ist («AM(4)», «ORTR3)» → AM, ORTR),
   braucht kein Urteil über die Zuordnung; ebenso «AM/PV» → AM, wie in der Vorlage über den ÄAVE-Äquivalenten. Ob ein
   Land andere Spalten hat als die Vorlage (zusätzlich KFO, ohne STR), ist dagegen ein Urteil: `spalten_abweichung`.
+  Eine zusätzliche Spalte ist dabei **kein Formfehler**: Die RSG-PM «kann um weitere bundeslandspezifische
+  Planungsgrößen und Zusatzinformationen ergänzt werden» (Textband S.76). Der Mensch beurteilt nur, ob die Spalte
+  richtig zugeordnet ist – bei KFO ist sie sogar nötig, weil die Vorlage für diesen Richtwert keine Zelle hat
+  (docs/METHODIK.md, R4).
 """
 
 from __future__ import annotations
@@ -66,7 +70,10 @@ def zeile_wie_vorlage(abschnitt: str, beschriftung: str, zeile_id: str) -> bool:
 
 
 def spalten_abweichung(faecher: set[str]) -> str:
-    """Fachspalten eines Landes gegen die Vorlage: «zusätzlich: KFO · fehlt: STR», leer, wenn genau wie die Vorlage."""
+    """Fachspalten eines Landes gegen die Vorlage: «zusätzlich: KFO · fehlt: STR», leer, wenn genau wie die Vorlage.
+
+    Beschreibt, sagt nichts über zulässig: Ergänzungen erlaubt der ÖSG ausdrücklich (Textband S.76, siehe Modulkopf).
+    """
     teile = []
     if zusaetzlich := sorted(faecher - set(SPALTEN_VORLAGE)):
         teile.append("zusätzlich: " + ", ".join(zusaetzlich))

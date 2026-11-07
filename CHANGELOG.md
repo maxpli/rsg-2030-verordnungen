@@ -7,6 +7,23 @@ Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem
 
 ## 2026.3 – in Arbeit
 
+**Doku und Prüfbericht:**
+
+- **KFO: Richtwert ohne Zelle in der Vorlage.** Die ÖSG-Vorlage der RSG-Planungsmatrix hat keine KFO-Spalte, obwohl
+  der ÖSG für die Unterzeile «- davon mit kieferorthopädischem Schwerpunkt» ein Soll-Intervall festlegt – anders als
+  bei PUL, das eine Spalte hat. Begründet wird das in keinem der drei Bände. Dass die Länder trotzdem unterschiedlich
+  ausweisen durften, steht im Textband S.76 («kann um weitere bundeslandspezifische Planungsgrößen … ergänzt werden»,
+  «Klarstellungen … in Fußnoten»). Jetzt belegt in docs/METHODIK.md (R4 und «Bekannte Grenzen» 8) mit Ankern in
+  `oesg_zitate.csv`. An den Daten ändert sich nichts.
+- **Neuer Fallstrick 13: Ein Fach kann in einem Land ganz fehlen.** Kärnten druckt keine MKG-Spalte; in der Tabelle
+  Versorgungsdichte fehlt MKG dort in allen drei Matrizen, in IST und PLAN. Ein Ländervergleich für MKG umfasst also
+  8 von 9 Ländern. Der **Prüfbericht** nennt jetzt je Land die Fachspalten gegen die Vorlage («Spalten gegen die
+  ÖSG-Vorlage»); bisher stand das nur in der Freigabe-Mappe.
+- **Wiens drei Zusatzzeilen** stehen in docs/DATEN.md nicht mehr als Sammelzeile «Wien-spezifische Zeilen», sondern
+  je mit Inhalt und Lesehinweis – vor allem `gastpat_spitalsambulant` und `gastpat_extramural`, die einzige Stelle in
+  allen 41 Matrizen, an der ein Land die Mitversorgung von außerhalb beziffert.
+- Die Freigabe-Mappe sagt bei abweichenden Spalten jetzt dazu, dass Ergänzungen laut Textband S.76 zulässig sind.
+
 **Webseite:**
 
 - **Die Seite zeigt zu jedem Wert, woher er kommt** (docs/WEB.md): PDF, Seite und die Zeile der Matrix wie gedruckt,
