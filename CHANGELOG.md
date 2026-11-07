@@ -26,11 +26,22 @@ Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem
 
 **Webseite:**
 
+- **Das Dashboard liest `?region=` und `?fach=`** aus der Adresse, damit die statischen Seiten mit vorbelegtem
+  Zustand hierher verlinken können. Ohne Parameter verhält es sich genau wie vorher; unbekannte Werte werden
+  verworfen, und die Adresse wird nie geschrieben. `data.json` enthält dafür je Region einen `slug` (Nummer der VR
+  bzw. Kürzel des Landes ohne Umlaute, derselbe wie in den Adressen der Lesefassung).
+- `python -m rsg2030 web` **räumt nur noch die eigenen Dateien weg** statt das ganze Zielverzeichnis: Dort liegt
+  jetzt auch die Lesefassung, und ein Lauf von «web» nähme sie sonst mit.
+
 - **Falscher Vorbehalt bei ZMK in Wien und Vorarlberg behoben.** Dort stand «KFO in Oberösterreich: nur als Fußnote
   zu ZMK gedruckt … per Korrekturregel übernommen», weil die Bedingung in `app.js` auch auf den Zuschnitt-Text «KFO
   nicht getrennt ausgewiesen» passte. In Wien und Vorarlberg ist KFO aber laut Fußnote bzw. Textteil **in ZMK
   enthalten**, nur nicht einzeln gezeigt (docs/DATEN.md, Fallstrick 4); betroffen waren alle 14 ZMK-Zellen dieser beiden Länder. Jetzt sind es zwei
   getrennte Vorbehalte, und ein Test bindet jeden an den Zuschnitt-Text, der ihn trägt.
+- **«Bis zur Untergrenze fehlen 0,0 ÄAVE» behoben.** Wo der ÄAVE-Abstand auf 0,0 rundet, nannte der Satz in
+  Worten eine Zahl, die nichts sagt. Jetzt nennt er die Richtung: «knapp unter der Untergrenze – es fehlen weniger
+  als 0,05 ÄAVE Sachleistung». Betrifft 10 der 637 Zellen außerhalb des Soll-Intervalls, auf dem Dashboard und in
+  der Lesefassung.
 - **Auch ohne Wert führt die Herkunft in die Quelle.** Die Klappe «Woher kommt diese Zahl?» sagte bei einer Zelle
   ohne Wert nur, es gebe nichts herzuleiten – ohne PDF und Seite. Genau dort will man aber nachsehen, dass in der
   Matrix wirklich nichts steht. Jetzt nennt sie immer PDF, Seite und die Verordnung im RIS und dazu den Grund: Fach

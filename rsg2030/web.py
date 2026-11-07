@@ -52,6 +52,21 @@ SPALTEN = [
 WERT = ["VD", "AAVE", "Bevoelkerung", "Jahr", "Lage_im_Intervall", "Position_im_Intervall", "AAVE_Abstand_Intervall", "Zuschnitt"]  # fmt: skip
 """Reihenfolge der Angaben je Zelle in `data.json` (`werte`); app.js liest sie in derselben Reihenfolge."""
 
+LAND_SLUG = {
+    "Burgenland": "burgenland",
+    "Kärnten": "kaernten",
+    "NÖ": "noe",
+    "OÖ": "ooe",
+    "Salzburg": "salzburg",
+    "Steiermark": "steiermark",
+    "Tirol": "tirol",
+    "Vorarlberg": "vorarlberg",
+    "Wien": "wien",
+}
+"""Kurzname des Landes → Adressteil ohne Umlaute. Fest eingetragen, nicht aus dem Namen gebildet: Die Adressen der
+Lesefassung (`/bl/ooe/`) können nicht umziehen, und derselbe Schlüssel steht in `data.json` (`slug`), damit das
+Dashboard ihn in `?region=` wiedererkennt."""
+
 HERKUNFT_ZEILE = "insgesamt"
 """Zeile der Tabelle Versorgungsdichte, deren Herkunft die Seite zeigt – die einzige, die sie darstellt."""
 
@@ -153,6 +168,7 @@ def _regionen(insgesamt: pd.DataFrame, regionen: pd.DataFrame, kacheln: pd.DataF
         out.append(
             {
                 "id": rid,
+                "slug": rid if ebene == "VR" else LAND_SLUG[land],
                 "ebene": ebene,
                 "land": land,
                 "land_name": lang[land],
@@ -454,9 +470,15 @@ def baue_seite(tabelle_csv: Path, long_csv: Path, ziel: Path) -> Path:
         lade_regeln(),
         meta,
     )
-    if ziel.exists():
-        shutil.rmtree(ziel)
-    ziel.mkdir(parents=True)
+    # Nur die eigenen Dateien ersetzen, nicht das ganze Verzeichnis: Dort liegt auch die Lesefassung
+    # (`python -m rsg2030 lesefassung`), und die soll ein Lauf von «web» nicht mitnehmen.
+    ziel.mkdir(parents=True, exist_ok=True)
+    for name in (*SEITE, "data.json"):
+        vorhanden = ziel / name
+        if vorhanden.is_dir():
+            shutil.rmtree(vorhanden)
+        elif vorhanden.exists():
+            vorhanden.unlink()
     for name in SEITE:
         quelle = web_dir() / name
         if quelle.is_dir():

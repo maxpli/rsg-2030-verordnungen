@@ -92,8 +92,13 @@ SATZ: dict[str, str] = {
     "im": "<p>{0}: <b>im Soll-Intervall</b>.</p>",
     "unter": '<p>{0}: Bis zur Untergrenze fehlen <b class="num">{1}</b> ÄAVE Sachleistung.</p>',
     "über": '<p>{0}: <b class="num">{1}</b> ÄAVE über der Obergrenze.</p>',
+    "knapp_unter": "<p>{0}: <b>knapp unter der Untergrenze</b> – es fehlen weniger als 0,05 ÄAVE Sachleistung.</p>",
+    "knapp_über": "<p>{0}: <b>knapp über der Obergrenze</b> – um weniger als 0,05 ÄAVE.</p>",
 }
-"""Der Wert in Worten, je Lage zum Soll-Intervall: {0} = Beschriftung (z. B. «PLAN 2030»), {1} = ÄAVE-Abstand."""
+"""Der Wert in Worten, je Lage zum Soll-Intervall: {0} = Beschriftung (z. B. «PLAN 2030»), {1} = ÄAVE-Abstand.
+
+«knapp_…» für die Fälle, in denen der Abstand auf 0,0 rundet: «Bis zur Untergrenze fehlen 0,0 ÄAVE» wäre Unsinn.
+Betrifft wenige Zellen, aber die Lage ist dort ohnehin nicht belastbar (docs/DATEN.md, Fallstrick 6)."""
 
 NICHT_GETRENNT = "nicht getrennt ausgewiesen"
 """Ende der Zuschnitt-Texte «<Fach> nicht getrennt ausgewiesen» (ZAE, KFO)."""
@@ -225,6 +230,9 @@ def satz(zelle: Zelle | None, beschriftung: str) -> str:
     if zelle.lage == "im":
         return SATZ["im"].format(beschriftung)
     abstand = float(zelle.aave_abstand or 0.0)
+    # Gerundet 0,0: dann nennt der Satz die Richtung, nicht eine Zahl, die nichts sagt
+    if zahl(abs(abstand)) == "0,0":
+        return SATZ["knapp_unter" if zelle.lage == "unter" else "knapp_über"].format(beschriftung)
     if zelle.lage == "unter":
         return SATZ["unter"].format(beschriftung, zahl(-abstand))
     return SATZ["über"].format(beschriftung, zahl(abstand))

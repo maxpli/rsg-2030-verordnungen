@@ -28,6 +28,17 @@ const sha12 = (h) => esc(String(h).slice(0, 12)) + "…";
 const STANDARD = { VR: "41", BL: "OÖ" };
 const S = { abschnitt: "PLAN", ebene: "VR", fach: "IM", region: STANDARD.VR, hatch: true, src: false };
 try { Object.assign(S, JSON.parse(localStorage.getItem("rsg-vd") || "{}")); } catch (e) { /* ohne gespeicherte Ansicht */ }
+/* Startzustand aus der Adresse, damit die statischen Seiten hierher verlinken können: «?region=41&fach=PSY»
+   (Region über `slug`: Nummer der VR oder Kürzel des Landes ohne Umlaute, derselbe wie in den Adressen der
+   Lesefassung). Ohne Parameter verhält sich die Seite genau wie vorher; unbekannte Werte werden verworfen,
+   geschrieben wird die Adresse nie – sonst wäre jeder Klick ein Eintrag im Verlauf (docs/WEB.md). */
+try {
+  const q = new URLSearchParams(location.search);
+  const r = D.regionen.find((x) => x.slug === q.get("region"));
+  if (r) { S.ebene = r.ebene; S.region = r.id; }
+  if (D.faecher.some((f) => f.id === q.get("fach"))) S.fach = q.get("fach");
+  if (["IST", "PLAN"].includes(q.get("abschnitt"))) S.abschnitt = q.get("abschnitt");
+} catch (e) { /* ohne Parameter */ }
 const save = () => { try { localStorage.setItem("rsg-vd", JSON.stringify(S)); } catch (e) { /* egal */ } };
 
 const get = (rid, ab, f) => {
