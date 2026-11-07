@@ -402,7 +402,10 @@ def test_data_json_gleich_tabelle():
         w = d["werte"][f"{r['Region_ID']}|{r['Abschnitt']}|{r['Fach']}"]
         for spalte, wert in zip(WERT, w):
             soll = r[spalte]
-            assert wert == (int(soll) if spalte in ("Bevoelkerung", "Jahr") else soll), (r["Region_ID"], spalte)
+            # Bevölkerung und Jahr stehen als ganze Zahl in data.json – gerundet, nicht abgeschnitten: Die
+            # Bevölkerung einer VR im PLAN hat Nachkommastellen (Landesprognose × ÖROK-Anteil der Region).
+            erwartet = round(soll) if spalte in ("Bevoelkerung", "Jahr") else soll
+            assert wert == erwartet, (r["Region_ID"], spalte, soll)
     assert {(r["ebene"], r["id"]) for r in d["regionen"]} == set(zip(ins["Ebene"], ins["Region_ID"].astype(str)))
 
 

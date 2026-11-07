@@ -192,11 +192,15 @@ GANZZAHLIG = {"Bevoelkerung", "Jahr"}
 
 
 def _wert(spalte: str, v: object) -> object:
-    """Angabe für JSON: Bevölkerung und Jahr als ganze Zahl, fehlende Werte als None, sonst wie in der Tabelle."""
+    """Angabe für JSON: Bevölkerung und Jahr als ganze Zahl, fehlende Werte als None, sonst wie in der Tabelle.
+
+    Gerundet, nicht abgeschnitten: Die Bevölkerung einer Versorgungsregion im PLAN hat Nachkommastellen
+    (Landesprognose × Anteil der Region), und `int()` machte aus 378.282,6 die Zahl 378.282.
+    """
     if isinstance(v, float) and math.isnan(v):
         return None
     if spalte in GANZZAHLIG:
-        return int(v)  # type: ignore[call-overload]
+        return round(float(v))  # type: ignore[arg-type]
     return v.item() if hasattr(v, "item") else v
 
 

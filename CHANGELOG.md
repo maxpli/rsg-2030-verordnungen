@@ -53,6 +53,11 @@ Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem
   nicht getrennt ausgewiesen» passte. In Wien und Vorarlberg ist KFO aber laut Fußnote bzw. Textteil **in ZMK
   enthalten**, nur nicht einzeln gezeigt (docs/DATEN.md, Fallstrick 4); betroffen waren alle 14 ZMK-Zellen dieser beiden Länder. Jetzt sind es zwei
   getrennte Vorbehalte, und ein Test bindet jeden an den Zuschnitt-Text, der ihn trägt.
+- **Bevölkerung wird gerundet statt abgeschnitten.** `data.json` wandelte die Bevölkerung mit `int()` um, das
+  schneidet ab: Aus 378.282,6 wurde 378.282 statt 378.283. Betrifft die Versorgungsregionen im PLAN 2030 (nur dort
+  hat die Zahl Nachkommastellen: Landesprognose × Anteil der Region laut ÖROK) – 20 der 32 Regionen, je um eine
+  Person. Dashboard und Lesefassung zeigen jetzt denselben gerundeten Wert. Die veröffentlichten Tabellen ändern
+  sich nicht.
 - **«Bis zur Untergrenze fehlen 0,0 ÄAVE» behoben.** Wo der ÄAVE-Abstand auf 0,0 rundet, nannte der Satz in
   Worten eine Zahl, die nichts sagt. Jetzt nennt er die Richtung: «knapp unter der Untergrenze – es fehlen weniger
   als 0,05 ÄAVE Sachleistung». Betrifft 10 der 637 Zellen außerhalb des Soll-Intervalls, auf dem Dashboard und in
