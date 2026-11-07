@@ -81,7 +81,9 @@ zusammengezählt: KFO 12,1, gesamt 951,3.
 
 ### Steiermark (Anlage 1, S.1)
 
-**ZMK, IST, vertragsärztliche Planstellen:** Gedruckt sind 358 ÖGK-Planstellen in ZMK und 25 in KFO, zusammen 383. Das
+**ZMK, IST, vertragsärztliche Planstellen:** Gedruckt sind 358 ÖGK-Planstellen in ZMK und 25 in KFO, zusammen
+383. Dass die beiden Spalten getrennt zählen und die Summe nichts doppelt nimmt, zeigt die gedruckte Spalte
+«gesamt» des Landes selbst: Sie geht nur mit KFO auf (1.364 mit, 1.339 ohne; Prüfung `zeilensumme`). Das
 RSG-Monitoring der GÖG weist für dasselbe Jahr 407 ÖGK-Planstellen in ZMK aus, dort ausdrücklich «inkl. KFO»; in den
 übrigen Fächern stimmen die Planstellen bis auf CH (4 gegenüber 0) und die technischen Fächer überein
 ([PRUEFUNG.md](PRUEFUNG.md#abgleich-mit-dem-rsg-monitoring), «Vertragsärztliche Planstellen»). Woher die 24 Stellen

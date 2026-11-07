@@ -1,0 +1,96 @@
+/* Lesefassung: statische Seiten zu den veröffentlichten Tabellen (docs/WEB.md, «Lesefassung»).
+
+   Absicht: Text vor Gestaltung. Kein Skript, keine Schrift und kein Stil von fremden Servern – die Seiten geben
+   nichts an Dritte. Eine Spalte, Systemschrift, Tabellen waagrecht scrollbar statt gequetscht. Hell und dunkel
+   über die Systemeinstellung; keine Farbe trägt eine Aussage (die Lage steht als Wort in der Tabelle). */
+
+:root {
+  --text: #1a1a1a;
+  --t2: #585858;
+  --grund: #fff;
+  --linie: #d8d8d8;
+  --flaeche: #f6f6f6;
+  --link: #0b4f8a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #e8e8e8;
+    --t2: #a8a8a8;
+    --grund: #16181a;
+    --linie: #3a3d40;
+    --flaeche: #1f2224;
+    --link: #8fc3f0;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0 16px 48px;
+  background: var(--grund);
+  color: var(--text);
+  font: 17px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  max-width: 62rem;
+  margin-inline: auto;
+}
+
+a { color: var(--link); }
+
+.skip { position: absolute; left: -9999px; }
+.skip:focus { position: static; display: inline-block; padding: 8px; }
+
+.kopf { padding: 16px 0 0; }
+.eyebrow { margin: 0; font-size: 14px; color: var(--t2); }
+.eyebrow a { color: inherit; }
+
+h1 { font-size: 1.7rem; line-height: 1.25; margin: 0.6em 0 0.4em; }
+h2 { font-size: 1.25rem; margin: 1.8em 0 0.4em; }
+h3 { font-size: 1.05rem; margin: 1.4em 0 0.3em; }
+h4 { font-size: 0.95rem; margin: 1.1em 0 0.2em; color: var(--t2); }
+
+p { margin: 0.6em 0; }
+.t2 { color: var(--t2); font-size: 15px; }
+.nb { white-space: nowrap; }
+.quelle { padding: 10px 12px; background: var(--flaeche); border-radius: 6px; }
+
+/* Tabellen: lieber scrollen als umbrechen – eine Zahl, die in drei Zeilen bricht, liest niemand */
+.scroll { overflow-x: auto; margin: 0.6em 0; }
+table.t { border-collapse: collapse; font-size: 15px; min-width: 100%; }
+table.t caption { caption-side: top; text-align: left; padding: 0 0 6px; color: var(--t2); font-size: 14px; }
+/* Beschriftung über der Tabelle: benennt sie für Bildschirmleser und für Maschinen, die Tabellen auslesen */
+table.t th, table.t td { padding: 6px 10px; border-bottom: 1px solid var(--linie); text-align: left; }
+table.t thead th { position: sticky; top: 0; background: var(--grund); border-bottom: 2px solid var(--linie); }
+table.t tbody th { font-weight: 600; }
+table.t .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+table.t-index tbody tr:nth-child(even) { background: var(--flaeche); }
+
+.kasten {
+  margin: 1.4em 0;
+  padding: 2px 16px 10px;
+  background: var(--flaeche);
+  border-left: 4px solid var(--linie);
+  border-radius: 0 6px 6px 0;
+}
+.kasten h2 { font-size: 1.05rem; margin-top: 0.9em; }
+.kasten ul { margin: 0.4em 0; padding-left: 1.2em; }
+.kasten li { margin: 0.4em 0; }
+
+/* Begriffe: die vier Wörter, ohne die keine Zahl lesbar ist – kompakt, aber vor der Tabelle */
+dl.begriffe { margin: 1.2em 0; display: grid; grid-template-columns: max-content 1fr; gap: 2px 14px; }
+dl.begriffe dt { font-weight: 600; }
+dl.begriffe dd { margin: 0; }
+@media (max-width: 560px) { dl.begriffe { grid-template-columns: 1fr; gap: 0 0; } dl.begriffe dd { margin: 0 0 8px; } }
+
+ul.worte { padding-left: 1.1em; }
+ul.worte li { margin: 0.5em 0; }
+
+details { margin: 0.7em 0; padding: 8px 12px; background: var(--flaeche); border-radius: 6px; }
+details summary { cursor: pointer; font-weight: 600; }
+details ul { padding-left: 1.2em; }
+details li { margin: 0.45em 0; }
+code { font-size: 0.9em; background: var(--grund); padding: 1px 4px; border-radius: 3px; }
+
+.fuss { margin-top: 3em; padding-top: 1em; border-top: 1px solid var(--linie); font-size: 15px; }
+.fuss h2 { font-size: 1rem; }

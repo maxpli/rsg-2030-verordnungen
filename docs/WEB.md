@@ -67,6 +67,68 @@ Patientenströme, innerhalb des Intervalls kein Unterschied.
 | Prüfsummen der Fußzeile | eine Zeile für beide Tabellen, das Release einmal genannt – sie kommen aus demselben. Die Prüfsummen auf zwölf Zeichen gekürzt wie in der Konsole, dahinter `SHA256SUMS.txt` des Release. Zwölf Zeichen sagen, **welche** Datei gezeigt wird; **belegen** kann die Seite sie nicht – eine Prüfsumme neben den Daten, die sie prüfen soll, ist kein Beweis. Der Beleg liegt im Release und in `erwartete_ausgaben.csv`, und dafür braucht man den Link, nicht die Zeichen auf der Seite. Zweimal 64 Zeichen kosteten am Handy vier Zeilen |
 | Farben | Nachbarstufen müssen sich deutlich unterscheiden, auch bei Farbsehschwäche (Protanopie, Deuteranopie): Abstand ΔE (OKLab × 100) mindestens 8. Ein Test rechnet das aus den Farben der Seite nach |
 
+## Lesefassung: statische Seiten
+
+Neben dem Dashboard erzeugt `python -m rsg2030 lesefassung` **59 Seiten ohne JavaScript**, in denen jede Zahl als
+Text im HTML steht. Grund: In den Verordnungs-PDFs sind die Zahlen für Suchmaschinen und Abrufsysteme unerreichbar
+(Querformat, teils Bildseiten ohne Textebene), und auf dem Dashboard entstehen sie erst im Browser. Der Mehrwert
+gegenüber den PDFs ist nicht die Abschrift, sondern der Vergleich: Versorgungsdichte, Lage zum Soll-Intervall,
+Position und ÄAVE-Abstand stehen in keinem veröffentlichten Dokument.
+
+| Adresse | Inhalt |
+|---|---|
+| `/daten/` | alle 537 Zeilen «insgesamt» in einer Tabelle, die neun Verordnungen, Downloads, «Was dieser Datensatz nicht tut» – und der **einzige** `Dataset`-Eintrag des Werks |
+| `/bl/<kurz>/` | 9 Bundesländer: Verzeichnis der Versorgungsregionen, Bevölkerung, Stellen, Versorgungsdichte, Apparat |
+| `/vr/<nr>/` | 32 Versorgungsregionen, dazu die Bezirke und der Hinweis, dass auf Ebene der Region geplant wird |
+| `/fach/<id>/` | 17 Fächer: dasselbe gekippt, je Region VD IST und PLAN, Lage, Abstand und Sachleistungsstellen |
+| `/sitemap.xml` | alle Seiten |
+
+**Die Adressen sind endgültig.** GitHub Pages kann nicht umleiten, deshalb Nummern und Kürzel statt Namen: Eine
+Versorgungsregion kann umbenannt werden, ihre Nummer nicht. Die Kürzel der Länder stehen als Liste in
+`lesefassung.py`, nicht als Umschrift-Regel – damit sie sich nicht still ändern können.
+
+### Darstellungsregeln der Lesefassung
+
+| Was | Regel |
+|---|---|
+| Drei Schichten | **1.** Region, Bezirke, Bevölkerung, Verordnung mit Seite, ein abgeleiteter Satz zur Lage, Kasten «Was diese Zahlen nicht sagen». **2.** die beiden Tabellen. **3.** Fußnoten, Korrekturen, Abweichungen in `<details>` – zugeklappt, aber im HTML und damit indexierbar |
+| Was auf die Seite gehört | **Text, der die Zahlen lesbar macht – nicht Text über unsere Entscheidungen.** Warum die IST-Planstellen fehlen, warum es keine Österreich-Zahl gibt, wie die VR-Bevölkerung geschätzt ist: Das steht in METHODIK.md und gehört nicht über eine Tabelle. Auf der Seite stehen dafür die vier Begriffe, ohne die keine Zahl lesbar ist (ÄAVE, VD, Soll-Intervall, Sachleistungsstellen), **vor** der Tabelle und im Wortlaut des Glossars in METHODIK.md |
+| Interaktiv vergleichen | ein Link **in der Fußzeile**, nicht als Kasten im Text: «Interaktiv vergleichen», mit vorbelegtem Zustand (`?region=41`, `?fach=PSY`). Der Schlüssel `slug` steht in `data.json` und ist derselbe wie in den Adressen. Ohne Parameter verhält sich das Dashboard wie vorher, und es schreibt die Adresse nie |
+| Vorbehalt im Satz | Der Vorbehalt steht **im selben Satz wie die Zahl**, nicht nur im Kasten: Ein Abrufsystem fasst zusammen und nimmt den Kasten nicht mit. Was für **jedes** Fach einer Matrix gilt, steht einmal vor der Liste statt siebzehnmal darin |
+| Satz je Fach | nur, wo er etwas sagt: ein Fach im Soll-Intervall **ohne** eigenen Vorbehalt wiederholt nur die Spalte «Lage» und steht mit den anderen in einer Zeile. Rundet der ÄAVE-Abstand auf 0,0, nennt der Satz die Richtung statt der Zahl («knapp unter der Untergrenze») |
+| Links nach außen | `target="_blank" rel="noopener noreferrer"` wie im Dashboard: Ein Sprung in eine 200-seitige PDF oder ins RIS-Portal soll die Seite nicht ersetzen, und niemand erfährt, von welcher Seite jemand kam. Interne Links (Region, Fach, Index, Dashboard) bleiben im selben Fenster und tragen kein `rel` |
+| Tabellenbeschriftung | jede Tabelle hat eine `<caption>`, die Region bzw. Fach, Abschnitt und Bezugsgröße nennt: Daran benennen Bildschirmleser und Text-Extraktoren die Tabelle |
+| Keine Farben | Die Lage steht als Wort in der Tabelle («über dem Soll-Intervall»). Ohne Farbe braucht es keine Farbprüfung, und der Text bleibt vollständig, wenn ihn eine Maschine liest |
+| Zuschnitt | ein Zeichen (◆) an den betroffenen Zeilen, aufgelöst in einer Zeile unter der Tabelle – je Tabelle eigens, weil AM bei den ÄAVE die ZAE enthält und bei den Stellen nicht (DATEN.md, «Warum AM hier anders zugeschnitten ist») |
+| Stellen | **nur PLAN 2030.** IST-Planstellen und PLAN-Sachleistungsstellen zählen Verschiedenes; der Vergleich bräuchte Annahmen (METHODIK.md, «Stellen»). Die Spalte «davon maximal als vertragsärztliche Planstellen» ist die gedruckte Beschriftung, kein Plan |
+| ÄAVE und VD | **IST und PLAN**, mit dem IST-Jahr in der Spaltenüberschrift: Hier ist der Vergleich eine Lesung, keine Auswertung |
+| «Planstellen» im Titel | Der Titel nennt «Planstellen und Versorgungsdichte», weil das die gesuchten Begriffe sind; im Text steht die Beschriftung der Verordnung («Sachleistungsstellen»), dazu der Beleg, dass Niederösterreich diesen Teil seiner Matrix mit «PLAN Kassenstellen 2030» überschreibt |
+| Bezirksnamen | im Fließtext als Zuordnung, mit dem Satz, dass auf Ebene der Versorgungsregion geplant wird – es gibt keine Bezirkszahlen |
+| Fußnoten | wörtlich, gruppiert nach Einordnung, mit «Seite 12: öffnen». Sie hängen an der Matrix, nicht an der Zelle: eigener Block, keine erfundenen Marker in unseren Tabellen |
+| Offene Fragen | **nur als Verweis**, nie als Text auf der Seite. Die Unsicherheit ist unsere, nicht die des Landes («Hier lässt sich aus der Verordnung allein nicht entscheiden, wie ein Wert gemeint ist», offene_punkte.md). Aufgezählt auf einer Seite, die den Namen des Landes in der Überschrift trägt, wäre eine Frage ein Befund gegen das Land – ein Urteil über die Fallstricke hinaus. Was eine Zahl wirklich betrifft, steht ohnehin als Vorbehalt oder Korrekturregel da |
+| Prosa | ausschließlich vorlagengesteuert, jeder Satz aus den Daten abgeleitet. Keine Seite mit eigenem Text; die Zahl der Fächer im Lage-Satz kommt aus den Daten (7 Versorgungsregionen haben 16 statt 17 Fächer mit Wert) |
+| Ein Dataset-Eintrag | nur `/daten/` trägt `Dataset`; alle anderen Seiten sind `WebPage` mit `isPartOf` darauf. Mehrere Einträge für denselben Datensatz konkurrieren miteinander |
+| Verbotene Urteile | «unterversorg…», «Versorgungsmangel», «Versorgungslücke», «Ärztemangel» brechen den Bau ab – auch in einer Verneinung, denn die geht beim Zusammenfassen verloren. «Lücke» allein ist erlaubt: So heißt die *Art* einer Korrekturregel |
+| Sitemap: `lastmod` | der Tag der Veröffentlichung des Release, aus `CITATION.cff` – das einzige Datum, das eine echte Änderung der Seiten bedeutet. Das Baudatum wäre falsch: Es behauptete bei jedem Lauf eine Änderung, und ein `lastmod` in Höhe von «jetzt» wird ignoriert. Passt die Version in `CITATION.cff` nicht zur Paketversion, bleibt das Datum weg – lieber keine Angabe als eine falsche |
+| Reihenfolge der Befehle | `web` baut das Dashboard, `lesefassung` die Seiten, beide nach `daten_ergebnis/web/`. `web` räumt nur seine eigenen Dateien weg, nicht das Verzeichnis – sonst nähme ein Lauf die 59 Seiten mit |
+
+### Wer prüft was (Lesefassung)
+
+| Was schiefgehen kann | Wer es findet |
+|---|---|
+| eine Satzvorlage passt nicht auf die Daten (16 statt 17 Fächer, fehlende Zeile) | Bau bricht ab: kein `{0}`, kein `nan`, kein `None` im HTML; Test über alle 59 Seiten |
+| ein Urteil, das die Daten nicht tragen | Bau bricht ab (verbotene Wortstämme); Test |
+| ein Vorbehalt fehlt dort, wo er gilt | Test: jede Seite nennt «Was diese Zahlen nicht sagen», jede Fachtabelle den Zuschnitt und die Teilmengen, jede SVE-Matrix den Block der ÄAVE-Äquivalente |
+| eine Zahl weicht von der Tabelle ab | Test: jede ÄAVE- und VD-Zahl der Zeile «insgesamt» steht zeichengleich auf der Seite (über 1.000 Werte) |
+| Fußnote oder Korrekturregel umformuliert oder der falschen Matrix zugeordnet | Test: jeder Text steht zeichengleich aus `fussnoten.csv` bzw. `korrekturen.csv` auf der Seite seiner Matrix |
+| Vorbehaltstexte laufen vom Dashboard weg | Test: kein Vorbehaltstext steht in `lesefassung.py` – alle kommen aus `darstellung.py` |
+| eine Seite ist nicht auffindbar | Test: jede Seite ist von `/daten/` verlinkt und steht in der Sitemap; jede hat Titel, `<h1>`, `description` und `canonical` |
+| ein Fragetext aus offene_punkte.md landet auf einer Seite, oder die Sprungmarke führt ins Leere | Test: kein Fragetext im HTML; wo ein Verweis steht, gibt es die Überschrift in offene_punkte.md, und die Sprungmarke passt dazu |
+| `lastmod` behauptet eine Änderung, die es nicht gab | Test: entweder trägt jede Adresse das Datum aus `CITATION.cff`, oder keine trägt eines |
+| eine Adresse ändert sich und bricht alle Links | Test: Adressen sind Nummern und Kürzel nach festem Muster |
+| die Seite lädt etwas von fremden Servern, oder ein Link verrät die Herkunft | Test: kein `<script>` außer JSON-LD, nur bekannte Ziele, jeder Link nach außen mit `target="_blank" rel="noopener noreferrer"` – und jeder interne Link **ohne** `target` |
+| die Seiten sind unverständlich oder im Ton falsch | der Herausgeber: drei Seiten lesen (eine Region, ein Fach, die Indexseite) |
+
 ## Der Satz und die Vorbehalte stehen einmal
 
 Zu jeder Zelle gehören zwei Texte, die nicht aus den Daten kommen, sondern Festlegungen der Darstellung sind: **der
@@ -155,11 +217,14 @@ web/                  die Seite: index.html, app.js, style.css
   kacheln.csv           je Region Spalte und Zeile der Kachelkarte und die Beschriftung der Kachel (VR und BL)
   faecher.csv           Fächer in der Reihenfolge der Spalten, Name, «Teil von» (PUL → IM, KFO → ZMK)
 rsg2030/darstellung.py  der Wert in Worten und die Vorbehalte je Zelle – einmal für jede Darstellung (siehe oben)
+rsg2030/lesefassung.py  «python -m rsg2030 lesefassung»: die 59 statischen Seiten und die Sitemap
+web/lesefassung/        lesefassung.css – ein Stil, keine Schrift von außen, keine Farbe mit Bedeutung
 rsg2030/web.py        «python -m rsg2030 web»: Tabellen Versorgungsdichte und Planungsmatrizen → data.json,
                         Seite nach daten_ergebnis/web/; `baue_herkunft` baut den Herkunfts-Teil
 rsg2030/korrekturen.py  `regel_fuer_zelle`: welche Regel aus korrekturen.csv eine korrigierte Zelle erklärt
 rsg2030/scripts/rohtext_eindeutig.py   belegt, warum die Seite die Zahl im PDF nicht markiert
 tests/test_web.py     Kacheln, Fächer, Vorbehalte, Farben, data.json, Herkunft (siehe «Wer prüft was»)
+tests/test_lesefassung.py   Adressen, Vorlagen, Zahlen und Apparat der Lesefassung
 .github/workflows/webseite.yml   bauen und auf GitHub Pages veröffentlichen
 ```
 
@@ -177,7 +242,10 @@ Daten (Entscheidung 15).
 ```bash
 .venv/bin/python -m rsg2030 web                          # braucht RSG_2030_Versorgungsdichte.csv und
                                                          # RSG_2030_Planungsmatrizen.csv in daten_ergebnis/
-.venv/bin/python -m http.server -d daten_ergebnis/web    # dann http://localhost:8000 im Browser
+.venv/bin/python -m rsg2030 lesefassung                  # die statischen Seiten dazu (braucht auch
+                                                         # RSG_2030_Stellen.csv); «--basis» setzt die Adresse
+.venv/bin/python -m http.server -d daten_ergebnis/web    # dann http://localhost:8000 im Browser,
+                                                         # die Lesefassung unter /daten/
 ```
 
 Die Tabellen entstehen mit `python -m rsg2030 alles`; es reichen auch die Dateien des Release in `daten_ergebnis/`.

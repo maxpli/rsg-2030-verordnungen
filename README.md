@@ -35,6 +35,14 @@ aktuellen Release ([docs/WEB.md](docs/WEB.md)).
 
 ---
 
+## Zahlen nachsehen
+
+Alle Werte stehen als Seiten zum Nachsehen und Verlinken bereit:
+[**alle 32 Versorgungsregionen und 17 Fächer auf einer Seite**](https://maxpli.github.io/rsg-2030-verordnungen/daten/),
+dazu je Bundesland, je Versorgungsregion und je Fach eine eigene Seite mit Herkunft, Fußnoten und Korrekturen –
+und das [interaktive Dashboard](https://maxpli.github.io/rsg-2030-verordnungen/) zum Vergleichen. Bitte vorher die
+[Fallstricke](docs/DATEN.md#fallstricke) lesen: Gezählt ist nur die Sachleistung, ohne Wahlärzt:innen.
+
 ## Was herauskommt
 
 Wer die Matrizen nur nachsehen will, nimmt die Excel-Mappe: ein Blatt je Matrix wie im PDF, mit den

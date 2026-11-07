@@ -20,6 +20,8 @@ on:
     paths:
       - "web/**"
       - "rsg2030/web.py"
+      - "rsg2030/lesefassung.py"
+      - "rsg2030/darstellung.py"
       - ".github/workflows/webseite.yml"
   workflow_dispatch:
 
@@ -61,11 +63,19 @@ jobs:
           mkdir -p daten_ergebnis
           cd daten_ergebnis
           gh release download "$tag" --pattern RSG_2030_Versorgungsdichte.csv \
-            --pattern RSG_2030_Planungsmatrizen.csv --pattern SHA256SUMS.txt --clobber
-          grep -E ' (RSG_2030_Versorgungsdichte|RSG_2030_Planungsmatrizen)\.csv$' SHA256SUMS.txt \
+            --pattern RSG_2030_Planungsmatrizen.csv --pattern RSG_2030_Stellen.csv \
+            --pattern SHA256SUMS.txt --clobber
+          grep -E ' (RSG_2030_Versorgungsdichte|RSG_2030_Planungsmatrizen|RSG_2030_Stellen)\.csv$' SHA256SUMS.txt \
             | sha256sum --check --strict
-      - name: Seite bauen
+      # Erst das Dashboard, dann die Lesefassung: «web» räumt seine eigenen Dateien weg, «lesefassung» legt
+      # ihre Seiten daneben (docs/WEB.md, «Lesefassung»).
+      - name: Dashboard bauen
         run: python -m rsg2030 web
+      - name: Lesefassung bauen
+        run: python -m rsg2030 lesefassung
+      # Erst jetzt möglich: Die Tests der Lesefassung brauchen die Tabellen des Release.
+      - name: Tests der Lesefassung
+        run: pytest tests/test_lesefassung.py
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:

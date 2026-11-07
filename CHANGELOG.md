@@ -26,6 +26,21 @@ Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem
 
 **Webseite:**
 
+- **Neu: 59 statische Seiten ohne JavaScript** (`python -m rsg2030 lesefassung`, docs/WEB.md «Lesefassung»):
+  eine Indexseite mit allen 537 Zeilen «insgesamt», 9 Bundesländer, 32 Versorgungsregionen, 17 Fächer, dazu eine
+  Sitemap. Grund: In den Verordnungs-PDFs sind die Zahlen für Suchmaschinen und Abrufsysteme unerreichbar, und auf
+  dem Dashboard entstehen sie erst im Browser. Jede Seite trägt drei Schichten – Überblick mit dem Kasten «Was
+  diese Zahlen nicht sagen», die beiden Tabellen (Sachleistungsstellen 2030 und Versorgungsdichte gegen das
+  Soll-Intervall, IST und PLAN), und in `<details>` den Apparat: Fußnoten wörtlich mit Seitensprung, Korrekturregeln
+  mit Begründung, bekannte Abweichungen. Der Vorbehalt steht im Satz, nicht nur im Kasten. Adressen sind endgültig
+  (`/daten/`, `/bl/<kurz>/`, `/vr/<nr>/`, `/fach/<id>/`), weil GitHub Pages nicht umleiten kann. Genau ein
+  `Dataset`-Eintrag, auf der Indexseite. Der Bau bricht ab bei unausgefüllten Vorlagen und bei Urteilen, die die
+  Daten nicht tragen; 20 Tests prüfen Adressen, Zahlen, Fußnoten und Auffindbarkeit. Die Sitemap trägt als
+  `lastmod` den Tag des Release aus `CITATION.cff`, nicht das Baudatum; jede Tabelle hat eine `<caption>`.
+  Fächer, die im Soll-Intervall liegen und keinen eigenen Vorbehalt haben, stehen in einer Zeile zusammen statt
+  in je einem Satz, der nur die Spalte «Lage» wiederholt. Wo es offene Fragen zu einer Verordnung gibt,
+  steht ein Verweis auf `docs/offene_punkte.md` – nicht der Fragetext: Die Unsicherheit ist unsere, nicht
+  die des Landes.
 - **Das Dashboard liest `?region=` und `?fach=`** aus der Adresse, damit die statischen Seiten mit vorbelegtem
   Zustand hierher verlinken können. Ohne Parameter verhält es sich genau wie vorher; unbekannte Werte werden
   verworfen, und die Adresse wird nie geschrieben. `data.json` enthält dafür je Region einen `slug` (Nummer der VR
