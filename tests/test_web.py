@@ -476,6 +476,14 @@ def test_herkunft_zitiert_die_tabelle_planungsmatrizen():
 # --- nichts von fremden Servern -------------------------------------------------------------------------------------
 
 
+def test_dashboard_verlinkt_die_lesefassung_fest_im_html():
+    """Suchmaschinen ohne JavaScript finden die Lesefassung nur über einen Link im HTML, nicht über app.js."""
+    html = (WEB / "index.html").read_text(encoding="utf-8")
+    assert '<a href="daten/">' in html
+    js = (WEB / "app.js").read_text(encoding="utf-8")
+    assert 'class="d-mehr"' in js and "fach/${esc(f)}/" in js
+
+
 def test_seite_laedt_nichts_von_fremden_servern():
     """Schriften, Skripte und Stile kommen aus web/ selbst; Links (<a href>) auf GitHub und das RIS sind erlaubt:
     Erst wer klickt, gibt seine IP-Adresse dorthin – anders als bei einer eingebundenen Datei (Datenschutz)."""
@@ -509,5 +517,6 @@ def test_externe_links_schicken_keinen_referrer():
     js = (WEB / "app.js").read_text(encoding="utf-8")
     anker = re.findall(r"<a href=[^>]*>", js)
     assert anker, "keine Links gefunden – prüft dieser Test noch, was er soll?"
-    ohne = [a for a in anker if "noreferrer" not in a]
+    # Ausgenommen sind Links innerhalb der Seite (in die Lesefassung, class="intern"): Sie verlassen sie nicht
+    ohne = [a for a in anker if "noreferrer" not in a and 'class="intern"' not in a]
     assert not ohne, f"Link ohne noreferrer: {ohne}"

@@ -98,10 +98,10 @@ def test_kein_javascript_und_nichts_von_fremden_servern(seiten):
             stelle = html[html.index(f'<a href="{url}"') : html.index(f'<a href="{url}"') + 400]
             assert 'rel="noopener noreferrer"' in stelle, (pfad, url)
             assert 'target="_blank"' in stelle, (pfad, url)
-        # Interne Links bleiben im selben Fenster
-        for url in re.findall(r'<a href="(\.\./[^"]+|[a-z]+/[^":]*)"[^>]*>', html):
-            stelle = html[html.index(f'<a href="{url}"') : html.index(f'<a href="{url}"') + 200]
-            assert "target=" not in stelle, (pfad, url)
+        # Interne Links bleiben im selben Fenster – geprüft im Tag selbst, nicht in den Zeichen danach (dort steht
+        # oft schon der nächste, externe Link)
+        for url, rest in re.findall(r'<a href="(\.\./[^"]+|[a-z]+/[^":]*)"([^>]*)>', html):
+            assert "target=" not in rest, (pfad, url)
 
 
 def test_jede_seite_ist_von_der_indexseite_erreichbar(seiten):
@@ -111,6 +111,41 @@ def test_jede_seite_ist_von_der_indexseite_erreichbar(seiten):
         if pfad == "daten/":
             continue
         assert f'href="../{pfad}"' in index, pfad
+
+
+def test_brotkrumen_und_beide_wege(seiten, aufbau):
+    """Jede Seite zeigt, wo sie steht, und führt in beide Richtungen: nachschlagen und vergleichen."""
+    for pfad, html in seiten.items():
+        assert '<nav class="bereiche"' in html, pfad
+        assert "Nachschlagen: Regionen und Fächer" in html and "Vergleichen: interaktive Matrix" in html, pfad
+        if pfad == "daten/":
+            continue
+        assert '<nav class="pfad"' in html and '"@type":"BreadcrumbList"' in html, pfad
+    for r in aufbau.regionen:
+        assert f'?region={r["slug"]}"' in seiten[aufbau.pfad(r)], r["id"]
+    for f in aufbau.faecher:
+        assert f'?fach={f["id"]}"' in seiten[f"fach/{f['id']}/"], f["id"]
+
+
+def test_saetze_je_fach_verstehen_sich_fuer_sich(seiten, aufbau):
+    """Ein Chatbot zitiert oft nur einen Listenpunkt: Region und Soll-Intervall müssen darin stehen."""
+    import html as html_mod
+
+    for r in aufbau.regionen:
+        seite = seiten[aufbau.pfad(r)]
+        liste = re.search(r'<ul class="worte">(.*?)</ul>', seite, re.S)
+        assert liste, r["id"]
+        name = html_mod.escape(str(r["name"]), quote=True)
+        for punkt in re.findall(r"<li>(.*?)</li>", liste.group(1), re.S):
+            assert name in punkt, (r["id"], punkt[:80])
+            if not punkt.startswith("<b>Im Soll-Intervall, ohne weitere Vorbehalte"):
+                assert "Soll-Intervall des ÖSG" in punkt, (r["id"], punkt[:80])
+
+
+def test_keine_null_mit_vorzeichen(seiten):
+    """«−0,0» sähe aus wie ein Fehler; gerundet auf null stehen zwei Nachkommastellen da."""
+    for pfad, html in seiten.items():
+        assert not re.search(r"[−+]0,0<", html), pfad
 
 
 # --- Was die Seiten sagen dürfen ------------------------------------------------------------------------------

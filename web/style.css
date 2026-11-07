@@ -131,6 +131,10 @@ table.mx { border-collapse: separate; border-spacing: 2px; font-size: 12.5px }
 /* Detail */
 .d-title { font-size: 18px; font-weight: 600; margin: 0; line-height: 1.25 }
 .d-meta { color: var(--muted); font-size: 12.5px; margin: 2px 0 14px }
+/* Link aus der Detailspalte in die Lesefassung: Vergleichen hier, Nachlesen dort (docs/WEB.md, «Lesefassung») */
+.d-mehr { margin: 14px 0 0; padding-top: 10px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--ink-2) }
+.d-mehr a, .lede-link a { color: var(--accent) }
+.lede-link { margin: 0; font-size: 13.5px }
 .d-grid { display: grid; grid-template-columns: auto 1fr 1fr; gap: 6px 12px; font-size: 13px; align-items: baseline }
 .d-grid .h { font-family: var(--f-cond); font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted) }
 .d-grid .l { color: var(--ink-2) }

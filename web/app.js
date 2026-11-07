@@ -218,7 +218,8 @@ function renderDetail() {
     </div>
     <div class="minibar">${miniBar(wI, wP, fi, dg)}</div>
     <div class="say">${satz(first[0], first[1])}${satz(second[0], second[1])}</div>
-    <ul class="cav">${vorbehalte(r, f, S.abschnitt).map((v) => `<li>${v.text} <a href="${DATEN_MD}" target="_blank" rel="noopener noreferrer">Fallstrick ${v.fallstrick}</a></li>`).join("")}</ul>`;
+    <ul class="cav">${vorbehalte(r, f, S.abschnitt).map((v) => `<li>${v.text} <a href="${DATEN_MD}" target="_blank" rel="noopener noreferrer">Fallstrick ${v.fallstrick}</a></li>`).join("")}</ul>
+    <p class="d-mehr">Nachlesen: <a class="intern" href="${r.ebene === "VR" ? "vr" : "bl"}/${esc(r.slug)}/">alles zu ${esc(titel(r))}</a> · <a class="intern" href="fach/${esc(f)}/">${esc(fi.name)} in allen Regionen</a></p>`;
 }
 function miniBar(wI, wP, fi, dg) {
   const W = 320, H = 46, x0 = 12, x1 = W - 12;
