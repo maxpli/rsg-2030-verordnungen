@@ -216,22 +216,24 @@ Was an der Webseite ([WEB.md](WEB.md)) noch offen ist.
    sich je Bundesland wiederholt. Offen ist auch, wie weit es die Matrix am Handy braucht: Wer einen Wert nachsieht,
    tippt die Zelle an und liest Fach und Region im Klartext in der Detailspalte.
 
-6. **Ein `Dataset`-Eintrag für den Datensatz, nicht zwei.** Heute beschreiben zwei Seiten denselben Datensatz als
-   `Dataset` (schema.org), mit verschiedener `@id`: die Lesefassung (`/daten/#dataset`) und die Seite des
-   Herausgebers (`loesungswerk.at/rsg-2030#dataset`). Zwei Einträge konkurrieren in der Suche (Google Dataset
-   Search) – genau das, was die Regel «Ein Dataset-Eintrag» in [WEB.md](WEB.md) vermeiden soll. Der Eintrag auf
-   loesungswerk.at ist der vollständigere (Downloads je Datei, Urheber mit ORCID, Zeit- und Ortsbezug, gemessene
-   Größen) und liegt auf einer eigenen Domain. Vorschlag:
-   - **loesungswerk.at/rsg-2030 bleibt die einzige Stelle mit `Dataset`.** Dort zusätzlich die Lesefassung
-     verlinken (`subjectOf` oder `sameAs` auf `/daten/`), damit beide Seiten als zusammengehörig erkannt werden.
-   - **Lesefassung:** `/daten/` wird `WebPage` mit `isBasedOn` → `https://loesungswerk.at/rsg-2030#dataset`,
-     die übrigen Seiten `isPartOf` → `/daten/`; ein sichtbarer Link «Beschreibung des Datensatzes» auf
-     loesungswerk.at.
-   - Nachziehen: Regel «Ein Dataset-Eintrag» in WEB.md, der Test dazu in `tests/test_lesefassung.py`.
-   - **Vorher entscheiden:** Version und Downloads stehen dann nur noch auf loesungswerk.at und müssen dort bei
-     jedem Release nachgezogen werden; bleibt das aus, zeigt der einzige `Dataset`-Eintrag eine alte Version.
-     Danach mit dem Rich Results Test von Google prüfen.
-   Zusammen damit: **eigene Domain für die Lesefassung?** Unter `maxpli.github.io/rsg-2030-verordnungen/` lässt
-   sich keine `robots.txt` setzen (sie gehört an die Wurzel der Domain), und GitHub Pages kann nicht umleiten –
-   ein späterer Umzug ließe die indexierten Adressen ins Leere laufen. Bis dahin die Sitemap über die Search
-   Console einreichen (Property mit URL-Präfix, Bestätigung per Meta-Tag).
+6. **Ein `Dataset`-Eintrag – entschieden: auf `/daten/`, nicht auf loesungswerk.at.** Zwei Einträge für denselben
+   Datensatz konkurrieren in der Suche (Google Dataset Search). Der Eintrag auf `/daten/` wird bei jedem Bau aus dem
+   Release erzeugt (Version, Datum aus `CITATION.cff`, Downloads; ein Test prüft, dass `release.yml` jede Datei
+   anhängt), der auf loesungswerk.at musste je Release nachgezogen werden. Übernommen von dort: gemessene Größen
+   (`variableMeasured`), Schlagwörter, Excel-Mappe als Download und die Person mit derselben Kennung
+   (`https://loesungswerk.at/#max-plischke`), damit beide Seiten als Werk desselben Menschen erkannt werden. Die
+   anderen Seiten der Lesefassung zeigen mit `isBasedOn` auf den Datensatz (WEB.md, «Strukturierte Daten»).
+   Auf loesungswerk.at/rsg-2030 (eigenes Repo): `Dataset` entfernt, die Seite verweist mit `about` auf
+   `/daten/#dataset`, die Links zeigen auf `rsg.loesungswerk.at`. Offen, nach dem Veröffentlichen beider Seiten:
+   - Sitemap in der Search Console einreichen (Domain-Property `loesungswerk.at`, Bestätigung per DNS, deckt die
+     Subdomain ab), für `/daten/` und loesungswerk.at/rsg-2030 «Indexierung beantragen».
+   - Rich Results Test für `/daten/` (ein Datensatz) und für loesungswerk.at/rsg-2030 (keiner mehr).
+   - Dass Google den alten Eintrag auf loesungswerk.at noch eine Weile in Dataset Search zeigt, ist normal; er
+     verschwindet beim nächsten Crawl der Seite, der neue erscheint, sobald `/daten/` gecrawlt ist.
+
+7. **Sachleistungsstellen ins Dashboard?** Sie stehen heute nur auf den Seiten der Lesefassung. Kämen sie in die
+   Detailspalte, hätte das Dashboard alles, was die Seiten zeigen – die Seiten blieben für Suchmaschinen und zum
+   Zitieren. Zu klären: eigene Zeilen in der Detailspalte (nur PLAN 2030, gemeinsam und zusätzlich je Träger), mit
+   dem Satz, dass Stellen nur den niedergelassenen Bereich zählen und nicht gegen die ÄAVE gerechnet werden
+   (DATEN.md, Tabelle Stellen); `data.json` bräuchte dafür die Tabelle Stellen. Zusammen mit «alle
+   Sachleistungsstellen als eigene Zeile» (oben) entscheiden.

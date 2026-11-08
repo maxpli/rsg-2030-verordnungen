@@ -18,12 +18,23 @@ const DATEN_MD = `${M.repo}/blob/${M.version}/docs/DATEN.md#fallstricke`;
 
 const nf = (d) => new Intl.NumberFormat("de-AT", { minimumFractionDigits: d, maximumFractionDigits: d });
 const fmt = (x, d = 1) => x == null ? "–" : nf(d).format(x).replace("-", "−");
-const sgn = (x, d = 1) => x == null ? "–" : (x > 0 ? "+" : "") + fmt(x, d);
-const vdDig = (f) => (f.max < 2 ? 2 : 1);
+/* ÄAVE-Abstand mit Vorzeichen, gerundet wie alle Zahlen (lesbar, unten): «−0,02» statt «−0,0», genau 0 als «0» */
+const sgn = (x) => x == null ? "–" : (x > 0 ? "+" : "") + lesbar(x);
+/* ÄAVE und VD: eine Nachkommastelle, eine mehr, wo die Rundung sonst etwas Falsches sagte (ein Wert ungleich 0 fiele
+   auf «0,0»; eine VD fiele genau auf VDmin/VDmax, liegt aber außerhalb), genau 0 als «0». Dieselbe Regel wie
+   rsg2030/darstellung.py, stellen_fuer und lesbar (docs/WEB.md, «Zahlen auf der Seite»). */
+const stellenFuer = (x, lo, hi) => {
+  for (const s of [1, 2, 3]) {
+    const nul = x !== 0 && fmt(Math.abs(x), s) === fmt(0, s);
+    const unten = lo != null && x < lo && fmt(x, s) === fmt(lo, s);
+    const oben = hi != null && x > hi && fmt(x, s) === fmt(hi, s);
+    if (!(nul || unten || oben)) return s;
+  }
+  return 3;
+};
+const lesbar = (x, lo, hi) => (x == null ? "–" : x === 0 ? "0" : fmt(x, stellenFuer(x, lo, hi)));
 const esc = (t) => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
 const trunc = (t, n) => t.length > n ? t.slice(0, n - 1) + "…" : t;
-/* Prüfsumme gekürzt wie in der Konsole; die vollen Werte stehen im Release (docs/WEB.md) */
-const sha12 = (h) => esc(String(h).slice(0, 12)) + "…";
 
 const STANDARD = { VR: "41", BL: "OÖ" };
 const S = { abschnitt: "PLAN", ebene: "VR", fach: "IM", region: STANDARD.VR, hatch: true, src: false };
@@ -60,15 +71,11 @@ const titel = (r) => r.ebene === "VR" ? r.name : r.land_name;
 const lageText = (w) => !w ? "kein Wert" : w.lage === "im" ? "im Intervall" : w.lage === "unter" ? "unter VDmin" : "über VDmax";
 const pill = (w) => `<span class="pill"><i class="k-${klasse(w)}"></i>${lageText(w)}</span>`;
 
-/* Kopf und Fußzeile: Datenstand, Stand der Seite, Quellen und wer sie erstellt hat (docs/WEB.md, Entscheidung 15).
-   Die Quellenzeile verlangt die Lizenz der Bevölkerungsdaten (LIZENZ_DATEN.md); derselbe Text wie in der
-   Lesefassung (rsg2030/lesefassung.py, QUELLEN). */
+/* Kopf und Fußzeile. Die Fußzeile kommt fertig aus data.json (rsg2030/darstellung.py, fusszeile): derselbe Text
+   wie in der Lesefassung – wer sie erstellt hat, die Links, die Namensnennung, die die Lizenz der Bevölkerungsdaten
+   verlangt (LIZENZ_DATEN.md; docs/WEB.md, Entscheidung 15). Die Prüfsummen stehen im Release und in data.json, nicht hier. */
 document.getElementById("eyebrow").textContent = `RSG-2030-Verordnungen · Release ${M.version}`;
-document.getElementById("footer").innerHTML = `
-  <div>Quelle: <a href="${M.repo}/releases/tag/${M.version}" target="_blank" rel="noopener noreferrer">Release ${esc(M.version)}</a> von <a href="${M.repo}" target="_blank" rel="noopener noreferrer">${esc(M.repo.replace("https://github.com/", ""))}</a>, zwei Tabellen: die Werte aus <span class="nb">${esc(M.datei)}</span> (SHA-256 <span class="num">${sha12(M.sha256)}</span>), die Herkunft je Wert aus <span class="nb">${esc(M.matrizen_datei)}</span> (<span class="num">${sha12(M.matrizen_sha256)}</span>). Volle Prüfsummen: <a href="${M.repo}/releases/download/${M.version}/SHA256SUMS.txt" target="_blank" rel="noopener noreferrer">SHA256SUMS.txt</a></div>
-  <div>Stand der Seite: <a href="${M.repo}/commit/${M.commit}" target="_blank" rel="noopener noreferrer" class="num">${esc(M.commit.slice(0, 7))}</a> · Alle Vorbehalte: <a href="${DATEN_MD}" target="_blank" rel="noopener noreferrer">docs/DATEN.md, Fallstricke</a> · Daten CC BY 4.0</div>
-  <div>Quellen: Verordnungen zu den RSG 2030 (RIS) · Bevölkerung: Statistik Austria – data.statistik.gv.at (CC BY 4.0, bearbeitet) · Aufteilung 2030 auf Versorgungsregionen: ÖROK-Prognose 2021 (CC BY 4.0, bearbeitet) · Soll-Intervalle und Versorgungsregionen: ÖSG 2023 (BMASGPK/GÖG)</div>
-  <div>Erstellt von Max Plischke, <a href="https://loesungswerk.at/rsg-2030" target="_blank" rel="noopener noreferrer">Lösungswerk</a>, ohne Auftrag. Inoffizielle Aufbereitung amtlicher Daten; maßgeblich sind die Verordnungen im RIS. Angaben ohne Gewähr, Fehler bitte melden. · <a href="https://loesungswerk.at/impressum" target="_blank" rel="noopener noreferrer">Impressum</a> · <a href="https://loesungswerk.at/datenschutz" target="_blank" rel="noopener noreferrer">Datenschutz</a></div>`;
+document.getElementById("footer").innerHTML = D.fusszeile;
 
 /* Über diese Daten: der Weg von der Seite in den Datensatz. Alle Links auf das Release, aus dem die Daten der Seite
    stammen (nicht «latest»), damit Downloads und Doku zu den gezeigten Zahlen passen. */
@@ -77,12 +84,13 @@ const REL = `${M.repo}/releases/download/${M.version}`, DOC = `${M.repo}/blob/${
    dieselbe Haltung wie die selbst ausgelieferten Schriften. Nebenbei die sichere Seite, falls ein Server fremde
    Referer je sperrt; ohne Referer antwortet das RIS, so lädt auch «python -m rsg2030 download». */
 const link = (href, text) => `<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`;
-document.getElementById("about").innerHTML = `
+/* davor, nicht anstelle: Der letzte Absatz (Link in die Lesefassung) steht fest in index.html */
+document.getElementById("about").insertAdjacentHTML("afterbegin", `
   <h2 id="h-about">Über diese Daten</h2>
   <p>Diese Seite zeigt einen Ausschnitt aus dem Datensatz <b>RSG 2030 – Planungsmatrizen der Verordnungen</b>: die Zeile «insgesamt» der Tabelle Versorgungsdichte. Der Datensatz enthält außerdem jede Zelle aller 41 Planungsmatrizen (9 Bundesländer, 32 Versorgungsregionen), auch Planstellen, Wahlärzt:innen und Fächer ohne Richtwert. Zu jedem Wert steht dort, woher er kommt: PDF, Seite, Originaltext und, wo korrigiert wurde, die Regel mit Begründung.</p>
   <p><b>Herunterladen</b> (Release ${esc(M.version)}): ${link(`${REL}/RSG_2030_Versorgungsdichte.csv`, "Tabelle Versorgungsdichte (CSV)")} · ${link(`${REL}/RSG_2030_Planungsmatrizen.csv`, "Tabelle Planungsmatrizen (CSV)")} · ${link(`${REL}/RSG_2030_Planungsmatrizen.xlsx`, "Excel-Mappe zum Nachsehen")} · ${link(`${REL}/Pruefbericht.md`, "Prüfbericht")}. Vor der Verwendung bitte die ${link(DATEN_MD, "Fallstricke")} lesen.</p>
   <p><b>Wie die Daten abgesichert sind:</b> Jede Quelldatei ist mit Prüfsumme registriert, jede Zelle wird zweimal unabhängig gelesen, Rechenprüfungen laufen bei jeder Erzeugung, und was keine Maschine prüfen kann, entscheidet ein Mensch am PDF. ${link(`${DOC}/docs/PRUEFUNG.md`, "Mehr dazu")}</p>
-  <p><b>Zitieren:</b> ${link(`${DOC}/CITATION.cff`, "CITATION.cff")} · <b>Fehler gefunden?</b> Issue ${link(`${M.repo}/issues/new?template=wert_weicht_ab.yml`, "«Wert weicht vom PDF ab»")} oder ${link(`${M.repo}/issues/new?template=methodik_frage.yml`, "«Frage zur Methodik»")}</p>`;
+  <p><b>Zitieren:</b> ${link(`${DOC}/CITATION.cff`, "CITATION.cff")} · <b>Fehler gefunden?</b> Issue ${link(`${M.repo}/issues/new?template=wert_weicht_ab.yml`, "«Wert weicht vom PDF ab»")} oder ${link(`${M.repo}/issues/new?template=methodik_frage.yml`, "«Frage zur Methodik»")}</p>`);
 
 /* Tooltip */
 const tip = document.getElementById("tip");
@@ -102,8 +110,7 @@ function tipHtml(r, f, ab) {
   const w = get(r.id, ab, f), fi = fachInfo[f];
   const head = `<b>${r.ebene === "VR" ? r.id + " " : ""}${esc(titel(r))}</b><br><span class="t2">${esc(fi.name)} · ${ab === "IST" ? "IST " + (w ? w.jahr : "") : "PLAN 2030"}</span>`;
   if (!w) return head + "<br>kein Wert";
-  const dg = vdDig(fi);
-  return `${head}<br>VD <span class="num">${fmt(w.vd, dg)}</span> · Soll <span class="num">${fmt(fi.min, dg)}–${fmt(fi.max, dg)}</span><br>${lageText(w)} · ÄAVE-Abstand <span class="num">${sgn(w.abst)}</span>`;
+  return `${head}<br>VD <span class="num">${lesbar(w.vd, fi.min, fi.max)}</span> · Soll <span class="num">${fmt(fi.min)}–${fmt(fi.max)}</span><br>${lageText(w)} · ÄAVE-Abstand <span class="num">${sgn(w.abst)}</span>`;
 }
 
 /* Bedienung */
@@ -200,7 +207,7 @@ function satz(w, label) {
   return fill(D.satz_vorlagen[lage], [label, abstand]);
 }
 function renderDetail() {
-  const r = regionById[S.region], f = S.fach, fi = fachInfo[f], dg = vdDig(fi);
+  const r = regionById[S.region], f = S.fach, fi = fachInfo[f];
   const wI = get(r.id, "IST", f), wP = get(r.id, "PLAN", f);
   const row = (l, a, b) => `<div class="l">${l}</div><div class="v">${a}</div><div class="v">${b}</div>`;
   const val = (w, fn) => w ? fn(w) : "–";
@@ -209,22 +216,21 @@ function renderDetail() {
   document.getElementById("detail").innerHTML = `
     ${backTo ? `<button type="button" class="d-back" id="d-back">↑ Zurück zur Auswahl</button>` : ""}
     <h2 class="d-title">${r.ebene === "VR" ? `<span class="num" style="color:var(--muted);font-weight:400">${r.id}</span> ` : ""}${esc(titel(r))}</h2>
-    <p class="d-meta">${r.ebene === "VR" ? esc(r.land_name) + " · " : ""}${esc(fi.name)} · Soll-Intervall <span class="num">${fmt(fi.min, dg)}–${fmt(fi.max, dg)}</span></p>
+    <p class="d-meta">${r.ebene === "VR" ? esc(r.land_name) + " · " : ""}${esc(fi.name)} · Soll-Intervall <span class="num">${fmt(fi.min)}–${fmt(fi.max)}</span></p>
     <div class="d-grid">
       <div></div><div class="h v">IST ${wI ? wI.jahr : ""}</div><div class="h v">PLAN 2030</div>
-      ${row("Versorgungsdichte", val(wI, (w) => num(fmt(w.vd, dg))), val(wP, (w) => num(fmt(w.vd, dg))))}
-      ${row("ÄAVE", val(wI, (w) => num(fmt(w.aave))), val(wP, (w) => num(fmt(w.aave))))}
+      ${row("Versorgungsdichte", val(wI, (w) => num(lesbar(w.vd, fi.min, fi.max))), val(wP, (w) => num(lesbar(w.vd, fi.min, fi.max))))}
+      ${row("ÄAVE", val(wI, (w) => num(lesbar(w.aave))), val(wP, (w) => num(lesbar(w.aave))))}
       ${row("Bevölkerung", val(wI, (w) => num(fmt(w.bev, 0))), val(wP, (w) => num(fmt(w.bev, 0))))}
       ${row("Lage", wI ? pill(wI) : "–", wP ? pill(wP) : "–")}
       ${row("Position", val(wI, (w) => num(fmt(w.pos, 2))), val(wP, (w) => num(fmt(w.pos, 2))))}
       ${row("ÄAVE-Abstand", val(wI, (w) => num(sgn(w.abst))), val(wP, (w) => num(sgn(w.abst))))}
     </div>
-    <div class="minibar">${miniBar(wI, wP, fi, dg)}</div>
+    <div class="minibar">${miniBar(wI, wP, fi)}</div>
     <div class="say">${satz(first[0], first[1])}${satz(second[0], second[1])}</div>
-    <ul class="cav">${vorbehalte(r, f, S.abschnitt).map((v) => `<li>${v.text} <a href="${DATEN_MD}" target="_blank" rel="noopener noreferrer">Fallstrick ${v.fallstrick}</a></li>`).join("")}</ul>
-    <p class="d-mehr">Nachlesen: <a class="intern" href="${r.ebene === "VR" ? "vr" : "bl"}/${esc(r.slug)}/">alles zu ${esc(titel(r))}</a> · <a class="intern" href="fach/${esc(f)}/">${esc(fi.name)} in allen Regionen</a></p>`;
+    <ul class="cav">${vorbehalte(r, f, S.abschnitt).map((v) => `<li>${v.text} <a href="${DATEN_MD}" target="_blank" rel="noopener noreferrer">Fallstrick ${v.fallstrick}</a></li>`).join("")}</ul>`;
 }
-function miniBar(wI, wP, fi, dg) {
+function miniBar(wI, wP, fi) {
   const W = 320, H = 46, x0 = 12, x1 = W - 12;
   const vals = [fi.min, fi.max, wI && wI.vd, wP && wP.vd].filter((v) => v != null);
   const span = fi.max - fi.min;
@@ -234,7 +240,7 @@ function miniBar(wI, wP, fi, dg) {
   const x = (v) => x0 + (v - lo) / (hi - lo) * (x1 - x0);
   let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Versorgungsdichte IST und PLAN im Soll-Intervall">`;
   s += `<rect class="band" x="${x(fi.min)}" y="8" width="${x(fi.max) - x(fi.min)}" height="16" rx="3"/>`;
-  s += `<text class="mono muted" x="${x(fi.min)}" y="40" font-size="10.5" text-anchor="middle">${fmt(fi.min, dg)}</text><text class="mono muted" x="${x(fi.max)}" y="40" font-size="10.5" text-anchor="middle">${fmt(fi.max, dg)}</text>`;
+  s += `<text class="mono muted" x="${x(fi.min)}" y="40" font-size="10.5" text-anchor="middle">${fmt(fi.min)}</text><text class="mono muted" x="${x(fi.max)}" y="40" font-size="10.5" text-anchor="middle">${fmt(fi.max)}</text>`;
   if (wI && wP) s += `<line class="s-link" x1="${x(wI.vd)}" x2="${x(wP.vd)}" y1="16" y2="16"/>`;
   if (wI) s += `<circle class="s-ring" cx="${x(wI.vd)}" cy="16" r="5"/>`;
   if (wP) s += `<circle class="f-${klasse(wP)} dot-ring" cx="${x(wP.vd)}" cy="16" r="6"/><circle cx="${x(wP.vd)}" cy="16" r="6" fill="none" stroke="var(--ink)" stroke-width="1"/>`;
@@ -325,7 +331,7 @@ function renderHerkunft() {
 const stripEl = document.getElementById("strip");
 const stripFussEl = document.getElementById("strip-fuss");
 function renderStrip() {
-  const f = S.fach, fi = fachInfo[f], dg = vdDig(fi);
+  const f = S.fach, fi = fachInfo[f];
   const regs = regionen().map((r) => ({ r, i: get(r.id, "IST", f), p: get(r.id, "PLAN", f) }));
   const key = (o) => { const w = S.abschnitt === "IST" ? o.i : o.p; return w ? w.pos : Infinity; };
   regs.sort((a, b) => key(a) - key(b));
@@ -336,8 +342,8 @@ function renderStrip() {
   let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" role="img" aria-label="Position im Soll-Intervall je Region, ${f}">`;
   s += `<rect class="band" x="${x(0)}" y="${top - 6}" width="${x(1) - x(0)}" height="${regs.length * rh + 6}"/>`;
   /* Zwei Zeilen über dem Band: oben die VD (VDmin links, VDmax rechts), darunter die Position – je Zeile ein Maßstab */
-  s += `<text class="mono" x="${x(0) - 3}" y="${top - 26}" font-size="10.5" text-anchor="end">VDmin ${fmt(fi.min, dg)}</text>`;
-  s += `<text class="mono" x="${x(1) + 3}" y="${top - 26}" font-size="10.5" text-anchor="start">VDmax ${fmt(fi.max, dg)}</text>`;
+  s += `<text class="mono" x="${x(0) - 3}" y="${top - 26}" font-size="10.5" text-anchor="end">VDmin ${fmt(fi.min)}</text>`;
+  s += `<text class="mono" x="${x(1) + 3}" y="${top - 26}" font-size="10.5" text-anchor="start">VDmax ${fmt(fi.max)}</text>`;
   for (const t of [-1, 0, 1, 2, 3]) {
     s += `<line class="grid" x1="${x(t)}" x2="${x(t)}" y1="${top - 6}" y2="${bot}"/>`;
     s += `<text class="muted mono" x="${x(t)}" y="${top - 11}" font-size="10.5" text-anchor="middle">${fmt(t, 0)}</text>`;

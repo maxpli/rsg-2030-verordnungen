@@ -6,7 +6,10 @@ vergleicht jede Zelle von data.json mit ihr.
 
 from __future__ import annotations
 
+import json
 import re
+import shutil
+import subprocess
 
 import pandas as pd
 import pytest
@@ -476,19 +479,80 @@ def test_herkunft_zitiert_die_tabelle_planungsmatrizen():
 # --- nichts von fremden Servern -------------------------------------------------------------------------------------
 
 
-def test_dashboard_verlinkt_die_lesefassung_fest_im_html():
-    """Suchmaschinen ohne JavaScript finden die Lesefassung nur über einen Link im HTML, nicht über app.js."""
+def test_dashboard_hat_eine_adresse_fuer_die_suche():
+    """`canonical` auf die Wurzel der Lesefassungs-Domain: Links mit ?region=…&fach=… sind keine eigenen Seiten."""
+    from rsg2030.lesefassung import BASIS_STANDARD
+
     html = (WEB / "index.html").read_text(encoding="utf-8")
-    assert '<a href="daten/">' in html
+    assert f'<link rel="canonical" href="{BASIS_STANDARD}/">' in html
+
+
+def test_dashboard_verlinkt_die_lesefassung_fest_im_html():
+    """Ein Link, unauffällig unter «Über diese Daten», fest im HTML: Crawler ohne JavaScript sehen nur das, und Links
+    von außen zeigen aufs Dashboard, nicht auf die Seiten (docs/WEB.md, «Zwei Wege»)."""
+    html = (WEB / "index.html").read_text(encoding="utf-8")
+    about = re.search(r'<section [^>]*id="about"[^>]*>(.*?)</section>', html, re.S)
+    assert about and '<a href="daten/">' in about.group(1)
     js = (WEB / "app.js").read_text(encoding="utf-8")
-    assert 'class="d-mehr"' in js and "fach/${esc(f)}/" in js
+    assert 'getElementById("about").innerHTML' not in js, "app.js überschriebe den festen Link"
 
 
-def test_dashboard_nennt_die_quellen_wie_die_lesefassung():
-    """Namensnennung nach LIZENZ_DATEN.md, im selben Wortlaut wie die Lesefassung – zwei Kopien, ein Test."""
-    from rsg2030.lesefassung import QUELLEN
+ZAHLFAELLE = [
+    # (Wert, VDmin, VDmax) → wie auf der Seite; None = keine Grenze (ÄAVE)
+    ((1.5890802, 1.6, 3.0), "1,59"),  # Burgenland-Nord, PUL, PLAN: sonst 1,6 neben 1,6–3,0 und «unter»
+    ((1.6466737, 1.6, 3.0), "1,6"),  # IST, im Intervall: bleibt
+    ((8.4143, 4.5, 8.4), "8,41"),  # knapp über VDmax
+    ((3.0, 1.6, 3.0), "3,0"),  # genau auf der Grenze ist innerhalb
+    ((0.787, 0.8, 1.4), "0,79"),  # KJP (VR 33, IST): eine Stelle wie im ÖSG, an der Grenze eine mehr
+    ((0.7951, 0.8, 1.4), "0,795"),  # auch zwei Stellen fielen auf die Grenze: drei
+    ((1.0549, 0.8, 1.4), "1,1"),  # KJP im Intervall: eine Stelle
+    ((0.0351898, 2.8, 5.1), "0,04"),  # Salzburg, KFO, IST: nicht 0, also nicht «0,0»
+    ((0.0, 0.5, 0.9), "0"),  # nichts geplant (in der Matrix «-»)
+    ((211.47, None, None), "211,5"),  # ÄAVE
+    ((0.04, None, None), "0,04"),
+    ((0.0, None, None), "0"),
+]
 
-    assert QUELLEN in (WEB / "app.js").read_text(encoding="utf-8")
+
+def test_zahlen_auf_der_seite():
+    """Eine Stelle; eine mehr, wo die Rundung sonst etwas Falsches sagte; genau 0 als «0» (docs/WEB.md)."""
+    from rsg2030.darstellung import lesbar
+
+    for args, text in ZAHLFAELLE:
+        assert lesbar(*args) == text, args
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="node nicht installiert")
+def test_dashboard_rundet_wie_die_lesefassung():
+    """Dieselbe Regel in app.js (`lesbar`) – die Funktionen aus app.js herausgelöst und mit node gerechnet."""
+    js = (WEB / "app.js").read_text(encoding="utf-8")
+    teil = js[js.index("const nf = ") : js.index("const esc = ")]
+    faelle = json.dumps([[*a, s] for a, s in ZAHLFAELLE])
+    prog = (
+        teil
+        + f"""
+for (const [x, lo, hi, soll] of {faelle}) {{
+  const ist = lesbar(x, lo, hi);
+  if (ist !== soll) {{ console.log(`${{x}}: ${{ist}} statt ${{soll}}`); process.exitCode = 1; }}
+}}"""
+    )
+    lauf = subprocess.run(["node", "-e", prog], capture_output=True, text=True)
+    assert lauf.returncode == 0, lauf.stdout + lauf.stderr
+
+
+def test_dashboard_hat_die_fusszeile_der_lesefassung():
+    """Eine Fußzeile für beide Darstellungen (rsg2030/darstellung.py, `fusszeile`): app.js setzt sie aus data.json
+    ein und schreibt keine eigene. Sie trägt die Namensnennung nach LIZENZ_DATEN.md."""
+    from rsg2030.darstellung import NAMENSNENNUNG, fusszeile
+
+    js = (WEB / "app.js").read_text(encoding="utf-8")
+    assert 'getElementById("footer").innerHTML = D.fusszeile;' in js
+    assert "Statistik Austria" not in js, "zweite Kopie der Namensnennung in app.js"
+    text = fusszeile("https://github.com/x/y", "2026.9", "8657f1075b26bf76a4c9c004617feb932c85ef76")
+    assert NAMENSNENNUNG in text and "Release 2026.9" in text and "Impressum" in text
+    assert 'commit/8657f1075b26bf76a4c9c004617feb932c85ef76"' in text and ">8657f10</a>" in text
+    assert "Stand der Seite" not in fusszeile("https://github.com/x/y", "2026.9", "unbekannt")
+    assert text.count("<a ") == text.count('rel="noopener noreferrer"')
 
 
 def test_seite_laedt_nichts_von_fremden_servern():
@@ -497,7 +561,9 @@ def test_seite_laedt_nichts_von_fremden_servern():
     html = (WEB / "index.html").read_text(encoding="utf-8")
     css = (WEB / "style.css").read_text(encoding="utf-8")
     js = (WEB / "app.js").read_text(encoding="utf-8")
-    assert not re.findall(r"<(?:link|script|img|iframe)[^>]+(?:href|src)=\"(?:https?:)?//", html)
+    # <link rel="canonical"> lädt nichts, es nennt nur die Adresse der Seite
+    ohne_canonical = re.sub(r'<link rel="canonical" href="[^"]*">', "", html)
+    assert not re.findall(r"<(?:link|script|img|iframe)[^>]+(?:href|src)=\"(?:https?:)?//", ohne_canonical)
     assert not re.findall(r"@import|url\(\s*[\"']?(?:https?:)?//", css)
     assert not re.findall(r"\b(?:fetch|import)\s*\(\s*[\"'`](?:https?:)?//", js)
 
@@ -524,6 +590,5 @@ def test_externe_links_schicken_keinen_referrer():
     js = (WEB / "app.js").read_text(encoding="utf-8")
     anker = re.findall(r"<a href=[^>]*>", js)
     assert anker, "keine Links gefunden – prüft dieser Test noch, was er soll?"
-    # Ausgenommen sind Links innerhalb der Seite (in die Lesefassung, class="intern"): Sie verlassen sie nicht
-    ohne = [a for a in anker if "noreferrer" not in a and 'class="intern"' not in a]
+    ohne = [a for a in anker if "noreferrer" not in a]
     assert not ohne, f"Link ohne noreferrer: {ohne}"

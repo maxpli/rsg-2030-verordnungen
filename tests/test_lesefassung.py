@@ -18,7 +18,7 @@ import pytest
 from conftest import ROOT
 
 from rsg2030.config import VERSORGUNGSDICHTE_DATEI, ausgabe_dir
-from rsg2030.darstellung import VORBEHALTE
+from rsg2030.darstellung import VORBEHALTE, lesbar, zahl
 from rsg2030.lesefassung import (
     LAND_SLUG,
     VERBOTEN,
@@ -251,21 +251,22 @@ def test_jede_zahl_steht_so_in_der_tabelle(seiten, aufbau):
         html = seiten[aufbau.pfad(r)]
         for z in ins[ins["Region_ID"] == str(r["id"])].itertuples():
             fach = next(f for f in aufbau.faecher if f["id"] == z.Fach)
-            stellen = 2 if float(str(fach["max"])) < 2 else 1
-            for wert, dg in ((z.AAVE, 1), (z.VD, stellen)):
-                text = f"{float(wert):.{dg}f}".replace(".", ",")
+            lo, hi = float(str(fach["min"])), float(str(fach["max"]))
+            # Rundung nach docs/WEB.md, «Zahlen auf der Seite» (Fälle in tests/test_web.py)
+            for text in (lesbar(float(z.AAVE)), lesbar(float(z.VD), lo, hi)):
                 assert f">{text}<" in html, (r["id"], z.Fach, text)
                 geprueft += 1
     assert geprueft > 1000, geprueft
 
 
 def test_soll_intervall_wie_im_richtwert(seiten, aufbau):
-    """Das Soll-Intervall steht auf jeder Fachseite so da wie in der Tabelle."""
+    """Das Soll-Intervall steht auf jeder Fachseite so da, wie der ÖSG es druckt (Textband S.39, eine Stelle):
+    zeichengleich mit der Referenz der Richtwerte, die es von dort abschreibt."""
+    richtwerte = pd.read_csv(ROOT / "oesg_methodik" / "referenz" / "oesg_planungsrichtwerte.csv", sep=";", dtype=str)
+    gedruckt = {z.OESG_Code: (z.VDmin, z.VDmax) for z in richtwerte.itertuples()}
     for f in aufbau.faecher:
-        dg = 2 if float(str(f["max"])) < 2 else 1
         html = seiten[f"fach/{f['id']}/"]
-        min_t = f"{float(str(f['min'])):.{dg}f}".replace(".", ",")
-        max_t = f"{float(str(f['max'])):.{dg}f}".replace(".", ",")
+        min_t, max_t = gedruckt[str(f["id"])]
         assert f"{min_t} bis {max_t}" in html, f["id"]
 
 
@@ -284,16 +285,66 @@ def test_zellen_ohne_wert_nennen_grund_und_quelle(seiten, aufbau):
 # --- Apparat --------------------------------------------------------------------------------------------------
 
 
-def test_fussnoten_wortgleich_aus_dem_verzeichnis(seiten, aufbau):
-    """Die Seiten zitieren, sie formulieren nicht um."""
-    import html as html_mod
+FUSSNOTE_AUF_DER_SEITE: dict[str, tuple[str, ...] | None] = {
+    # Verweis in fussnoten.csv → woran man auf der Seite erkennt, dass die Fußnote berücksichtigt ist (eines genügt).
+    # Wörter aus den Vorbehalten (rsg2030/darstellung.py) und dem Zuschnitt, nicht Fachnamen, die überall stehen.
+    "METHODIK.md R5": ("AM + ZAE", "ZAE nicht getrennt ausgewiesen"),  # spitalsambulant = ZAE
+    "Art «Fußnote» (KFO)": ("KFO in Oberösterreich",),  # OÖ: KFO nur als Fußnote, per Korrekturregel
+    "R4 «ZMK und KFO je Land»": ("Wien rechnet mehr zu ZMK", "KFO in Oberösterreich"),  # was in ZMK steckt
+    "OÖ spitalsambulant": ("OÖ PLAN spitalsambulant",),  # fortgeschriebenes IST
+    "offene_punkte.md": ("offene_punkte.md",),  # Methodenfrage: Link unter «Offene Fragen»
+    "planstellen_oegk_svs_bvaeb": None,  # betrifft IST-Planstellen; die zeigen die Seiten nicht
+}
+
+
+def test_jede_fussnote_die_werte_betrifft_steht_auf_der_seite(seiten, aufbau):
+    """Die Fußnoten stehen nur gezählt da (docs/WEB.md, «Fußnoten»). Das ist nur vertretbar, wenn jede, die Werte
+    betrifft oder eine offene Frage ist, auf der Seite ihrer Matrix berücksichtigt ist – als Vorbehalt, Zuschnitt
+    oder Link. Eine neue Art Verweis lässt den Test scheitern: dann entscheiden, was die Seite dazu sagen muss."""
+    from rsg2030.fussnoten import MIT_VERWEIS
 
     fn = aufbau.fussnoten
+    pfade = {(str(r["ebene"]), str(r["id"])): aufbau.pfad(r) for r in aufbau.regionen}
+    geprueft = 0
+    for z in fn[fn["Einordnung"].isin(MIT_VERWEIS)].itertuples():
+        merkmale = [m for k, m in FUSSNOTE_AUF_DER_SEITE.items() if k in str(z.Verweis)]
+        assert merkmale, f"{z.Land} {z.Zeichen}: Verweis «{z.Verweis}» ohne Regel für die Seite"
+        html = seiten[pfade[(str(z.Ebene), str(z.Region_ID))]]
+        for m in merkmale:
+            if m is not None:
+                assert any(x in html for x in m), (z.Land, z.Region_ID, z.Zeichen, m)
+                geprueft += 1
+    assert geprueft > 30, geprueft
+
+
+def test_fussnoten_gezaehlt_mit_link(seiten, aufbau):
+    """Statt der Liste: Zahl der Fußnoten und die Seite im PDF – und kein Fußnotentext mehr auf der Seite. Der Satz
+    danach passt zum Verzeichnis: Verweis auf die Hinweise nur, wo eine Fußnote Werte betrifft; sonst sagt er, dass
+    keine es tut – ein Leser soll nicht vergeblich suchen."""
+    import html as html_mod
+
+    from rsg2030.fussnoten import MIT_VERWEIS
+
+    fn = aufbau.fussnoten
+    mit, ohne = 0, 0
     for r in aufbau.regionen:
         seite = seiten[aufbau.pfad(r)]
         treffer = fn[(fn["Ebene"] == r["ebene"]) & (fn["Region_ID"].astype(str) == str(r["id"]))]
-        for z in treffer.drop_duplicates(["Zeichen", "Text"]).itertuples():
-            assert html_mod.escape(str(z.Text), quote=True) in seite, (r["id"], z.Zeichen)
+        if treffer.empty:
+            continue
+        n = len(treffer.drop_duplicates(["Zeichen", "Text"]))
+        assert f"druckt zu dieser Matrix {n} Fußnote" in seite, r["id"]
+        lang = [t for t in treffer["Text"] if len(str(t)) > 40]
+        assert not any(html_mod.escape(str(t), quote=True) in seite for t in lang), r["id"]
+        verweis = "Was davon die Werte hier betrifft" in seite
+        keine = "ändert keine davon eine Zahl" in seite
+        if treffer["Einordnung"].isin(MIT_VERWEIS).any():
+            assert verweis and not keine, r["id"]
+            mit += 1
+        else:
+            assert keine and not verweis, r["id"]
+            ohne += 1
+    assert mit and ohne, (mit, ohne)
 
 
 def test_jede_korrigierte_matrix_zeigt_ihre_regeln(seiten, aufbau):
@@ -362,14 +413,58 @@ def test_offene_fragen_nur_als_verweis_und_mit_gueltigem_anker(seiten, aufbau):
 # --- Sitemap und Dataset --------------------------------------------------------------------------------------
 
 
+def _ld_bloecke(html: str) -> list[dict]:
+    """Alle JSON-LD-Blöcke einer Seite, geparst – ein Block, der kein gültiges JSON ist, lässt den Test scheitern."""
+    import json
+
+    bloecke = re.findall(r'<script type="application/ld\+json">\n(.*?)\n</script>', html, re.S)
+    knoten: list[dict] = []
+    for b in bloecke:
+        d = json.loads(b)
+        knoten += d.get("@graph", [d])
+    return knoten
+
+
 def test_genau_ein_dataset_eintrag(seiten):
-    """Mehrere Dataset-Einträge für denselben Datensatz konkurrieren miteinander (docs/WEB.md)."""
-    mit = [p for p, h in seiten.items() if '"@type":"Dataset"' in h]
+    """Ein Dataset für den ganzen Datensatz, auf /daten/ (docs/WEB.md, «Strukturierte Daten»). Die anderen Seiten
+    zeigen einen Ausschnitt daraus (`isBasedOn`), ihr Hauptthema ist nicht der Datensatz (kein `mainEntity`)."""
+    dataset_id = f"{BASIS}/daten/#dataset"
+    mit = [p for p, h in seiten.items() if any(k["@type"] == "Dataset" for k in _ld_bloecke(h))]
     assert mit == ["daten/"], mit
     for pfad, html in seiten.items():
+        seite = next(k for k in _ld_bloecke(html) if k["@type"] == "WebPage")
+        assert seite["isPartOf"] == {"@id": f"{BASIS}/#website"}, pfad
         if pfad == "daten/":
-            continue
-        assert '"isPartOf"' in html, pfad
+            assert seite["mainEntity"] == {"@id": dataset_id}
+        else:
+            assert seite["isBasedOn"] == {"@id": dataset_id} and "mainEntity" not in seite, pfad
+
+
+def test_adresse_der_seiten_ist_die_eigene_domain():
+    """Die Adresse steht in canonical, Sitemap, robots.txt und jedem JSON-LD-Block, und die alte github.io-Adresse
+    leitet dorthin um (docs/WEB.md, «Die Adressen sind endgültig»). Ändert sie sich still, verlieren indexierte Seiten
+    ihren Platz – deshalb steht sie hier ein zweites Mal."""
+    from rsg2030.lesefassung import BASIS_STANDARD
+
+    assert BASIS_STANDARD == "https://rsg.loesungswerk.at"
+
+
+def test_dataset_vollstaendig_und_downloads_im_release(seiten):
+    """Was Google Dataset Search braucht, und jeder Download liegt wirklich im Release – release.yml hängt ihn an."""
+    from rsg2030.lesefassung import PERSON, RELEASE_DATEIEN
+
+    ds = next(k for k in _ld_bloecke(seiten["daten/"]) if k["@type"] == "Dataset")
+    for feld in ("name", "description", "license", "creator", "version", "variableMeasured", "distribution"):
+        assert ds.get(feld), feld
+    assert len(ds["description"]) >= 50
+    assert ds["creator"] == PERSON and PERSON["@id"] == "https://loesungswerk.at/#max-plischke"
+    workflow = (ROOT / ".github" / "workflows" / "release.yml").read_text(encoding="utf-8")
+    liste = re.search(r'dateien="([^"]+)"', workflow)
+    assert liste, "release.yml: Liste «dateien» nicht gefunden"
+    angehaengt = set(liste.group(1).split())
+    for name, _ in RELEASE_DATEIEN:
+        assert name in angehaengt, name
+    assert [d["name"] for d in ds["distribution"]] == [n for n, _ in RELEASE_DATEIEN]
 
 
 def test_sitemap_enthaelt_jede_seite():
@@ -384,6 +479,68 @@ def test_sitemap_enthaelt_jede_seite():
     for pfad in seiten_auf_platte:
         assert f"/{pfad}</loc>" in xml, pfad
     assert xml.count("<url>") == len(seiten_auf_platte)
+
+
+def test_robots_nennt_die_sitemap():
+    """Die eigene Domain erlaubt eine robots.txt an der Wurzel; sie zeigt auf die Sitemap derselben Adresse."""
+    from rsg2030.lesefassung import Aufbau, _robots
+
+    text = _robots(Aufbau(BASIS))
+    assert f"Sitemap: {BASIS}/sitemap.xml" in text and "Disallow" not in text
+
+
+def test_seiten_haben_die_fusszeile_des_dashboards(seiten, aufbau):
+    """Dieselbe Fußzeile wie im Dashboard, aus derselben Funktion – nicht nur ähnlich."""
+    from rsg2030.darstellung import fusszeile
+
+    meta = aufbau.daten["meta"]
+    erwartet = fusszeile(str(meta["repo"]), str(meta["version"]), str(meta["commit"]))
+    for pfad, html in seiten.items():
+        assert erwartet in html, pfad
+
+
+def test_oesg_link_zeigt_auf_die_seite_der_richtwerte(seiten):
+    """Der Link «ÖSG-Textband S.39» springt auf die Seite, von der die Soll-Intervalle stammen: dieselbe Seite wie in
+    der Referenz der Richtwerte, und auf die Datei, die quellen.csv als Textband führt."""
+    from rsg2030.lesefassung import OESG_TEXTBAND, RICHTWERTE_SEITE, oesg_textband_url
+
+    richtwerte = pd.read_csv(ROOT / "oesg_methodik" / "referenz" / "oesg_planungsrichtwerte.csv", sep=";", dtype=str)
+    mit_intervall = richtwerte[richtwerte["VDmin"].notna()]
+    assert len(mit_intervall) and (mit_intervall["Quelle"].str.endswith(f"S.{RICHTWERTE_SEITE}")).all()
+    url = oesg_textband_url(RICHTWERTE_SEITE)
+    assert url.startswith("https://ogd.ris.bka.gv.at/") and url.endswith(f"{Path(OESG_TEXTBAND).name}#page=39")
+    fachseiten = [h for p, h in seiten.items() if p.startswith("fach/")]
+    assert fachseiten and all(f'href="{url}"' in h for h in fachseiten)
+
+
+def test_keine_vd_steht_gerundet_auf_der_grenze_obwohl_ausserhalb(aufbau, seiten):
+    """Liegt eine VD außerhalb, steht sie nie gerundet gleich wie VDmin/VDmax da (Burgenland-Nord, PUL: 1,59 statt 1,6
+    neben 1,6–3,0). Geprüft an jeder Zelle mit Lage, über die Funktion, die die Tabellen füllen."""
+    from rsg2030.lesefassung import _vd
+
+    geprueft = 0
+    for f in aufbau.faecher:
+        lo, hi = float(str(f["min"])), float(str(f["max"]))
+        for r in aufbau.regionen:
+            for ab in ("IST", "PLAN"):
+                z = aufbau.zelle(str(r["id"]), ab, str(f["id"]))
+                if z is None or z.lage not in ("unter", "über"):
+                    continue
+                text = _vd(aufbau, str(r["id"]), ab, f)
+                if text == "0":
+                    continue  # nichts geplant, liegt nie auf einer Grenze
+                stellen = len(text.split(",")[1])
+                assert text != zahl(lo if z.lage == "unter" else hi, stellen), (r["id"], ab, f["id"], text)
+                geprueft += 1
+    assert geprueft > 300
+    assert '<td class="num">1,59</td>' in seiten["vr/11/"]
+
+
+def test_null_steht_als_null_und_fast_null_nicht_als_null(seiten):
+    """Genau 0 steht als «0», nie «0,0» oder «0,00»; ein Wert ungleich 0 nie gerundet als 0 (docs/WEB.md)."""
+    for pfad, html in seiten.items():
+        assert not re.search(r'class="num">−?0,0+<', html), pfad
+    assert '<td class="num">0</td>' in seiten["vr/11/"]  # MKG, nichts geplant
 
 
 def test_lastmod_ist_der_tag_des_release():

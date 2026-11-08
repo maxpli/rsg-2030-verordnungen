@@ -1,7 +1,7 @@
 # RSG 2030 – Planungsmatrizen der Verordnungen
 
 [![Tests](https://github.com/maxpli/rsg-2030-verordnungen/actions/workflows/tests.yml/badge.svg)](https://github.com/maxpli/rsg-2030-verordnungen/actions/workflows/tests.yml)
-[![Webseite](https://github.com/maxpli/rsg-2030-verordnungen/actions/workflows/webseite.yml/badge.svg)](https://maxpli.github.io/rsg-2030-verordnungen/)
+[![Webseite](https://github.com/maxpli/rsg-2030-verordnungen/actions/workflows/webseite.yml/badge.svg)](https://rsg.loesungswerk.at/)
 [![Daten: CC BY 4.0](https://img.shields.io/badge/Daten-CC%20BY%204.0-lightgrey.svg)](LIZENZ_DATEN.md)
 [![Code: MIT](https://img.shields.io/badge/Code-MIT-blue.svg)](LICENSE)
 [![Python 3.13](https://img.shields.io/badge/Python-3.13-blue.svg)](.python-version)
@@ -25,7 +25,7 @@ aus dem öffentlichen Code und den öffentlichen Quellen; Lauf und Protokoll sin
 auch selbst ([Selbst erzeugen](#selbst-erzeugen)) und sieht am Ende, ob das Ergebnis Byte für Byte der
 veröffentlichten Version entspricht.
 
-**Zum Nachsehen im Browser:** [Webseite zur Tabelle Versorgungsdichte](https://maxpli.github.io/rsg-2030-verordnungen/)
+**Zum Nachsehen im Browser:** [Webseite zur Tabelle Versorgungsdichte](https://rsg.loesungswerk.at/)
 – je Versorgungsregion und Fach, ob die Sachleistung unter, im oder über dem Soll-Intervall liegt, mit den Daten des
 aktuellen Release ([docs/WEB.md](docs/WEB.md)).
 
@@ -38,9 +38,9 @@ aktuellen Release ([docs/WEB.md](docs/WEB.md)).
 ## Zahlen nachsehen
 
 Alle Werte stehen als Seiten zum Nachsehen und Verlinken bereit:
-[**alle 32 Versorgungsregionen und 17 Fächer auf einer Seite**](https://maxpli.github.io/rsg-2030-verordnungen/daten/),
+[**alle 32 Versorgungsregionen und 17 Fächer auf einer Seite**](https://rsg.loesungswerk.at/daten/),
 dazu je Bundesland, je Versorgungsregion und je Fach eine eigene Seite mit Herkunft, Fußnoten und Korrekturen –
-und das [interaktive Dashboard](https://maxpli.github.io/rsg-2030-verordnungen/) zum Vergleichen. Bitte vorher die
+und das [interaktive Dashboard](https://rsg.loesungswerk.at/) zum Vergleichen. Bitte vorher die
 [Fallstricke](docs/DATEN.md#fallstricke) lesen: Gezählt ist nur die Sachleistung, ohne Wahlärzt:innen.
 
 ## Was herauskommt
@@ -161,8 +161,9 @@ Ohne GitHub-Konto: E-Mail an [max.plischke@loesungswerk.at](mailto:max.plischke@
   (Richtwerte, Regionen), die ÖSG-Dateien selbst werden nur verlinkt. Die Lizenz jeder Quelldatei steht im Register.
   Die Schriften der Webseite (`web/fonts/`, IBM Plex) stehen unter der SIL Open Font License 1.1
   ([web/fonts/OFL.txt](web/fonts/OFL.txt)).
-- Erstellt von Max Plischke, [Lösungswerk](https://loesungswerk.at/rsg-2030), ohne Auftrag. Inoffizielle
-  Aufbereitung amtlicher Daten; maßgeblich sind die Verordnungen im RIS. Angaben ohne Gewähr, Fehler bitte melden.
+- Von Max Plischke ([Lösungswerk](https://loesungswerk.at/rsg-2030)) ohne Auftrag aus den Verordnungen im RIS
+  aufbereitet. Keine amtliche Veröffentlichung: Maßgeblich sind die Verordnungen selbst; Angaben ohne Gewähr,
+  Fehler bitte melden.
 
 ## Für Entwickler:innen
 

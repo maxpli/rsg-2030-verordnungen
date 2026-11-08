@@ -47,11 +47,28 @@ Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem
   Auffindbarkeit. Die Sitemap trägt als `lastmod` den Tag des Release aus `CITATION.cff`, nicht das Baudatum;
   jede Tabelle hat eine `<caption>`. Wo es offene Fragen zu einer Verordnung gibt, steht ein Verweis auf
   `docs/offene_punkte.md` – nicht der Fragetext: Die Unsicherheit ist unsere, nicht die des Landes.
-- **Quellen in der Fußzeile von Dashboard und Lesefassung**, wie LIZENZ_DATEN.md es verlangt: Bevölkerung von
-  Statistik Austria und ÖROK-Prognose (beide CC BY 4.0, bearbeitet), Verordnungen (RIS), ÖSG 2023. Bisher nannte
-  das Dashboard nur das Release.
-- **Das Dashboard verlinkt die Lesefassung:** aus der Detailspalte auf die Seite der Region und des Fachs, und fest
-  im HTML auf `/daten/`, damit Suchmaschinen ohne JavaScript die Seiten finden.
+- **Eine Fußzeile für Dashboard und Lesefassung**, aus `darstellung.fusszeile`: wer sie erstellt hat, die Links
+  (Release, Lizenz, Methodik, Zitieren, Fehler melden, Impressum, Datenschutz) und die Quellen, wie LIZENZ_DATEN.md
+  es verlangt: Bevölkerung von Statistik Austria und ÖROK-Prognose (beide CC BY 4.0, bearbeitet), Verordnungen
+  (RIS), ÖSG 2023. Die Prüfsummen stehen nicht mehr in der Fußzeile des Dashboards, nur noch im Release und in
+  `data.json`; der Commit steht in beiden Darstellungen kurz hinter «Angaben ohne Gewähr».
+- **Ein `Dataset`-Eintrag, auf `/daten/`**, mit gemessenen Größen, Schlagwörtern, Datum und Excel-Mappe; die anderen
+  Seiten verweisen mit `isBasedOn` darauf statt ihn als Hauptthema zu nennen. Die Seite auf loesungswerk.at trägt
+  keinen eigenen mehr (docs/WEB.md, «Strukturierte Daten»).
+- **Fußnoten der Verordnung auf den Seiten nur gezählt, mit Link auf die Seite im PDF**, nicht mehr als Liste: Ohne
+  die Stelle, an der ein Zeichen im PDF hängt, waren sie nicht zuzuordnen. Was die Werte betrifft, steht in den
+  Hinweisen unter der Tabelle Versorgungsdichte; ein Test prüft das für jede dieser Fußnoten. Wo nach dem
+  Verzeichnis keine Fußnote die Werte betrifft, sagt der Satz das statt auf die Hinweise zu verweisen
+  (docs/WEB.md, «Fußnoten»).
+- **Eine Rundungsregel für alle Zahlen** (Seiten und Dashboard; docs/WEB.md, «Zahlen auf der Seite»): eine
+  Nachkommastelle, auch bei KJP und MKG, wie der ÖSG die Soll-Intervalle druckt (bisher zwei); eine Stelle mehr, wo
+  die Rundung sonst etwas Falsches sagte («1,59» statt «1,6» knapp unter VDmin 1,6; «0,04» statt «0,0»); genau 0
+  als «0» statt «0,00».
+- **Neue Adresse `https://rsg.loesungswerk.at/`** für Dashboard und Lesefassung (canonical, Sitemap, README); dazu
+  eine `robots.txt` mit dem Ort der Sitemap.
+- **Die Lesefassung führt ins Dashboard; zurück nur ein Link unter «Über diese Daten»**, fest im HTML, damit
+  Suchmaschinen die Seiten finden. Kein Link je Zelle: Das Dashboard zeigt zu jeder Zelle mehr als die Seiten
+  (docs/WEB.md, «Zwei Wege»).
 - **Das Dashboard liest `?region=` und `?fach=`** aus der Adresse, damit die statischen Seiten mit vorbelegtem
   Zustand hierher verlinken können. Ohne Parameter verhält es sich genau wie vorher; unbekannte Werte werden
   verworfen, und die Adresse wird nie geschrieben. `data.json` enthält dafür je Region einen `slug` (Nummer der VR

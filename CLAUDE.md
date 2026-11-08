@@ -49,7 +49,7 @@ relativ zum Arbeitsordner (oder `RSG2030_DATEN`): aus dem Stammordner des Repos 
 ```bash
 python3.13 -m venv .venv && .venv/bin/pip install -c requirements.txt -e ".[dev]"   # einmalig
 
-.venv/bin/python -m rsg2030 alles        # download → daten → versorgungsdichte
+.venv/bin/python -m rsg2030 alles        # download → daten → versorgungsdichte → stellen
 .venv/bin/python -m rsg2030 download     # Quellen, SHA-256-Prüfung (--neu = neu laden)
 .venv/bin/python -m rsg2030 seiten       # Seitenregister seiten.csv neu erzeugen
 .venv/bin/python -m rsg2030 manuell      # Blätter für Bildseiten in manuell.xlsx anlegen
@@ -57,8 +57,10 @@ python3.13 -m venv .venv && .venv/bin/pip install -c requirements.txt -e ".[dev]
 .venv/bin/python -m rsg2030 freigabe     # freigabe.xlsx (Freigabe durch einen Menschen) nachziehen, Häkchen bleiben
 .venv/bin/python -m rsg2030 daten        # auslesen, korrigieren, prüfen → FREIGEGEBEN / NICHT FREIGEGEBEN, ✓/✗ gegen veröffentlicht
 .venv/bin/python -m rsg2030 versorgungsdichte  # ÄAVE im ÖSG-Zuschnitt, VD, Lage zum Soll-Intervall, ✓/✗ gegen veröffentlicht
+.venv/bin/python -m rsg2030 stellen      # Planstellen und Sachleistungsstellen im ÖSG-Zuschnitt, ✓/✗ gegen veröffentlicht
 .venv/bin/python -m rsg2030 waechter     # neue Verordnungen im RIS? --quellen: Originale ersetzt? --archiv: Archivkopien richtig? nur Hinweise
 .venv/bin/python -m rsg2030 web          # Webseite: Tabelle Versorgungsdichte + Herkunft je Wert → daten_ergebnis/web/ (docs/WEB.md; nicht in «alles»)
+.venv/bin/python -m rsg2030 lesefassung  # statische Seiten je Land, Region und Fach → daten_ergebnis/web/ (nach «web»; nicht in «alles»)
 
 .venv/bin/python -m pytest -m "not slow"  # ~5 s, ohne Quelldateien
 .venv/bin/python -m pytest                # ~2,5 min, braucht daten_original/
@@ -98,9 +100,12 @@ rsg2030/              der Datensatz; __main__.py ruft die main() der Module auf
   protokoll.py          Logging, Laufprotokoll_<schritt>.json
   web.py                «web»: Tabellen Versorgungsdichte und Planungsmatrizen (Herkunft je Wert) → data.json +
                           Seite aus web/ (nur bei passenden Prüfsummen)
+  darstellung.py        gemeinsame Schicht für Dashboard und Lesefassung: Satz, Vorbehalte, Rundung (lesbar), Fußzeile
+  lesefassung.py        «lesefassung»: 59 statische Seiten, Sitemap, robots.txt, JSON-LD (Dataset nur auf /daten/)
   eingaben/2026/        von Hand gepflegte Eingaben: seiten, korrekturen, bekannte_abweichungen, manuell.xlsx, fussnoten.csv, zweitlesung/, freigabe.xlsx
 tests/                pytest; Fixture `pipeline` = baue_pipeline() einmal je Testlauf
-web/                  Webseite (kein Python): index.html, app.js, style.css, kacheln.csv, faecher.csv (docs/WEB.md)
+web/                  Webseite (kein Python): index.html, app.js, style.css, kacheln.csv, faecher.csv, fonts/,
+                        lesefassung/lesefassung.css (docs/WEB.md)
 ```
 
 ## Regeln, die leicht brechen

@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import argparse
 import html
+import json
 import logging
 import re
 import shutil
@@ -39,16 +40,37 @@ from oesg_methodik.bevoelkerung import lade_regionen
 from rsg2030.abgleich import gleiche_ab, paketversion
 from rsg2030.analyse_eingang import lade_matrix_long
 from rsg2030.config import LONG_DATEI, STELLEN_DATEI, VERSORGUNGSDICHTE_DATEI, ausgabe_dir
-from rsg2030.darstellung import KEIN_WERT, VORBEHALTE, Zelle, zahl
+from rsg2030.darstellung import KEIN_WERT, VORBEHALTE, Zelle, fusszeile, lesbar, zahl
+from rsg2030.fussnoten import MIT_VERWEIS
 from rsg2030.korrekturen import lade_regeln
 from rsg2030.protokoll import einrichten, schreibe_laufprotokoll
+from rsg2030.quellen import lade_quellen, ogd_pdf_url
 from rsg2030.web import LAND_SLUG, baue_daten, repo_url, seiten_commit, web_dir
 
 log = logging.getLogger(__name__)
 
-BASIS_STANDARD = "https://maxpli.github.io/rsg-2030-verordnungen"
-"""Adresse, unter der die Seiten liegen – für `canonical` und die Sitemap. Beim Umzug auf eine eigene Domain nur
-hier und im Aufruf (`--basis`) ändern; die Pfade bleiben."""
+BASIS_STANDARD = "https://rsg.loesungswerk.at"
+"""Adresse, unter der die Seiten liegen – für `canonical`, Sitemap und `robots.txt`. GitHub Pages leitet
+`maxpli.github.io/rsg-2030-verordnungen/` auf diese Domain um. Bei einem Umzug nur hier und im Aufruf (`--basis`)
+ändern; die Pfade bleiben."""
+
+OESG_TEXTBAND = "oesg/SPG_AT_OSG_G_20261009_8_2026.pdf"
+"""Der ÖSG-Textband in `quellen.csv`; aus seiner Zeile kommt die Adresse beim RIS. Bei einem neuen ÖSG hier tauschen."""
+RICHTWERTE_SEITE = 39
+"""Seite der Soll-Intervalle im Textband – gedruckte Seite und Seite der PDF-Datei sind dieselbe (METHODIK.md, VDmin /
+VDmax; `oesg_methodik/referenz/oesg_planungsrichtwerte.csv`, Spalte «Quelle»; Test in tests/test_lesefassung.py)."""
+
+
+def oesg_textband_url(seite: int) -> str:
+    """Link auf eine Seite des ÖSG-Textbands auf dem Dateiserver des RIS. Der ÖSG wird nur verlinkt, nicht
+    weitergegeben (Lizenz in `quellen.csv`)."""
+    q = lade_quellen()
+    zeile = q[q["Datei"] == OESG_TEXTBAND]
+    if len(zeile) != 1:
+        raise ValueError(f"{OESG_TEXTBAND} steht nicht (genau einmal) in quellen.csv")
+    r = zeile.iloc[0]
+    return ogd_pdf_url(str(r["Kennung"]), str(r["Datei"]), "", seite)
+
 
 VERBOTEN = ("unterversorg", "versorgungsmangel", "versorgungslücke", "ärztemangel", "mangelversorgung")
 """Urteile über die Versorgung, die die Daten nicht tragen (docs/DATEN.md, Fallstricke 1 und 11). Der Bau bricht
@@ -259,9 +281,22 @@ def _tausend(x: object) -> str:
     return f"{round(float(str(x))):,}".replace(",", ".")
 
 
-def _stellen_vd(f: dict[str, object]) -> int:
-    """Nachkommastellen der Versorgungsdichte: zwei, wo das Intervall schmaler als 2 ist (KJP, MKG)."""
-    return 2 if float(str(f["max"])) < 2 else 1
+def _vd(a: Aufbau, rid: str, abschnitt: str, f: dict[str, object]) -> str:
+    """Versorgungsdichte einer Zelle wie auf der Seite (`darstellung.lesbar`): mit dem Soll-Intervall, damit sie
+    gerundet nicht auf der Grenze landet, wenn sie außerhalb liegt."""
+    x = a.wert(rid, abschnitt, str(f["id"]), 0)
+    vd = None if x is None else float(str(x))
+    return lesbar(vd, float(str(f["min"])), float(str(f["max"])))
+
+
+def _aave(x: object) -> str:
+    """ÄAVE (und Stellen) wie auf der Seite (`darstellung.lesbar`): genau 0 als «0»."""
+    return lesbar(None if x is None else float(str(x)))
+
+
+def _stellen(x: object) -> str:
+    """Stellen aus der Tabelle Stellen; leer (NaN) als «–», sonst wie ÄAVE."""
+    return "–" if x is None or pd.isna(x) else _aave(x)
 
 
 def _zuschnitt_abweichend(zuschnitt: str | None, fach: str) -> bool:
@@ -309,7 +344,7 @@ def _tabelle_stellen(a: Aufbau, rid: str) -> str:
         zellen = []
         for z in spalten:
             r = werte.get((z, fid))
-            zellen.append(f'<td class="num">{num(r.Stellen) if r is not None else "–"}</td>')
+            zellen.append(f'<td class="num">{_aave(r.Stellen) if r is not None else "–"}</td>')
         zuschnitt = None if g is None else str(g.Zuschnitt)
         mark = ZUSCHNITT_ZEICHEN if _zuschnitt_abweichend(zuschnitt, fid) else ""
         if mark and zuschnitt is not None and zuschnitt not in zuschnitte:
@@ -388,27 +423,31 @@ def _seite_link(a: Aufbau, pdf: str, seite: int) -> str:
 
 
 def _fussnoten(a: Aufbau, r: dict[str, object]) -> str:
-    """Die Fußnoten der Matrix, wörtlich, gruppiert nach Einordnung. Sie hängen an der Matrix, nicht an der Zelle –
-    deshalb ein eigener Block und keine erfundenen Marker in unseren Tabellen."""
+    """Die Fußnoten der Matrix nur gezählt, mit Link auf die Seite im PDF – nicht als Liste (docs/WEB.md,
+    «Fußnoten»). Wo ein Zeichen wie (2) im PDF hängt, steht nicht in `fussnoten.csv`; als Liste ohne Bezug wären die
+    meisten nicht zuzuordnen (Vorlagetext, Vertragsdetails, «davon …»). Was die Werte betrifft («betrifft Werte»,
+    «Methodenfrage»), steht als Vorbehalt bei der Tabelle oder unter «Offene Fragen»; das prüft
+    tests/test_lesefassung.py für jede dieser Fußnoten."""
     f = a.fussnoten
     treffer = f[(f["Ebene"] == r["ebene"]) & (f["Region_ID"].astype(str) == str(r["id"]))]
     if treffer.empty:
         return ""
-    gruppen = []
-    for einordnung, g in treffer.groupby("Einordnung", sort=True):
-        punkte = "".join(
-            f"<li><b>{esc(z.Zeichen)}</b> «{esc(z.Text)}» "
-            f'<span class="t2">({_seite_link(a, str(z.PDF), int(z.Seite))})</span></li>'
-            for z in g.drop_duplicates(["Zeichen", "Text"]).itertuples()
+    n = len(treffer.drop_duplicates(["Zeichen", "Text"]))
+    orte = treffer.drop_duplicates(["PDF", "Seite"]).sort_values("Seite", key=lambda s: s.astype(int))
+    links = ", ".join(_seite_link(a, str(z.PDF), int(z.Seite)) for z in orte.itertuples())
+    wort = "Fußnote" if n == 1 else "Fußnoten"
+    # Nur wo das Verzeichnis eine Fußnote als wertrelevant einordnet, gibt es unter der Tabelle etwas zu finden
+    if treffer["Einordnung"].isin(MIT_VERWEIS).any():
+        folge = (
+            "Was davon die Werte hier betrifft, steht in den Hinweisen unter der "
+            '<a href="#vd">Tabelle Versorgungsdichte</a>.'
         )
-        gruppen.append(f"<h4>{esc(einordnung)}</h4><ul>{punkte}</ul>")
-    return (
-        f"<details><summary>Fußnoten der Verordnung zu dieser Matrix ({len(treffer)})</summary>"
-        '<p class="t2">Wörtlich wie gedruckt. «Vorlage» heißt: Die Fußnote steht schon in der ÖSG-Vorlage '
-        "(Tabellenband S.239); «betrifft Werte» heißt: Sie ändert, was eine Zahl bedeutet.</p>"
-        + "".join(gruppen)
-        + "</details>"
-    )
+    else:
+        folge = (
+            "Nach dem Fußnotenverzeichnis des Datensatzes (<code>fussnoten.csv</code>) ändert keine davon eine Zahl "
+            "dieser Tabellen oder ihre Bedeutung."
+        )
+    return f"<p>Die Verordnung druckt zu dieser Matrix {n} {wort} ({links}). {folge}</p>"
 
 
 def _korrigiert(a: Aufbau, r: dict[str, object], regeln: int) -> str:
@@ -508,9 +547,142 @@ def _abweichungen(a: Aufbau, r: dict[str, object]) -> str:
 # --- Seiten ---------------------------------------------------------------------------------------------------
 
 
-def _json(text: str) -> str:
-    """Zeichenkette für JSON-LD (die Seite schreibt JSON von Hand, damit kein Skript nötig ist)."""
-    return '"' + str(text).replace("\\", "\\\\").replace('"', '\\"').replace("\n", " ") + '"'
+PERSON: dict[str, object] = {
+    "@type": "Person",
+    "@id": "https://loesungswerk.at/#max-plischke",
+    "name": "Max Plischke",
+    "honorificPrefix": "Priv.-Doz. Dr.",
+    "url": "https://loesungswerk.at/max-plischke",
+    "sameAs": "https://orcid.org/0000-0002-7410-2611",
+}
+"""Dieselbe Person mit derselben Kennung wie auf loesungswerk.at: So erkennt eine Suchmaschine beide Seiten als ein
+Werk desselben Menschen. Ausgeschrieben, nicht nur als Kennung – über Seiten hinweg löst Google `@id` nicht auf."""
+
+DATENSATZ_NAME = "RSG 2030 – Planungsmatrizen der Verordnungen"
+
+RELEASE_DATEIEN = (
+    ("RSG_2030_Versorgungsdichte.csv", "text/csv"),
+    ("RSG_2030_Stellen.csv", "text/csv"),
+    ("RSG_2030_Planungsmatrizen.csv", "text/csv"),
+    ("RSG_2030_Planungsmatrizen.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+)
+"""Downloads im `Dataset`; ein Test prüft, dass `.github/workflows/release.yml` jede davon ans Release hängt."""
+
+
+def _ld(daten: dict[str, object]) -> str:
+    """JSON-LD-Block. `</` maskiert, damit kein Text den Skriptblock schließen kann."""
+    text = json.dumps(daten, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    return f'<script type="application/ld+json">\n{text}\n</script>'
+
+
+def _website(a: Aufbau) -> dict[str, object]:
+    return {
+        "@type": "WebSite",
+        "@id": f"{a.basis}/#website",
+        "url": f"{a.basis}/",
+        "name": DATENSATZ_NAME,
+        "inLanguage": "de-AT",
+        "publisher": PERSON,
+    }
+
+
+def _webpage(a: Aufbau, s: Seite) -> str:
+    """Jede Seite ist Teil der Website. `/daten/` beschreibt den Datensatz (`mainEntity`); die anderen Seiten zeigen
+    einen Ausschnitt daraus (`isBasedOn`) – ihr Thema ist eine Region, ein Land oder ein Fach, nicht der ganze
+    Datensatz (docs/WEB.md, «Strukturierte Daten»)."""
+    dataset = {"@id": f"{a.basis}/daten/#dataset"}
+    seite: dict[str, object] = {
+        "@type": "WebPage",
+        "@id": f"{a.basis}/{s.pfad}#webpage",
+        "url": f"{a.basis}/{s.pfad}",
+        "name": s.titel,
+        "description": s.beschreibung,
+        "inLanguage": "de-AT",
+        "isPartOf": {"@id": f"{a.basis}/#website"},
+        "license": "https://creativecommons.org/licenses/by/4.0/",
+    }
+    if s.pfad == "daten/":
+        seite["mainEntity"] = dataset
+    else:
+        seite["isBasedOn"] = dataset
+    return _ld({"@context": "https://schema.org", "@graph": [seite, _website(a)]})
+
+
+def _dataset(a: Aufbau) -> str:
+    """Der einzige `Dataset`-Eintrag, für Google Dataset Search. Version, Datum und Downloads aus dem Release, das
+    die Seiten zeigen – nichts davon von Hand gepflegt (docs/WEB.md, «Strukturierte Daten»)."""
+    meta = a.daten["meta"]
+    repo, version = str(meta["repo"]), str(meta["version"])  # type: ignore[index]
+    rel = f"{repo}/releases/download/{version}"
+    eintrag: dict[str, object] = {
+        "@context": "https://schema.org",
+        "@type": "Dataset",
+        "@id": f"{a.basis}/daten/#dataset",
+        "name": DATENSATZ_NAME,
+        "description": (
+            "Die Planungsmatrizen der Regionalen Strukturpläne Gesundheit 2030 aller neun österreichischen "
+            "Bundesländer: ambulante ärztliche Kapazität in ÄAVE und Sachleistungsstellen je Bundesland, "
+            "Versorgungsregion und Fach, IST und PLAN 2030, dazu Versorgungsdichte und Lage zum "
+            "Versorgungsdichte-Soll-Intervall des ÖSG. Aus den Verordnungstexten im RIS erfasst, jede Zelle bis "
+            "zur PDF-Seite nachvollziehbar."
+        ),
+        "url": f"{a.basis}/daten/",
+        "sameAs": repo,
+        "version": version,
+        "license": "https://creativecommons.org/licenses/by/4.0/",
+        "isAccessibleForFree": True,
+        "inLanguage": "de-AT",
+        "creator": PERSON,
+        "spatialCoverage": "Österreich",
+        "temporalCoverage": "2022/2030",
+        "variableMeasured": [
+            {
+                "@type": "PropertyValue",
+                "name": "Versorgungsdichte",
+                "description": "Ambulante ärztliche Kapazität der Sachleistung je Fach, bezogen auf die Bevölkerung "
+                "der Region",
+                "unitText": "ÄAVE je 100.000 Einwohner:innen",
+            },
+            {
+                "@type": "PropertyValue",
+                "name": "Ambulante ärztliche Kapazität",
+                "description": "IST (2022 oder 2023, je Bundesland) und PLAN 2030 je Bundesland, Versorgungsregion "
+                "und Fach",
+                "unitText": "ÄAVE",
+            },
+            {
+                "@type": "PropertyValue",
+                "name": "Lage zum Soll-Intervall des ÖSG",
+                "description": "Unter, im oder über dem Versorgungsdichte-Soll-Intervall (VDmin–VDmax), mit "
+                "Position im Intervall und Abstand in ÄAVE",
+            },
+            {
+                "@type": "PropertyValue",
+                "name": "Sachleistungsstellen",
+                "description": "PLAN 2030, niedergelassener Bereich und Ambulatorien, gemeinsam und je "
+                "Krankenversicherungsträger",
+                "unitText": "Stellen",
+            },
+        ],
+        "keywords": [
+            "Regionaler Strukturplan Gesundheit",
+            "RSG 2030",
+            "Österreichischer Strukturplan Gesundheit",
+            "Versorgungsdichte",
+            "Sachleistungsstellen",
+            "ambulante Versorgung",
+            "Gesundheitsplanung",
+            "Österreich",
+        ],
+        "distribution": [
+            {"@type": "DataDownload", "name": name, "encodingFormat": typ, "contentUrl": f"{rel}/{name}"}
+            for name, typ in RELEASE_DATEIEN
+        ],
+    }
+    datum = release_datum()
+    if datum:
+        eintrag["datePublished"] = datum
+    return _ld(eintrag)
 
 
 def _abstand(z: Zelle | None) -> str:
@@ -519,12 +691,7 @@ def _abstand(z: Zelle | None) -> str:
     if z is None or z.aave_abstand is None:
         return "–"
     v = float(z.aave_abstand)
-    if v == 0:
-        return "0"
-    text = num(v)
-    if text in ("0,0", "−0,0"):
-        text = num(v, 2)
-    return ("+" if v > 0 else "") + text
+    return ("+" if v > 0 else "") + lesbar(v)
 
 
 def _lage_zelle(z: Zelle | None) -> str:
@@ -564,15 +731,6 @@ heißt (docs/DATEN.md, Fallstricke 1 und 11, «Vergleich mit dem Soll-Intervall�
 nicht in einem Kasten darüber – wer eine Tabelle zitiert, nimmt den Text darunter eher mit als einen Kasten weiter
 oben."""
 
-QUELLEN = (
-    "Quellen: Verordnungen zu den RSG 2030 (RIS) · Bevölkerung: Statistik Austria – data.statistik.gv.at "
-    "(CC BY 4.0, bearbeitet) · Aufteilung 2030 auf Versorgungsregionen: ÖROK-Prognose 2021 (CC BY 4.0, bearbeitet) · "
-    "Soll-Intervalle und Versorgungsregionen: ÖSG 2023 (BMASGPK/GÖG)"
-)
-"""Namensnennung in der Fußzeile jeder Seite, Wortlaut nach LIZENZ_DATEN.md: Die Bevölkerungsdaten stehen unter
-CC BY 4.0 und gehen bearbeitet in die Versorgungsdichte ein; die Lizenz verlangt die Nennung bei jeder
-Veröffentlichung, ein Link auf die Methodik reicht dafür nicht. Derselbe Text steht in der Fußzeile des Dashboards
-(`web/app.js`; Test in tests/test_web.py)."""
 
 IST_HILFE = (
     "Das Soll-Intervall gilt für 2030; am IST-Wert gemessen zeigt es den Abstand zur Norm 2030, keine Verletzung im "
@@ -664,16 +822,16 @@ def _tabelle_region(a: Aufbau, rid: str, titel: str) -> str:
     jahr = esc(a.wert(rid, "IST", "AM", 3))
     zeilen = []
     for f in faecher:
-        fid, dg = str(f["id"]), _stellen_vd(f)
+        fid = str(f["id"])
         p = a.zelle(rid, "PLAN", fid)
         mark = ZUSCHNITT_ZEICHEN if _zuschnitt_abweichend(p.zuschnitt if p else None, fid) else ""
         if mark and p is not None and str(p.zuschnitt) not in zuschnitte:
             zuschnitte.append(str(p.zuschnitt))
         zeilen.append(
             f'<tr><th scope="row">{esc(f["name"])} <span class="t2">({esc(fid)}{mark})</span>{zeichen[fid]}</th>'
-            f'<td class="num">{num(a.wert(rid, "IST", fid, 0), dg)}</td>'
-            f'<td class="num">{num(a.wert(rid, "PLAN", fid, 0), dg)}</td>'
-            f'<td class="num">{num(f["min"], dg)}–{num(f["max"], dg)}</td>'
+            f'<td class="num">{_vd(a, rid, "IST", f)}</td>'
+            f'<td class="num">{_vd(a, rid, "PLAN", f)}</td>'
+            f'<td class="num">{num(f["min"])}–{num(f["max"])}</td>'
             f"{_lage_zelle(p)}</tr>"
         )
     n = '<th scope="col" class="num">'
@@ -713,8 +871,8 @@ def _tabelle_aave_region(a: Aufbau, rid: str) -> str:
         mark = ZUSCHNITT_ZEICHEN if _zuschnitt_abweichend(p.zuschnitt if p else None, fid) else ""
         zeilen.append(
             f'<tr><th scope="row">{esc(f["name"])} <span class="t2">({esc(fid)}{mark})</span></th>'
-            f'<td class="num">{num(a.wert(rid, "IST", fid, 1))}</td>'
-            f'<td class="num">{num(a.wert(rid, "PLAN", fid, 1))}</td>'
+            f'<td class="num">{_aave(a.wert(rid, "IST", fid, 1))}</td>'
+            f'<td class="num">{_aave(a.wert(rid, "PLAN", fid, 1))}</td>'
             f'<td class="num">{_abstand(p)}</td></tr>'
         )
     n = '<th scope="col" class="num">'
@@ -732,7 +890,7 @@ def _tabelle_aave_region(a: Aufbau, rid: str) -> str:
 def seite_fach(a: Aufbau, f: dict[str, object]) -> Seite:
     """Ein Fach über alle Versorgungsregionen – dieselben drei Tabellen wie auf der Seite einer Region, gekippt.
     Kein Ranking, keine Österreich-Zahl."""
-    fid, name, dg = str(f["id"]), str(f["name"]), _stellen_vd(f)
+    fid, name = str(f["id"]), str(f["name"])
     regionen, ohne, roh = [], [], []
     for r in a.regionen:
         if r["ebene"] != "VR":
@@ -758,14 +916,14 @@ def seite_fach(a: Aufbau, f: dict[str, object]) -> Seite:
         vd_zeilen.append(
             f'<tr><th scope="row"><a href="{hoch}vr/{esc(rid)}/">{esc(rid)} {esc(r["name"])}</a>{zeichen[rid]}</th>'
             f"<td>{esc(land)}</td>"
-            f'<td class="num">{num(a.wert(rid, "IST", fid, 0), dg)}</td>'
-            f'<td class="num">{num(a.wert(rid, "PLAN", fid, 0), dg)}</td>'
+            f'<td class="num">{_vd(a, rid, "IST", f)}</td>'
+            f'<td class="num">{_vd(a, rid, "PLAN", f)}</td>'
             f"{_lage_zelle(p)}</tr>"
         )
         aave_zeilen.append(
             f'<tr><th scope="row">{esc(rid)} {esc(r["name"])}</th>'
-            f'<td class="num">{num(a.wert(rid, "IST", fid, 1))}</td>'
-            f'<td class="num">{num(a.wert(rid, "PLAN", fid, 1))}</td>'
+            f'<td class="num">{_aave(a.wert(rid, "IST", fid, 1))}</td>'
+            f'<td class="num">{_aave(a.wert(rid, "PLAN", fid, 1))}</td>'
             f'<td class="num">{_abstand(p)}</td></tr>'
         )
         stellen_je_region[rid] = a.stellen_plan(rid, fid)
@@ -783,7 +941,7 @@ def seite_fach(a: Aufbau, f: dict[str, object]) -> Seite:
         w = stellen_je_region[rid]
         stellen_zeilen.append(
             f'<tr><th scope="row">{esc(rid)} {esc(r["name"])}</th>'
-            + "".join(f'<td class="num">{num(w.get(z))}</td>' for z in spalten)
+            + "".join(f'<td class="num">{_stellen(w.get(z))}</td>' for z in spalten)
             + "</tr>"
         )
     stellen_kopf = "".join(f'<th scope="col" class="num">{esc(STELLEN_KOPF[z])}</th>' for z in spalten)
@@ -795,8 +953,9 @@ def seite_fach(a: Aufbau, f: dict[str, object]) -> Seite:
         else ""
     )
     soll = (
-        f'Soll-Intervall des ÖSG <b class="num">{num(f["min"], dg)} bis {num(f["max"], dg)}</b> ÄAVE je 100.000 '
-        "Einwohner:innen (ÖSG-Textband S.39)"
+        f'Soll-Intervall des ÖSG <b class="num">{num(f["min"])} bis {num(f["max"])}</b> ÄAVE je 100.000 '
+        f'Einwohner:innen (<a href="{esc(oesg_textband_url(RICHTWERTE_SEITE))}" target="_blank" '
+        f'rel="noopener noreferrer">ÖSG-Textband S.{RICHTWERTE_SEITE}</a>)'
     )
     n = '<th scope="col" class="num">'
     b_vd = (
@@ -832,30 +991,17 @@ Der ÖSG misst je Versorgungsregion.</p>
     titel = f"Planstellen und Versorgungsdichte {name} 2030 | RSG 2030"
     beschreibung = (
         f"{name} ({fid}) in allen 32 Versorgungsregionen: Versorgungsdichte 2030 im Vergleich zum "
-        f"Soll-Intervall des ÖSG ({num(f['min'], dg)}–{num(f['max'], dg)} ÄAVE je 100.000)."
+        f"Soll-Intervall des ÖSG ({num(f['min'])}–{num(f['max'])} ÄAVE je 100.000)."
     )
     pfadleiste = (("RSG 2030", "daten/"), ("Fächer", "daten/#faecher"), (name, ""))
     return Seite(f"fach/{fid}/", titel, beschreibung, rumpf, f"?fach={fid}", pfadleiste)
 
 
-def _urheber(a: Aufbau, pfad: str, dashboard: str = "") -> str:
-    """Fußzeile: wer die Seiten erstellt hat, mit den Vorbehalten im selben Satz, und die Links, die eine
-    veröffentlichte Seite braucht (docs/WEB.md, Entscheidung 15). Zwei Zeilen, Wortlaut wie im Dashboard. Die ORCID
-    steht in den strukturierten Daten (`creator`), nicht sichtbar auf jeder Seite; die Methode einmal auf /daten/."""
+def _urheber(a: Aufbau) -> str:
+    """Fußzeile, dieselbe wie im Dashboard (`darstellung.fusszeile`). Die ORCID steht in den strukturierten Daten
+    (`creator`), nicht sichtbar auf jeder Seite; die Methode einmal auf /daten/."""
     meta = a.daten["meta"]
-    repo, version = str(meta["repo"]), esc(meta["version"])  # type: ignore[index]
-    neu = 'target="_blank" rel="noopener noreferrer"'
-    return f"""<p>Inoffizielle Aufbereitung amtlicher Daten, erstellt von
-<a href="https://loesungswerk.at/max-plischke" {neu}>Max Plischke</a> (Lösungswerk), ohne Auftrag. Maßgeblich sind
-die Verordnungen im RIS; Angaben ohne Gewähr.</p>
-<p><a href="{repo}/releases/tag/{version}" {neu}>Release {version}</a> ·
-<a href="https://creativecommons.org/licenses/by/4.0/deed.de" {neu}>CC BY 4.0</a> ·
-<a href="{repo}/blob/{version}/docs/METHODIK.md" {neu}>Methodik</a> ·
-<a href="{repo}/blob/{version}/CITATION.cff" {neu}>Zitieren</a> ·
-<a href="{repo}/issues/new?template=wert_weicht_ab.yml" {neu}>Fehler melden</a> ·
-<a href="https://loesungswerk.at/impressum" {neu}>Impressum</a> ·
-<a href="https://loesungswerk.at/datenschutz" {neu}>Datenschutz</a></p>
-<p class="t2">{QUELLEN}</p>"""
+    return fusszeile(str(meta["repo"]), str(meta["version"]), str(meta["commit"]))  # type: ignore[index]
 
 
 def _kopfzeile(teile: list[str]) -> str:
@@ -934,20 +1080,15 @@ def _pfadleiste(a: Aufbau, s: Seite) -> tuple[str, str]:
     if not s.pfadleiste:
         return "", ""
     hoch = a.hoch(s.pfad)
-    punkte, json_punkte = [], []
+    punkte, glieder = [], []
     for i, (name, ziel) in enumerate(s.pfadleiste, start=1):
         if ziel:
             punkte.append(f'<li><a href="{hoch}{esc(ziel)}">{esc(name)}</a></li>')
         else:
             punkte.append(f'<li aria-current="page">{esc(name)}</li>')
-        adresse = f"{a.basis}/{ziel or s.pfad}"
-        json_punkte.append(f'{{"@type":"ListItem","position":{i},"name":{_json(name)},"item":{_json(adresse)}}}')
+        glieder.append({"@type": "ListItem", "position": i, "name": name, "item": f"{a.basis}/{ziel or s.pfad}"})
     nav = f'<nav class="pfad" aria-label="Pfad"><ol>{"".join(punkte)}</ol></nav>'
-    ld = (
-        '<script type="application/ld+json">\n'
-        f'{{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{",".join(json_punkte)}]}}\n'
-        "</script>"
-    )
+    ld = _ld({"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": glieder})
     return nav, ld
 
 
@@ -971,13 +1112,7 @@ def _dokument(a: Aufbau, s: Seite) -> str:
 <meta name="description" content="{esc(s.beschreibung)}">
 <link rel="canonical" href="{esc(a.basis)}/{esc(s.pfad)}">
 <link rel="stylesheet" href="{esc(a.stil(s.pfad))}">
-<script type="application/ld+json">
-{{"@context":"https://schema.org","@type":"WebPage","name":{_json(s.titel)},
-"description":{_json(s.beschreibung)},"inLanguage":"de-AT",
-"url":{_json(f"{a.basis}/{s.pfad}")},"isPartOf":{{"@id":{_json(f"{a.basis}/daten/#dataset")}}},
-"mainEntity":{{"@id":{_json(f"{a.basis}/daten/#dataset")}}},
-"license":"https://creativecommons.org/licenses/by/4.0/"}}
-</script>
+{_webpage(a, s)}
 {ld_pfad}
 </head>
 <body>
@@ -994,7 +1129,7 @@ def _dokument(a: Aufbau, s: Seite) -> str:
 {s.rumpf}
 </main>
 <footer class="fuss">
-{_urheber(a, s.pfad, s.dashboard)}
+{_urheber(a)}
 </footer>
 </body>
 </html>
@@ -1020,12 +1155,11 @@ def _verzeichnis_faecher(a: Aufbau) -> str:
     """Die 17 Fächer mit ihrem Soll-Intervall – das Intervall gilt für ganz Österreich, also steht es hier."""
     punkte = []
     for f in a.faecher:
-        dg = _stellen_vd(f)
         teil = f" · Teil von {esc(f['teil_von'])}" if f["teil_von"] else ""
         punkte.append(
             f'<li><a href="../fach/{esc(f["id"])}/">{esc(f["name"])}</a> '
-            f'<span class="t2">{esc(f["id"])} · Soll-Intervall <span class="num">{num(f["min"], dg)}–'
-            f"{num(f['max'], dg)}</span>{teil}</span></li>"
+            f'<span class="t2">{esc(f["id"])} · Soll-Intervall <span class="num">{num(f["min"])}–'
+            f"{num(f['max'])}</span>{teil}</span></li>"
         )
     return f'<ul class="fach-liste">{"".join(punkte)}</ul>'
 
@@ -1040,7 +1174,8 @@ def seite_index(a: Aufbau) -> Seite:
     Abruf beantworten; die CSV erreicht nicht jedes Werkzeug. Spalten wie in der Tabelle Versorgungsdichte einer
     Region, darunter dieselbe Lesehilfe – wer nur diese Seite liest, hat den wichtigsten Vorbehalt.
 
-    Ein **einziger** `Dataset`-Eintrag im ganzen Werk; alle anderen Seiten verweisen mit `isPartOf` hierher.
+    Ein **einziger** `Dataset`-Eintrag im ganzen Werk, auch über loesungswerk.at hinweg; alle anderen Seiten
+    verweisen mit `isBasedOn` hierher.
     Mehrere Einträge für denselben Datensatz konkurrieren miteinander (docs/WEB.md, «Lesefassung»).
     """
     meta = a.daten["meta"]
@@ -1052,40 +1187,19 @@ def seite_index(a: Aufbau) -> Seite:
             continue
         rid = str(r["id"])
         for f in a.faecher:
-            fid, dg = str(f["id"]), _stellen_vd(f)
+            fid = str(f["id"])
             p = a.zelle(rid, "PLAN", fid)
             if p is None:
                 continue
             zeilen.append(
                 f'<tr><th scope="row"><a href="../vr/{esc(rid)}/">{esc(rid)} {esc(r["name"])}</a></th>'
                 f'<td><a href="../fach/{esc(fid)}/">{esc(fid)}</a></td>'
-                f'<td class="num">{num(a.wert(rid, "PLAN", fid, 0), dg)}</td>'
-                f'<td class="num">{num(f["min"], dg)}–{num(f["max"], dg)}</td>'
+                f'<td class="num">{_vd(a, rid, "PLAN", f)}</td>'
+                f'<td class="num">{num(f["min"])}–{num(f["max"])}</td>'
                 f"{_lage_zelle(p)}"
                 f'<td class="num">{_abstand(p)}</td></tr>'
             )
-    dataset = f"""<script type="application/ld+json">
-{{"@context":"https://schema.org","@type":"Dataset","@id":{_json(f"{a.basis}/daten/#dataset")},
-"name":"RSG 2030 – Planungsmatrizen der Verordnungen",
-"description":{
-        _json(
-            "Die Planungsmatrizen der Regionalen Strukturpläne Gesundheit 2030 aller neun österreichischen Bundesländer: "
-            "ambulante ärztliche Kapazität in ÄAVE und Sachleistungsstellen je Bundesland, Versorgungsregion und Fach, "
-            "IST und PLAN 2030, dazu Versorgungsdichte und Lage zum Versorgungsdichte-Soll-Intervall des ÖSG."
-        )
-    },
-"url":{_json(f"{a.basis}/daten/")},"sameAs":{_json(repo)},"version":{_json(version)},
-"license":"https://creativecommons.org/licenses/by/4.0/","isAccessibleForFree":true,"inLanguage":"de-AT",
-"creator":{{"@type":"Person","name":"Max Plischke","sameAs":"https://orcid.org/0000-0002-7410-2611"}},
-"spatialCoverage":"Österreich","temporalCoverage":"2022/2030",
-"distribution":[
- {{"@type":"DataDownload","name":"RSG_2030_Versorgungsdichte.csv","encodingFormat":"text/csv",
-  "contentUrl":{_json(f"{rel}/RSG_2030_Versorgungsdichte.csv")}}},
- {{"@type":"DataDownload","name":"RSG_2030_Stellen.csv","encodingFormat":"text/csv",
-  "contentUrl":{_json(f"{rel}/RSG_2030_Stellen.csv")}}},
- {{"@type":"DataDownload","name":"RSG_2030_Planungsmatrizen.csv","encodingFormat":"text/csv",
-  "contentUrl":{_json(f"{rel}/RSG_2030_Planungsmatrizen.csv")}}}]}}
-</script>"""
+    dataset = _dataset(a)
     rumpf = f"""{dataset}
 <h1>Versorgungsdichte und Planstellen 2030 je Region und Fach</h1>
 <p>Was die Verordnungen zu den Regionalen Strukturplänen Gesundheit (RSG) 2030 für die ambulante ärztliche
@@ -1113,15 +1227,18 @@ sind nach der Methode des ÖSG gerechnet.</p>
 <a href="{repo}/blob/{version}/docs/METHODIK.md" target="_blank" rel="noopener noreferrer">Methodik</a> ·
 <a href="{repo}/blob/{version}/docs/PRUEFUNG.md" target="_blank" rel="noopener noreferrer">Prüfkonzept</a></p>
 {_quellen_uebersicht(a)}
-<details><summary>Was dieser Datensatz nicht tut</summary><ul>
-<li>Er interpretiert nicht: Die Werte stehen so da, wie die Verordnungen sie drucken; jede Abweichung vom PDF ist
-eine dokumentierte Regel mit Begründung.</li>
-<li>Versorgungsdichte, Lage, Position und ÄAVE-Abstand sind die einzigen Kennzahlen; sie stehen in der
-veröffentlichten Tabelle.</li>
-<li>Keine Österreich-Werte: Der ÖSG misst je Versorgungsregion, und ein Österreich-IST würde zwei IST-Jahre mischen
-(2022 und 2023, je nach Bundesland).</li>
-<li>Kein Vergleich der Stellen IST → PLAN: IST-Planstellen und PLAN-Sachleistungsstellen zählen Verschiedenes.</li>
-<li>Keine Daten von außerhalb der Verordnungen, der ÖSG-Richtwerte und der amtlichen Bevölkerungsdaten.</li>
+<details><summary>Bewusst weggelassen</summary><ul>
+<li><b>Eine Bewertung.</b> Die Zahlen sagen, wo ein Fach zum Soll-Intervall liegt, nicht, ob die Versorgung reicht.</li>
+<li><b>Weitere Kennzahlen.</b> Gerechnet sind nur Versorgungsdichte, Lage, Position im Intervall und ÄAVE-Abstand.
+Die ÄAVE stehen so da, wie die Verordnungen sie drucken; wo wir vom PDF abweichen, steht die Regel mit Begründung
+dabei.</li>
+<li><b>Werte für ganz Österreich.</b> Die Soll-Intervalle des ÖSG gelten je Versorgungsregion, und die Länder haben
+verschiedene IST-Jahre (2022 oder 2023).</li>
+<li><b>Ein Vergleich der Stellen zwischen IST und PLAN.</b> Im IST stehen vertragsärztliche Planstellen je
+Krankenversicherungsträger, im PLAN Sachleistungsstellen: Planstellen und ärztliche Vollzeitäquivalente in
+Ambulatorien.</li>
+<li><b>Daten aus anderen Quellen.</b> Verwendet sind nur die Verordnungen, die Richtwerte des ÖSG und die
+Bevölkerungsdaten von Statistik Austria und ÖROK.</li>
 </ul></details>
 <details class="alle"><summary>Alle {len(zeilen)} Werte in einer Tabelle (PLAN 2030)</summary>
 <div class="scroll"><table class="t t-index">{
@@ -1194,6 +1311,12 @@ def _sitemap(a: Aufbau, seiten: list[Seite]) -> str:
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{eintraege}</urlset>\n'
 
 
+def _robots(a: Aufbau) -> str:
+    """Alles darf gelesen werden; die Zeile `Sitemap` sagt Suchmaschinen, wo die Liste aller Seiten liegt – auch ohne
+    Search Console. Geht nur an der Wurzel einer Domain, deshalb erst seit der eigenen Adresse."""
+    return f"User-agent: *\nAllow: /\n\nSitemap: {a.basis}/sitemap.xml\n"
+
+
 def baue_lesefassung(basis: str = BASIS_STANDARD) -> Path:
     """Alle Seiten erzeugen und nach `daten_ergebnis/web/` schreiben (neben das Dashboard)."""
     a = Aufbau(basis)
@@ -1210,6 +1333,7 @@ def baue_lesefassung(basis: str = BASIS_STANDARD) -> Path:
         ordner.mkdir(parents=True, exist_ok=True)
         (ordner / "index.html").write_text(text, encoding="utf-8")
     (ziel / "sitemap.xml").write_text(_sitemap(a, seiten), encoding="utf-8")
+    (ziel / "robots.txt").write_text(_robots(a), encoding="utf-8")
     shutil.copyfile(web_dir() / "lesefassung" / "lesefassung.css", ziel / "lesefassung.css")
     # Dieselben Schriften wie das Dashboard, aus demselben Ordner – auch wenn «web» nicht vorher lief
     shutil.copytree(web_dir() / "fonts", ziel / "fonts", dirs_exist_ok=True)

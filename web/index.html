@@ -7,6 +7,9 @@
 <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
 <title>RSG 2030 Versorgungsdichte</title>
 <meta name="description" content="ÄAVE der Sachleistung aus den Planungsmatrizen der RSG-2030-Verordnungen je 100.000 Einwohner:innen, je Versorgungsregion und Fach, verglichen mit dem Versorgungsdichte-Soll-Intervall des ÖSG.">
+<!-- Eine Adresse für die Suche: Die Lesefassung verlinkt hierher mit ?region=…&fach=…, die alte Adresse auf
+     github.io leitet um – beides ist dieselbe Seite (docs/WEB.md, «Zwei Wege») -->
+<link rel="canonical" href="https://rsg.loesungswerk.at/">
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -16,8 +19,6 @@
     <div class="eyebrow" id="eyebrow">RSG-2030-Verordnungen</div>
     <h1>Ambulante Versorgungsdichte laut RSG 2030</h1>
     <p class="lede">ÄAVE der Sachleistung aus den Planungsmatrizen je 100.000 Einwohner:innen (für 2030 laut Bevölkerungsprognose), je Versorgungsregion und Fach, verglichen mit dem Versorgungsdichte-Soll-Intervall des ÖSG. Die Farbe zeigt, ob ein Wert unter, im oder über dem Intervall liegt.</p>
-    <!-- Fester Link im HTML, nicht aus app.js: So finden auch Suchmaschinen ohne JavaScript die Lesefassung -->
-    <p class="lede-link"><a href="daten/">Zum Nachschlagen: jede Region und jedes Fach auf einer eigenen Seite</a></p>
   </header>
 
   <div class="notice"><b>So lesen:</b> Gezählt ist nur die Sachleistung, ohne Wahlärzt:innen; das Soll-Intervall gilt mit ihnen. <b>«unter»</b> heißt deshalb: die Sachleistung allein reicht nicht bis VDmin. Es heißt nicht «unterversorgt nach ÖSG». Patientenströme zwischen Regionen sind nicht berücksichtigt. Innerhalb des Intervalls macht der ÖSG keinen Unterschied, deshalb ist dort alles grau.</div>
@@ -69,7 +70,11 @@
     </section>
   </div>
 
-  <section class="panel about" id="about" aria-labelledby="h-about"></section>
+  <!-- Der Absatz steht fest im HTML, app.js setzt den übrigen Text davor: So finden auch Crawler ohne JavaScript die
+       Lesefassung (docs/WEB.md, «Zwei Wege») -->
+  <section class="panel about" id="about" aria-labelledby="h-about">
+    <p><b>Nachschlagen:</b> <a href="daten/">jede Region und jedes Fach als Tabelle</a>, mit den Sachleistungsstellen PLAN 2030.</p>
+  </section>
 
   <footer id="footer"></footer>
 </div>

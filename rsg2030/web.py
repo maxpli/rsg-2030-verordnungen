@@ -32,7 +32,7 @@ from oesg_methodik.faecher import ZAE, ZAE_QUELLE, teile
 from rsg2030.abgleich import gleiche_ab, paketversion
 from rsg2030.analyse_eingang import lade_matrix_long
 from rsg2030.config import LONG_DATEI, VERSORGUNGSDICHTE_DATEI, ausgabe_dir
-from rsg2030.darstellung import KEIN_WERT, SATZ, VORBEHALTE, Zelle, kein_wert, vorbehalte
+from rsg2030.darstellung import KEIN_WERT, SATZ, VORBEHALTE, Zelle, fusszeile, kein_wert, vorbehalte
 from rsg2030.korrekturen import lade_regeln, regel_fuer_zelle
 from rsg2030.protokoll import einrichten, schreibe_laufprotokoll
 from rsg2030.quellen import ist_rsg_verordnung, lade_quellen, ogd_pdf_url, ris_dokument_url
@@ -447,6 +447,7 @@ def baue_daten(tabelle: pd.DataFrame, regionen: pd.DataFrame, kacheln: pd.DataFr
         # Texte einmal, Auswahl je Zelle – dieselbe Schicht wie die statischen Seiten (rsg2030/darstellung.py)
         "vorbehalt_texte": {k: [v.fallstrick, v.text] for k, v in VORBEHALTE.items()},
         "satz_vorlagen": SATZ,
+        "fusszeile": fusszeile(meta["repo"], meta["version"], meta["commit"]),
         "vorbehalte": _vorbehalte(werte, faecher_liste, regionen_liste, matrizen),
         "kein_wert_texte": KEIN_WERT,
         "kein_wert": _fehlende(werte, faecher_liste, regionen_liste, long),

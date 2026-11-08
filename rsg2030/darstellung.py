@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import math
 import re
+from html import escape
 from typing import NamedTuple
 
 
@@ -223,6 +224,32 @@ def zahl(x: float | None, stellen: int = 1) -> str:
     return s.replace("-", "−")
 
 
+def stellen_fuer(x: float, vdmin: float | None = None, vdmax: float | None = None, stellen: int = 1) -> int:
+    """Nachkommastellen einer Zahl auf der Seite: eine, und eine mehr, wo die Rundung sonst etwas Falsches sagte
+    (docs/WEB.md, «Zahlen auf der Seite»):
+    - ein Wert ungleich 0 fiele auf «0,0» (Salzburg, KFO, IST: 0,035 → «0,04»);
+    - eine VD fiele genau auf VDmin oder VDmax, liegt aber außerhalb – sonst stünde «1,6» neben «1,6–3,0» und
+      «unterhalb» (Burgenland-Nord, PUL: 1,589 → «1,59»).
+    Dieselbe Logik wie beim ÄAVE-Abstand («−0,02» statt «−0,0»). Dieselbe Regel steht in web/app.js (`stellenFuer`);
+    Test in tests/test_web.py."""
+    for s in (stellen, stellen + 1, stellen + 2):
+        null = x != 0 and zahl(abs(x), s) == zahl(0.0, s)
+        unten = vdmin is not None and x < vdmin and zahl(x, s) == zahl(vdmin, s)
+        oben = vdmax is not None and x > vdmax and zahl(x, s) == zahl(vdmax, s)
+        if not (null or unten or oben):
+            return s
+    return stellen + 2
+
+
+def lesbar(x: float | None, vdmin: float | None = None, vdmax: float | None = None) -> str:
+    """ÄAVE oder VD wie auf der Seite: eine Nachkommastelle (`stellen_fuer`), genau 0 als «0» – «0,0» sähe aus wie
+    «gerundet fast nichts», gemeint ist «nichts geplant» (in der Matrix «-»)."""
+    if _fehlt(x):
+        return "–"
+    v = float(x or 0.0)
+    return "0" if v == 0 else zahl(v, stellen_fuer(v, vdmin, vdmax))
+
+
 def satz(zelle: Zelle | None, beschriftung: str) -> str:
     """Der Wert in Worten, wie in der Detailspalte des Dashboards («Bis zur Untergrenze fehlen … ÄAVE»)."""
     if zelle is None or zelle.lage is None:
@@ -241,3 +268,39 @@ def satz(zelle: Zelle | None, beschriftung: str) -> str:
 def platzhalter(text: str) -> set[int]:
     """Die Platzhalter eines Textes (`{0}`, `{1}` …) – für die Prüfung, dass die Argumente dazu passen."""
     return {int(n) for n in re.findall(r"\{(\d+)\}", text)}
+
+
+NAMENSNENNUNG = (
+    "Quellen: Verordnungen zu den RSG 2030 (RIS) · Bevölkerung: Statistik Austria – data.statistik.gv.at "
+    "(CC BY 4.0, bearbeitet) · Aufteilung 2030 auf Versorgungsregionen: ÖROK-Prognose 2021 (CC BY 4.0, bearbeitet) · "
+    "Soll-Intervalle und Versorgungsregionen: ÖSG 2023 (BMASGPK/GÖG)"
+)
+"""Namensnennung, Wortlaut nach LIZENZ_DATEN.md: Die Bevölkerungsdaten stehen unter CC BY 4.0 und gehen bearbeitet
+in die Versorgungsdichte ein; die Lizenz verlangt die Nennung bei jeder Veröffentlichung, ein Link auf die Methodik
+reicht dafür nicht."""
+
+
+def fusszeile(repo: str, version: str, commit: str) -> str:
+    """Die Fußzeile beider Darstellungen, Dashboard und Lesefassung (docs/WEB.md, Entscheidung 15): wer sie erstellt
+    hat, mit den Vorbehalten im selben Satz; die Links, die eine veröffentlichte Seite braucht; die Namensnennung.
+    Einmal hier, damit die beiden nicht auseinanderlaufen. Der Name verlinkt auf die Personenseite beim
+    Herausgeber; dass es Lösungswerk ist, sagen Adresse, Impressum und Datenschutz. Der Commit sagt, welcher Text
+    dabeistand: Die Seite ändert sich auch ohne neues Release; ohne bekannten Commit fällt er weg."""
+    v = escape(version)
+    neu = 'target="_blank" rel="noopener noreferrer"'
+    stand = (
+        f'. Stand der Seite: <a href="{repo}/commit/{commit}" {neu}>{commit[:7]}</a>'
+        if re.fullmatch(r"[0-9a-f]{7,40}", commit)
+        else ""
+    )
+    return f"""<p>Von <a href="https://loesungswerk.at/max-plischke" {neu}>Max Plischke</a> ohne Auftrag
+aus den Verordnungen im RIS aufbereitet. Keine amtliche Veröffentlichung: Maßgeblich sind die
+Verordnungen selbst; Angaben ohne Gewähr{stand}.</p>
+<p><a href="{repo}/releases/tag/{v}" {neu}>Release {v}</a> ·
+<a href="https://creativecommons.org/licenses/by/4.0/deed.de" {neu}>CC BY 4.0</a> ·
+<a href="{repo}/blob/{v}/docs/METHODIK.md" {neu}>Methodik</a> ·
+<a href="{repo}/blob/{v}/CITATION.cff" {neu}>Zitieren</a> ·
+<a href="{repo}/issues/new?template=wert_weicht_ab.yml" {neu}>Fehler melden</a> ·
+<a href="https://loesungswerk.at/impressum" {neu}>Impressum</a> ·
+<a href="https://loesungswerk.at/datenschutz" {neu}>Datenschutz</a></p>
+<p class="t2">{NAMENSNENNUNG}</p>"""
