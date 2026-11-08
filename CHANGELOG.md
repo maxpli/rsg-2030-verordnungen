@@ -57,9 +57,12 @@ Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem
   keinen eigenen mehr (docs/WEB.md, «Strukturierte Daten»).
 - **Fußnoten der Verordnung auf den Seiten nur gezählt, mit Link auf die Seite im PDF**, nicht mehr als Liste: Ohne
   die Stelle, an der ein Zeichen im PDF hängt, waren sie nicht zuzuordnen. Was die Werte betrifft, steht in den
-  Hinweisen unter der Tabelle Versorgungsdichte; ein Test prüft das für jede dieser Fußnoten. Wo nach dem
-  Verzeichnis keine Fußnote die Werte betrifft, sagt der Satz das statt auf die Hinweise zu verweisen
-  (docs/WEB.md, «Fußnoten»).
+  Hinweisen unter der Tabelle Versorgungsdichte; ein Test prüft das für jede dieser Fußnoten. Wo das Verzeichnis
+  keine solche Fußnote führt, stehen nur Anzahl und Link (docs/WEB.md, «Fußnoten»).
+- **Bei Werten eines Bundeslands steht jetzt, dass der ÖSG das Soll-Intervall je Versorgungsregion setzt** (Dashboard
+  und Lesefassung; docs/METHODIK.md, «Österreich»; docs/DATEN.md, Fallstrick 11). An den Daten ändert sich nichts.
+- **Korrekturregeln je Seite nach Ebene getrennt:** Eine Regel nur für die Landesmatrix steht nicht mehr auf den Seiten
+  ihrer Regionen, und umgekehrt.
 - **Eine Rundungsregel für alle Zahlen** (Seiten und Dashboard; docs/WEB.md, «Zahlen auf der Seite»): eine
   Nachkommastelle, auch bei KJP und MKG, wie der ÖSG die Soll-Intervalle druckt (bisher zwei); eine Stelle mehr, wo
   die Rundung sonst etwas Falsches sagte («1,59» statt «1,6» knapp unter VDmin 1,6; «0,04» statt «0,0»); genau 0

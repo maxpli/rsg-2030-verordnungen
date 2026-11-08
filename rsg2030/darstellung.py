@@ -76,6 +76,11 @@ VORBEHALTE: dict[str, Vorbehalt] = {
         6,
         "<b>Weniger als 1 ÄAVE vom Intervall entfernt.</b> Lage und Position sind hier nicht belastbar.",
     ),
+    "soll_je_region": Vorbehalt(
+        11,
+        "<b>Der ÖSG setzt das Soll-Intervall je Versorgungsregion.</b> Der Wert des Landes fasst seine Regionen "
+        "zusammen; einzelne Regionen können anders liegen.",
+    ),
     "keine_patientenstroeme": Vorbehalt(
         11,
         "<b>Ohne Patientenströme.</b> Regionen mit Zentrumsfunktion liegen eher höher, ihr Umland eher tiefer.",
@@ -209,6 +214,8 @@ def vorbehalte(
         out.append(("wien", ()))
     if unter_einer_aave(zelle):
         out.append(("unter_einer_aave", ()))
+    if ebene == "BL":
+        out.append(("soll_je_region", ()))
     if ebene == "VR":
         out.append(("keine_patientenstroeme", ()))
     if abschnitt == "IST":

@@ -43,3 +43,6 @@ Textband;236;Privatordination führen. Die Fachrichtungszuordnung erfolgt über 
 Tabellenband;239;"URO PCH(2) PUL ORTR(3) MKG ZMK STR RAD NUK PMR PAT LAB";Vorlage hat eine PUL-Spalte, aber keine KFO-Spalte: hinter ZMK folgt direkt STR (R4)
 Textband;76;"hat in Struktur und Aufbau dem Anhang 9 zu entsprechen und kann um weitere bundeslandspezifische Planungsgrößen und Zusatzinformationen ergänzt werden";Ergänzungen und Fußnoten-Klarstellungen der Länder sind zulässig (R4)
 Textband;12;"KFO Kieferorthopädie";KFO steht im Textband nur im Abkürzungsverzeichnis, nicht als Fachbereich der Vorlage (R4)
+Textband;38;Die Versorgungsdichte soll in jeder Versorgungsregion;Soll-Intervall gilt je Versorgungsregion, nicht je Bundesland
+Textband;215;Die Planungsrichtwerte beziehen sich grundsätzlich auf Bundeslandebene;Großgeräte: Landesebene ausdrücklich genannt (Gegenstück zur Versorgungsdichte)
+Methodenband;24;werden auf Ebene der Bundesländer;Bettenmessziffern: Landesebene ausdrücklich genannt (Gegenstück zur Versorgungsdichte)

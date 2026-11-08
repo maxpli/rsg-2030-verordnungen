@@ -160,6 +160,10 @@ dasselbe «Planungsrichtwerte-Intervall» (S.18–19).
 **Was der ÖSG sagt:**
 - Das Soll-Intervall gilt **je Versorgungsregion** (Textband S.38, Zitat bei R3). Eine Versorgungsdichte für ganz
   Österreich ist keine Planungsgröße des ÖSG.
+- Auch ein **Bundesland** ist keine Ebene des Soll-Intervalls: Für die ambulante Versorgungsdichte haben wir in den
+  drei Bänden nur die Versorgungsregion gefunden (Textband S.38; «pro Versorgungsregion», S.37). Die Vorlage der
+  RSG-Planungsmatrix gibt es auch für das Bundesland (Tabellenband S.239), ohne Soll-Intervall. Wo der ÖSG die
+  Landesebene meint, sagt er das: bei den Bettenmessziffern (Methodenband S.24) und den Großgeräten (Textband S.215).
 - Ein Bundesdurchschnitt kommt nur als Ausgangspunkt der Soll-Intervalle vor, und zwar **ohne Wien** (Textband S.38;
   Legende VD2021 «ohne Wien», Textband S.39; Methodenband S.18).
 
@@ -169,7 +173,8 @@ dasselbe «Planungsrichtwerte-Intervall» (S.18–19).
 **Entscheidung:** Die Kennzahlen haben die Ebenen Bundesland und Versorgungsregion, **keine
 Österreich-Ebene**. Die Excel-Mappe enthält die Summe der Länder (Blatt `AT_Gesamt`, mit Hinweis auf die IST-Jahre).
 Wer Österreich-Werte braucht, rechnet sie in der eigenen Analyse und legt dort fest, wie; mit ÖSG-Bezug wäre
-«Österreich ohne Wien».
+«Österreich ohne Wien». Die Werte je Bundesland fassen die Regionen zum Lesen zusammen; die Darstellungen tragen dort
+einen Vorbehalt (DATEN.md, Fallstrick 11).
 
 ### R4 – Fächer zusammenfassen
 

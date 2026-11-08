@@ -436,34 +436,34 @@ def _fussnoten(a: Aufbau, r: dict[str, object]) -> str:
     orte = treffer.drop_duplicates(["PDF", "Seite"]).sort_values("Seite", key=lambda s: s.astype(int))
     links = ", ".join(_seite_link(a, str(z.PDF), int(z.Seite)) for z in orte.itertuples())
     wort = "Fußnote" if n == 1 else "Fußnoten"
-    # Nur wo das Verzeichnis eine Fußnote als wertrelevant einordnet, gibt es unter der Tabelle etwas zu finden
-    if treffer["Einordnung"].isin(MIT_VERWEIS).any():
-        folge = (
-            "Was davon die Werte hier betrifft, steht in den Hinweisen unter der "
-            '<a href="#vd">Tabelle Versorgungsdichte</a>.'
-        )
-    else:
-        folge = (
-            "Nach dem Fußnotenverzeichnis des Datensatzes (<code>fussnoten.csv</code>) ändert keine davon eine Zahl "
-            "dieser Tabellen oder ihre Bedeutung."
-        )
-    return f"<p>Die Verordnung druckt zu dieser Matrix {n} {wort} ({links}). {folge}</p>"
+    # Der Verweis nur, wo das Verzeichnis eine Fußnote als wertrelevant führt. Sonst keine Aussage «keine ändert
+    # etwas»: Auch «Teilmenge» und «Vorlage» sagen oft, was in einer Zahl steckt (spitalsambulant = ZAE).
+    folge = (
+        ' Was davon die Werte hier betrifft, steht in den Hinweisen unter der <a href="#vd">Tabelle '
+        "Versorgungsdichte</a>."
+        if treffer["Einordnung"].isin(MIT_VERWEIS).any()
+        else ""
+    )
+    return f"<p>Die Verordnung druckt zu dieser Matrix {n} {wort} ({links}).{folge}</p>"
 
 
 def _korrigiert(a: Aufbau, r: dict[str, object], regeln: int) -> str:
     """«18 Werte nach 4 dokumentierten Regeln korrigiert» – eine Regel kann viele Zellen betreffen."""
     zellen = a.long[(a.long["Region_ID"] == str(r["id"])) & (a.long["Quelle"] == "korrigiert")]
     if not len(zellen):
-        return f"{regeln} dokumentierte Regeln für diese Matrix"
-    return f"{len(zellen)} Werte nach {regeln} dokumentierten Regeln korrigiert"
+        return f"{regeln} dokumentierte {'Regel' if regeln == 1 else 'Regeln'} für diese Matrix"
+    werte = "Wert" if len(zellen) == 1 else "Werte"
+    return f"{len(zellen)} {werte} nach {regeln} dokumentierten {'Regel' if regeln == 1 else 'Regeln'} korrigiert"
 
 
 def _korrekturen(a: Aufbau, r: dict[str, object]) -> str:
-    """Die Korrekturregeln, die für diese Matrix gelten – wörtlich mit Art, Befund und Begründung."""
+    """Die Korrekturregeln, die für diese Matrix gelten – wörtlich mit Art, Befund und Begründung. Region_ID «*» heißt
+    «alle Matrizen der Ebene»: Eine Regel nur für die Landesmatrix gehört nicht auf die Seite einer Region."""
     k = a.regeln
     land = str(r["land"])
     treffer = k[
         ((k["Land"] == land) | (k["Land"] == "*"))
+        & k["Ebene"].isin([str(r["ebene"]), "*"])
         & ((k["Region_ID"].astype(str) == str(r["id"])) | (k["Region_ID"] == "*"))
     ]
     if treffer.empty:
@@ -946,6 +946,7 @@ def seite_fach(a: Aufbau, f: dict[str, object]) -> Seite:
         )
     stellen_kopf = "".join(f'<th scope="col" class="num">{esc(STELLEN_KOPF[z])}</th>' for z in spalten)
     ist_jahre = "; ".join(f"{esc(j)} in {_und([esc(x) for x in jahre[j]])}" for j in sorted(jahre))
+    ist_kopf = esc("/".join(sorted(j for j in jahre if j.isdigit())))
     teil = (
         f'Teil von <a href="{hoch}fach/{esc(f["teil_von"])}/">{esc(f["teil_von"])}</a>, mit eigenem Soll-Intervall '
         "(nicht addieren)"
@@ -971,7 +972,7 @@ def seite_fach(a: Aufbau, f: dict[str, object]) -> Seite:
 {_kopfzeile([soll, teil])}
 <h2 id="vd">Versorgungsdichte: {esc(name)}</h2>
 <div class="scroll"><table class="t">{_beschriftung(b_vd)}<thead><tr><th scope="col">Versorgungsregion</th>
-<th scope="col">Bundesland</th>{n}VD IST</th>{n}VD PLAN 2030</th><th scope="col" class="lage-kopf">{LAGE_KOPF}</th></tr></thead>
+<th scope="col">Bundesland</th>{n}VD IST {ist_kopf}</th>{n}VD PLAN 2030</th><th scope="col" class="lage-kopf">{LAGE_KOPF}</th></tr></thead>
 <tbody>{"".join(vd_zeilen)}</tbody></table></div>
 <div class="lesehilfe"><p>{LESEHILFE} {IST_HILFE} IST-Jahr: {ist_jahre}. Keine Summe und kein Österreich-Wert:
 Der ÖSG misst je Versorgungsregion.</p>
@@ -979,7 +980,7 @@ Der ÖSG misst je Versorgungsregion.</p>
 {f'<p class="t2">Ohne Wert in der Matrix: {", ".join(ohne)}.</p>' if ohne else ""}</div>
 <h2 id="aave">ÄAVE: {esc(name)}</h2>
 <div class="scroll"><table class="t">{_beschriftung(b_aave)}<thead><tr><th scope="col">Versorgungsregion</th>
-{n}ÄAVE IST</th>{n}ÄAVE PLAN 2030</th>{n}Abstand PLAN 2030 zum Soll-Intervall (ÄAVE)</th></tr></thead>
+{n}ÄAVE IST {ist_kopf}</th>{n}ÄAVE PLAN 2030</th>{n}Abstand PLAN 2030 zum Soll-Intervall (ÄAVE)</th></tr></thead>
 <tbody>{"".join(aave_zeilen)}</tbody></table></div>
 <div class="lesehilfe"><p>{ABSTAND_HILFE}</p></div>
 <h2 id="stellen">Sachleistungsstellen PLAN 2030: {esc(name)}</h2>
@@ -1230,8 +1231,8 @@ sind nach der Methode des ÖSG gerechnet.</p>
 <details><summary>Bewusst weggelassen</summary><ul>
 <li><b>Eine Bewertung.</b> Die Zahlen sagen, wo ein Fach zum Soll-Intervall liegt, nicht, ob die Versorgung reicht.</li>
 <li><b>Weitere Kennzahlen.</b> Gerechnet sind nur Versorgungsdichte, Lage, Position im Intervall und ÄAVE-Abstand.
-Die ÄAVE stehen so da, wie die Verordnungen sie drucken; wo wir vom PDF abweichen, steht die Regel mit Begründung
-dabei.</li>
+Die ÄAVE kommen aus den Verordnungen; wo der ÖSG Fächer zusammenfasst, sind die Spalten der Matrix addiert, und wo
+wir vom PDF abweichen, steht die Regel mit Begründung dabei.</li>
 <li><b>Werte für ganz Österreich.</b> Die Soll-Intervalle des ÖSG gelten je Versorgungsregion, und die Länder haben
 verschiedene IST-Jahre (2022 oder 2023).</li>
 <li><b>Ein Vergleich der Stellen zwischen IST und PLAN.</b> Im IST stehen vertragsärztliche Planstellen je

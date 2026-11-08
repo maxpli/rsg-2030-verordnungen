@@ -220,6 +220,10 @@ Bitte vor jeder Auswertung lesen.
     [Vergleich mit dem Soll-Intervall](#vergleich-mit-dem-soll-intervall-welche-zahl-für-welche-aussage). Dazu:
     - **Der ÖSG verlangt nur «im Intervall».** Die VD «soll in jeder Versorgungsregion … im angegebenen Intervall
       liegen» (Textband S.38). Innerhalb des Intervalls macht er keinen Unterschied.
+    - **Auf Landesebene:** Die Tabelle rechnet die Lage auch je Bundesland, der ÖSG setzt das Soll-Intervall aber je
+      Versorgungsregion ([METHODIK.md](METHODIK.md), «Österreich»). Der Wert des Landes fasst seine Regionen
+      zusammen; einzelne Regionen können anders liegen als das Land. Für eine Aussage nach ÖSG die Zeilen der
+      Versorgungsregionen lesen.
     - **Ohne Wahlärzt:innen:** «unter» und «im» sind nach ÖSG nicht abschließend, «über» schon (Fallstrick 1).
     - **Ohne Patientenströme:** Die VD teilt durch die Wohnbevölkerung der Region. Der ÖSG verlangt die Bewertung
       «unter Berücksichtigung von regionalen Austauschbeziehungen» (Textband S.38), «inkl. Wechselwirkungen zwischen

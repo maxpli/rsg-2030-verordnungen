@@ -318,9 +318,8 @@ def test_jede_fussnote_die_werte_betrifft_steht_auf_der_seite(seiten, aufbau):
 
 
 def test_fussnoten_gezaehlt_mit_link(seiten, aufbau):
-    """Statt der Liste: Zahl der Fußnoten und die Seite im PDF – und kein Fußnotentext mehr auf der Seite. Der Satz
-    danach passt zum Verzeichnis: Verweis auf die Hinweise nur, wo eine Fußnote Werte betrifft; sonst sagt er, dass
-    keine es tut – ein Leser soll nicht vergeblich suchen."""
+    """Statt der Liste: Zahl der Fußnoten und die Seite im PDF – und kein Fußnotentext mehr auf der Seite. Der Verweis
+    auf die Hinweise steht nur, wo eine Fußnote Werte betrifft; ein Leser soll nicht vergeblich suchen."""
     import html as html_mod
 
     from rsg2030.fussnoten import MIT_VERWEIS
@@ -337,14 +336,52 @@ def test_fussnoten_gezaehlt_mit_link(seiten, aufbau):
         lang = [t for t in treffer["Text"] if len(str(t)) > 40]
         assert not any(html_mod.escape(str(t), quote=True) in seite for t in lang), r["id"]
         verweis = "Was davon die Werte hier betrifft" in seite
-        keine = "ändert keine davon eine Zahl" in seite
-        if treffer["Einordnung"].isin(MIT_VERWEIS).any():
-            assert verweis and not keine, r["id"]
-            mit += 1
-        else:
-            assert keine and not verweis, r["id"]
-            ohne += 1
+        erwartet = bool(treffer["Einordnung"].isin(MIT_VERWEIS).any())
+        assert verweis == erwartet, r["id"]
+        mit, ohne = mit + erwartet, ohne + (not erwartet)
     assert mit and ohne, (mit, ohne)
+
+
+def test_korrekturregeln_nur_von_der_eigenen_ebene(seiten, aufbau):
+    """Auf einer Seite stehen die Regeln ihrer Matrix, wörtlich und richtig gezählt – eine Regel nur für die
+    Landesmatrix (Ebene BL, Region_ID «*») gehört nicht auf die Seite einer Region, und umgekehrt."""
+    import html as html_mod
+
+    k = aufbau.regeln
+    ausgeschlossen = 0
+    for r in aufbau.regionen:
+        seite = seiten[aufbau.pfad(r)]
+        passt = k["Land"].isin([str(r["land"]), "*"]) & k["Region_ID"].astype(str).isin([str(r["id"]), "*"])
+        ebene = k["Ebene"].isin([str(r["ebene"]), "*"])
+        eigene, andere = k[passt & ebene], k[passt & ~ebene]
+        texte = set(eigene["Begruendung"])
+        for t in texte:
+            assert html_mod.escape(str(t), quote=True) in seite, (r["id"], str(t)[:60])
+        for t in set(andere["Begruendung"]) - texte:
+            assert html_mod.escape(str(t), quote=True) not in seite, (r["id"], str(t)[:60])
+            ausgeschlossen += 1
+        if len(eigene):
+            assert re.search(rf"\b{len(eigene)} dokumentierte", seite), r["id"]
+        assert not re.search(r"\b1 Werte\b|\b1 dokumentierten? Regeln\b", seite), r["id"]
+    assert ausgeschlossen > 0
+
+
+def test_bundesland_nennt_die_ebene_des_soll_intervalls(seiten, aufbau):
+    """Der ÖSG setzt das Soll-Intervall je Versorgungsregion (Textband S.38): Auf jeder Seite eines Bundeslands steht
+    das einmal bei der Tabelle, auf den Seiten der Regionen nicht (docs/DATEN.md, Fallstrick 11)."""
+    text = VORBEHALTE["soll_je_region"].text
+    for r in aufbau.regionen:
+        assert seiten[aufbau.pfad(r)].count(text) == (1 if r["ebene"] == "BL" else 0), r["id"]
+
+
+def test_fachseite_nennt_die_ist_jahre_im_kopf(seiten, aufbau):
+    """Spaltenköpfe mit dem IST-Jahr (docs/WEB.md, «Aufbau»); auf Fachseiten die Jahre der Länder, die das Fach haben."""
+    tab = pd.read_csv(ausgabe_dir() / VERSORGUNGSDICHTE_DATEI, dtype={"Region_ID": str})
+    ist = tab[(tab["Ebene"] == "VR") & (tab["Abschnitt"] == "IST") & (tab["Zeile_ID"] == "insgesamt")]
+    for f in aufbau.faecher:
+        jahre = "/".join(sorted({str(int(j)) for j in ist.loc[ist["Fach"] == f["id"], "Jahr"]}))
+        html = seiten[f"fach/{f['id']}/"]
+        assert f"VD IST {jahre}<" in html and f"ÄAVE IST {jahre}<" in html, (f["id"], jahre)
 
 
 def test_jede_korrigierte_matrix_zeigt_ihre_regeln(seiten, aufbau):

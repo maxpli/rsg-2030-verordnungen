@@ -39,7 +39,7 @@ aktuellen Release ([docs/WEB.md](docs/WEB.md)).
 
 Alle Werte stehen als Seiten zum Nachsehen und Verlinken bereit:
 [**alle 32 Versorgungsregionen und 17 Fächer auf einer Seite**](https://rsg.loesungswerk.at/daten/),
-dazu je Bundesland, je Versorgungsregion und je Fach eine eigene Seite mit Herkunft, Fußnoten und Korrekturen –
+dazu eine eigene Seite je Fach und je Bundesland und Versorgungsregion, dort mit Herkunft und Korrekturen –
 und das [interaktive Dashboard](https://rsg.loesungswerk.at/) zum Vergleichen. Bitte vorher die
 [Fallstricke](docs/DATEN.md#fallstricke) lesen: Gezählt ist nur die Sachleistung, ohne Wahlärzt:innen.
 
