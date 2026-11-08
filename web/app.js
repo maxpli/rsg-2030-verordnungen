@@ -60,11 +60,14 @@ const titel = (r) => r.ebene === "VR" ? r.name : r.land_name;
 const lageText = (w) => !w ? "kein Wert" : w.lage === "im" ? "im Intervall" : w.lage === "unter" ? "unter VDmin" : "über VDmax";
 const pill = (w) => `<span class="pill"><i class="k-${klasse(w)}"></i>${lageText(w)}</span>`;
 
-/* Kopf und Fußzeile: Datenstand, Stand der Seite und wer sie erstellt hat (docs/WEB.md, Entscheidung 15) */
+/* Kopf und Fußzeile: Datenstand, Stand der Seite, Quellen und wer sie erstellt hat (docs/WEB.md, Entscheidung 15).
+   Die Quellenzeile verlangt die Lizenz der Bevölkerungsdaten (LIZENZ_DATEN.md); derselbe Text wie in der
+   Lesefassung (rsg2030/lesefassung.py, QUELLEN). */
 document.getElementById("eyebrow").textContent = `RSG-2030-Verordnungen · Release ${M.version}`;
 document.getElementById("footer").innerHTML = `
   <div>Quelle: <a href="${M.repo}/releases/tag/${M.version}" target="_blank" rel="noopener noreferrer">Release ${esc(M.version)}</a> von <a href="${M.repo}" target="_blank" rel="noopener noreferrer">${esc(M.repo.replace("https://github.com/", ""))}</a>, zwei Tabellen: die Werte aus <span class="nb">${esc(M.datei)}</span> (SHA-256 <span class="num">${sha12(M.sha256)}</span>), die Herkunft je Wert aus <span class="nb">${esc(M.matrizen_datei)}</span> (<span class="num">${sha12(M.matrizen_sha256)}</span>). Volle Prüfsummen: <a href="${M.repo}/releases/download/${M.version}/SHA256SUMS.txt" target="_blank" rel="noopener noreferrer">SHA256SUMS.txt</a></div>
   <div>Stand der Seite: <a href="${M.repo}/commit/${M.commit}" target="_blank" rel="noopener noreferrer" class="num">${esc(M.commit.slice(0, 7))}</a> · Alle Vorbehalte: <a href="${DATEN_MD}" target="_blank" rel="noopener noreferrer">docs/DATEN.md, Fallstricke</a> · Daten CC BY 4.0</div>
+  <div>Quellen: Verordnungen zu den RSG 2030 (RIS) · Bevölkerung: Statistik Austria – data.statistik.gv.at (CC BY 4.0, bearbeitet) · Aufteilung 2030 auf Versorgungsregionen: ÖROK-Prognose 2021 (CC BY 4.0, bearbeitet) · Soll-Intervalle und Versorgungsregionen: ÖSG 2023 (BMASGPK/GÖG)</div>
   <div>Erstellt von Max Plischke, <a href="https://loesungswerk.at/rsg-2030" target="_blank" rel="noopener noreferrer">Lösungswerk</a>, ohne Auftrag. Inoffizielle Aufbereitung amtlicher Daten; maßgeblich sind die Verordnungen im RIS. Angaben ohne Gewähr, Fehler bitte melden. · <a href="https://loesungswerk.at/impressum" target="_blank" rel="noopener noreferrer">Impressum</a> · <a href="https://loesungswerk.at/datenschutz" target="_blank" rel="noopener noreferrer">Datenschutz</a></div>`;
 
 /* Über diese Daten: der Weg von der Seite in den Datensatz. Alle Links auf das Release, aus dem die Daten der Seite

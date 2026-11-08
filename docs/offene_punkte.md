@@ -169,6 +169,27 @@ Wahlärzt:innen im IST-Jahr übernehmen und für 2030 als Szenario fortschreiben
 eigene, gekennzeichnete Größe, nicht als Wert der Verordnungen. Eine solche Quelle ist das RSG-Monitoring der GÖG
 (Zeile «ÄAVE WahlärztInnen», je Land und Jahr; PRUEFUNG.md, «Abgleich mit dem RSG-Monitoring»).
 
+## Mögliche Erweiterung: alle Sachleistungsstellen als eigene Zeile in der Tabelle Stellen
+
+Im PLAN sind gemeinsame und zusätzliche Sachleistungsstellen verschiedene Stellen und dürfen addiert werden
+(DATEN.md, Tabelle Stellen, «Drei Dinge, die beim Summieren schiefgehen»). Die Summe steht aber in keiner Datei:
+Wer alle geplanten Stellen einer Region braucht, rechnet sie heute selbst – und nach der Regel «Andere Projekte
+lesen die veröffentlichten Dateien» (CLAUDE.md) fehlt sie damit in den Dateien. Auch die Lesefassung zeigt deshalb
+gemeinsame und zusätzliche Stellen nur nebeneinander ([WEB.md](WEB.md), «Lesefassung»).
+
+Vorschlag: eine Zeile `slst_alle` = `slst_gemeinsam` + `slst_zus_oegk` + `slst_zus_svs` + `slst_zus_bvaeb`, je Region,
+Fach und PLAN, im selben Zuschnitt; ohne `slst_eva` (Teilmenge der gemeinsamen) und ohne Wiens gedruckte
+`slst_gesamt`. Dazu `Max_VAEP_Stellen` als Summe der Obergrenzen der Teile (je Matrixspalte gerechnet, erst dann
+summiert – wie bei den übrigen Zeilen). Zu klären bzw. zu dokumentieren:
+
+- **Wien druckt eine Gesamtzeile**, und sie trifft die Summe der Teile in allen Fachspalten bis auf eine: AM in
+  Wien-Mitte-Südost (VR 91), gedruckt 413, Summe 414. Die neue Zeile summiert die Teile; die Abweichung gehört als
+  bekannte Abweichung mit Grund in `bekannte_abweichungen.csv` und als Prüfung, dass `slst_alle` sonst überall
+  `slst_gesamt` trifft.
+- **Datenänderung:** neue Zeile in `RSG_2030_Stellen.csv` → neue Prüfsumme, Eintrag in CHANGELOG.md, neue Version;
+  DATEN.md (Spalte `Zeile_ID` der Tabelle Stellen) nachziehen.
+- **Danach die Lesefassung:** `slst_alle` als Spalte «alle Sachleistungsstellen 2030» neben den Teilen.
+
 ## Webseite
 
 Was an der Webseite ([WEB.md](WEB.md)) noch offen ist.

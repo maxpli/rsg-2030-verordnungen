@@ -25,6 +25,7 @@ from rsg2030.lesefassung import (
     Aufbau,
     _anker,
     _dokument,
+    _kennungen,
     offene_fragen_ueberschrift,
     release_datum,
     seite_fach,
@@ -127,19 +128,65 @@ def test_brotkrumen_und_beide_wege(seiten, aufbau):
         assert f'?fach={f["id"]}"' in seiten[f"fach/{f['id']}/"], f["id"]
 
 
-def test_saetze_je_fach_verstehen_sich_fuer_sich(seiten, aufbau):
-    """Ein Chatbot zitiert oft nur einen Listenpunkt: Region und Soll-Intervall müssen darin stehen."""
-    import html as html_mod
-
+def test_jeder_vorbehalt_steht_einmal_bei_der_tabelle(seiten, aufbau):
+    """Was für eine Zelle gilt, steht unter der Tabelle – einmal, nicht je Fach wiederholt; jede Zahl an einer
+    Zeile hat ihren Vorbehalt darunter («Teil von» sagt der Satz zu PUL und KFO)."""
     for r in aufbau.regionen:
         seite = seiten[aufbau.pfad(r)]
-        liste = re.search(r'<ul class="worte">(.*?)</ul>', seite, re.S)
+        liste = re.search(r'<ul class="vorbehalte">(.*?)</ul>', seite, re.S)
+        texte = set()
+        for f in aufbau.faecher:
+            for kennung, text in _kennungen(aufbau, str(r["id"]), str(f["id"])):
+                if kennung != "teil_von":
+                    texte.add(text)
+        if not texte:
+            continue
         assert liste, r["id"]
-        name = html_mod.escape(str(r["name"]), quote=True)
-        for punkt in re.findall(r"<li>(.*?)</li>", liste.group(1), re.S):
-            assert name in punkt, (r["id"], punkt[:80])
-            if not punkt.startswith("<b>Im Soll-Intervall, ohne weitere Vorbehalte"):
-                assert "Soll-Intervall des ÖSG" in punkt, (r["id"], punkt[:80])
+        for text in texte:
+            assert liste.group(1).count(text) == 1, (r["id"], text[:60])
+        zeichen = set(re.findall(r"<sup>(\d+)</sup>", seite.split('<ul class="vorbehalte">')[0]))
+        unten = set(re.findall(r"<li><sup>(\d+)</sup>", liste.group(1)))
+        assert zeichen == unten, (r["id"], zeichen, unten)
+
+
+def test_eine_einheit_je_tabelle(seiten, aufbau):
+    """Drei Tabellen, je eine Einheit: Versorgungsdichte (IST und PLAN, Soll-Intervall, Lage), ÄAVE mit dem Abstand
+    zum Soll-Intervall, Sachleistungsstellen. Die Stellen (extramural) nie als Spalte neben den ÄAVE (ganze
+    Sachleistung), dazu der Hinweis, beide nicht gegeneinander zu rechnen (docs/METHODIK.md, «Begriffe»)."""
+    for pfad, html in seiten.items():
+        if not pfad.startswith(("bl/", "vr/", "fach/")):
+            continue
+        tabellen = html.split("</table>")
+        vd, aave = tabellen[0].split("<thead>")[1], tabellen[1].split("<thead>")[1]
+        assert "VD IST" in vd and "VD PLAN 2030" in vd and "ÄAVE" not in vd and "Abstand" not in vd, pfad
+        assert (
+            "ÄAVE PLAN 2030" in aave and "Abstand PLAN 2030 zum Soll-Intervall" in aave and "Sachleistungs" not in aave
+        ), pfad
+        assert html.index('id="vd"') < html.index('id="aave"') < html.index('id="stellen"'), pfad
+        assert "nicht gegeneinander rechnen" in html, pfad
+    for r in aufbau.regionen:
+        html = seiten[aufbau.pfad(r)]
+        assert ("Wien bewertet zusätzliche Sachleistungsstellen" in html) == (r["land"] == "Wien"), r["id"]
+
+
+def test_fachseite_zeigt_auch_zusaetzliche_stellen(seiten, aufbau):
+    """Im PLAN sind zusätzliche Stellen eigene Stellen (docs/DATEN.md, Tabelle Stellen): Wo ein Träger in einem Fach
+    irgendwo zusätzliche Stellen plant, hat die Fachseite die Spalte – sonst verzerrt der Vergleich der Regionen."""
+    s = aufbau.stellen
+    plan = s[(s["Ebene"] == "VR") & (s["Abschnitt"] == "PLAN") & (s["Stellen"].fillna(0) != 0)]
+    for f in aufbau.faecher:
+        html = seiten[f"fach/{f['id']}/"].split('id="stellen"')[1].split("</table>")[0]
+        for zeile, kopf in (("slst_zus_svs", "zusätzlich SVS"), ("slst_zus_bvaeb", "zusätzlich BVAEB")):
+            erwartet = not plan[(plan["Fach"] == f["id"]) & (plan["Zeile_ID"] == zeile)].empty
+            assert (kopf in html) == erwartet, (f["id"], zeile)
+
+
+def test_jede_seite_nennt_die_quellen_wie_die_lizenz_verlangt(seiten):
+    """Bevölkerung (Statistik Austria, ÖROK) steht unter CC BY 4.0 und geht bearbeitet ein: Namensnennung auf jeder
+    Seite, im Wortlaut von LIZENZ_DATEN.md."""
+    for pfad, html in seiten.items():
+        assert "Statistik Austria – data.statistik.gv.at (CC BY 4.0, bearbeitet)" in html, pfad
+        assert "ÖROK-Prognose 2021 (CC BY 4.0, bearbeitet)" in html and "ÖSG 2023" in html, pfad
 
 
 def test_keine_null_mit_vorzeichen(seiten):
@@ -165,10 +212,12 @@ def test_keine_unausgefuellte_vorlage(seiten):
 
 
 def test_jede_seite_nennt_die_grenzen_der_zahlen(seiten):
-    """«Was diese Zahlen nicht sagen» steht auf jeder Seite mit Werten – nicht nur auf der Indexseite."""
+    """Der wichtigste Vorbehalt steht auf jeder Seite, bei den Zahlen: nur Sachleistung, ohne Wahlärzt:innen,
+    und dass der ÖSG innerhalb des Intervalls keinen Unterschied macht (docs/DATEN.md, Fallstricke 1 und 11)."""
     for pfad, html in seiten.items():
-        assert "Was diese Zahlen nicht sagen" in html, pfad
-        assert "ohne Wahlärzt:innen" in html or "Wahlärzt:innen" in html, pfad
+        assert "Gezählt ist nur die Sachleistung" in html, pfad
+        assert "ohne Wahlärzt:innen" in html, pfad
+        assert "Innerhalb des Intervalls macht der ÖSG keinen Unterschied" in html, pfad
 
 
 def test_zuschnitt_und_teilmengen_stehen_bei_jeder_fachtabelle(seiten):

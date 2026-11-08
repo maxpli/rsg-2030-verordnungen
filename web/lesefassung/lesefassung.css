@@ -99,7 +99,10 @@ a:hover { text-decoration-thickness: 2px; }
 
 h1 { font-size: clamp(1.7rem, 4.5vw, 2.3rem); line-height: 1.12; margin: 0.3em 0 0.15em; font-weight: 700;
   letter-spacing: -.015em; text-wrap: balance; }
-.unterzeile { margin: 0 0 1.1em; color: var(--t2); font-size: 16px; }
+/* Eckdaten und Quelle: je eine Zeile unter der Überschrift */
+.eckdaten { margin: 0 0 0.3em; color: var(--t2); }
+.quelle { margin: 0 0 1.4em; font-size: 15px; color: var(--t2); }
+.eckdaten + .scroll { margin-top: 1.4em; }
 h2 { font-size: 1.25rem; line-height: 1.3; margin: 2em 0 0.5em; font-weight: 600; padding-top: 0.6em;
   border-top: 1px solid var(--linie); }
 h3 { font-size: 1.05rem; margin: 1.5em 0 0.3em; font-weight: 600; }
@@ -108,30 +111,8 @@ h4 { font-family: var(--f-cond); font-size: 13px; letter-spacing: .06em; text-tr
 
 p { margin: 0.6em 0; }
 /* Fließtext auf eine lesbare Zeilenlänge; Tabellen dürfen breiter sein */
-main p, main li, main dd, .kasten { max-width: 70ch; }
+main p, main li, main dd { max-width: 70ch; }
 main .scroll, main table, .verzeichnis, .verzeichnis li { max-width: none; }
-
-/* Steckbrief: die Eckdaten als kurze Liste statt als Absätze */
-dl.steckbrief { display: grid; grid-template-columns: max-content 1fr; gap: 8px 20px; margin: 0 0 1.4em;
-  padding: 14px 0; border-top: 1px solid var(--linie); border-bottom: 1px solid var(--linie); font-size: 15px; }
-dl.steckbrief dt { font-family: var(--f-cond); font-size: 13px; font-weight: 600; letter-spacing: .04em;
-  text-transform: uppercase; color: var(--t3); padding-top: 2px; }
-dl.steckbrief dd { margin: 0; }
-@media (max-width: 560px) {
-  dl.steckbrief { grid-template-columns: 1fr; gap: 0; }
-  dl.steckbrief dd { margin: 0 0 10px; }
-}
-
-/* Auf einen Blick: die Antwort der Seite zuerst und groß. Drei Zahlen, keine Farbe – das Wort darunter trägt
-   die Aussage, und derselbe Befund steht gleich danach als Satz. */
-.blick { margin: 0 0 1.2em; }
-ul.blick-zahlen { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px 36px; }
-ul.blick-zahlen li { display: flex; align-items: baseline; gap: 8px; max-width: none; }
-ul.blick-zahlen b { font-size: 2.4rem; line-height: 1; font-weight: 700; font-variant-numeric: tabular-nums; }
-ul.blick-zahlen span { color: var(--t2); font-size: 15px; }
-.blick p { margin-top: 0.7em; }
-.t2 { color: var(--t2); font-size: 14.5px; }
-.nb { white-space: nowrap; }
 
 /* Tabellen: lieber scrollen als umbrechen – eine Zahl, die in drei Zeilen bricht, liest niemand.
    Die erste Spalte bleibt beim seitlichen Scrollen stehen, damit man weiß, welche Zeile man liest. Der Schatten
@@ -192,36 +173,17 @@ table.t-index tbody tr:nth-child(even) > :first-child { background: var(--flaech
   table.t tbody th:first-child:not(.num) { min-width: 8rem; max-width: 9.5rem; }
 }
 
-/* Was diese Zahlen nicht sagen: steht auf jeder Seite, aber ruhiger als die Antwort darüber – ein Rahmen,
-   keine Fläche. Der wichtigste Vorbehalt steht ohnehin schon im Satz der Antwort. */
-.kasten {
-  margin: 1.2em 0 0.5em;
-  padding: 2px 16px 8px;
-  border: 1px solid var(--linie);
-  border-left: 3px solid var(--akzent);
-  border-radius: 0 6px 6px 0;
-  font-size: 14.5px;
-  color: var(--t2);
-}
-.kasten b { color: var(--text); }
-.kasten h2 { font-size: 1rem; margin: 0.7em 0 0.2em; border: 0; padding: 0; }
-.kasten ul { margin: 0.3em 0; padding-left: 1.1em; }
-.kasten li { margin: 0.3em 0; }
 
-/* Begriffe: die vier Wörter, ohne die keine Zahl lesbar ist – zugeklappt direkt vor der ersten Tabelle */
-details.begriffe { background: transparent; border: 1px solid var(--linie); }
-details.begriffe summary { font-weight: 600; font-size: 15px; }
-details.begriffe dl { margin: 0.6em 0 0.2em; display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px;
-  font-size: 15px; }
-details.begriffe dt { font-weight: 600; }
-details.begriffe dd { margin: 0; }
-@media (max-width: 560px) {
-  details.begriffe dl { grid-template-columns: 1fr; gap: 0; }
-  details.begriffe dd { margin: 0 0 8px; }
-}
-
-ul.worte { padding-left: 1.1em; }
-ul.worte li { margin: 0.6em 0; }
+/* Lesehilfe und Vorbehalte direkt unter der Tabelle: nur, was für diese Tabelle gilt, jeder Vorbehalt einmal;
+   die Zahl verweist von der Zeile hierher */
+.lesehilfe { font-size: 14.5px; color: var(--t2); margin: 0.4em 0 0; }
+.lesehilfe p { margin: 0.5em 0; }
+.lesehilfe b { color: var(--text); font-weight: 600; }
+ul.vorbehalte { margin: 0.5em 0; padding-left: 0; list-style: none; }
+ul.vorbehalte li { margin: 0.35em 0; padding-left: 1.3em; text-indent: -1.3em; }
+ul.vorbehalte li:not(:has(sup))::before { content: "–"; display: inline-block; width: 1.3em; text-indent: 0; }
+ul.vorbehalte sup { display: inline-block; width: 1.3em; text-indent: 0; }
+sup { font-size: 0.72em; line-height: 0; color: var(--akzent); font-weight: 600; margin-left: 2px; }
 
 /* Verzeichnis auf /daten/: je Bundesland seine Regionen, in Spalten */
 .verzeichnis { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 4px 20px; }

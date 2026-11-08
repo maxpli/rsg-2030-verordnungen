@@ -369,7 +369,10 @@ gilt:
   denen eines Trägers (Steiermark, Glossar Anlage 1 S.65). Für einen Träger sind es also gemeinsam + zusätzlich; bei
   der ÖGK ist «zusätzlich» überall 0 oder «-». Dass IST `planstellen_<träger>` und PLAN gemeinsam + zusätzlich
   zueinander passen, ist eine Beobachtung, keine Regel (Zahlen: METHODIK, «Stellen»).
-- **Nie über Träger addieren**, weder im IST noch im PLAN: Eine Stelle hat meist Verträge mit mehreren Trägern.
+- **IST nicht über Träger addieren, PLAN schon.** Eine IST-Planstelle hat meist Verträge mit mehreren Trägern und
+  steht in mehreren Zeilen. Die PLAN-Sachleistungsstellen dagegen sind verschiedene Stellen: gemeinsame und
+  zusätzliche zusammen ergeben alle geplanten Stellen ([Tabelle Stellen](#rsg_2030_stellencsv), «Drei Dinge, die
+  beim Summieren schiefgehen»).
 - **Die %-Zeile gehört zur Zeile darüber.** `slst_gemeinsam_max_vaep_prozent` sagt, wie viele der gemeinsamen Stellen
   höchstens Kassenpraxis sein dürfen, `slst_zus_svs_max_vaep_prozent` nur für die zusätzlichen SVS-Stellen
   (Tabellenband S.232: «jeweils»). Höchstzahl Kassenpraxen eines Trägers = gemeinsam × % + zusätzlich × %, je Fach

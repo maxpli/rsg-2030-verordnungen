@@ -484,6 +484,13 @@ def test_dashboard_verlinkt_die_lesefassung_fest_im_html():
     assert 'class="d-mehr"' in js and "fach/${esc(f)}/" in js
 
 
+def test_dashboard_nennt_die_quellen_wie_die_lesefassung():
+    """Namensnennung nach LIZENZ_DATEN.md, im selben Wortlaut wie die Lesefassung – zwei Kopien, ein Test."""
+    from rsg2030.lesefassung import QUELLEN
+
+    assert QUELLEN in (WEB / "app.js").read_text(encoding="utf-8")
+
+
 def test_seite_laedt_nichts_von_fremden_servern():
     """Schriften, Skripte und Stile kommen aus web/ selbst; Links (<a href>) auf GitHub und das RIS sind erlaubt:
     Erst wer klickt, gibt seine IP-Adresse dorthin – anders als bei einer eingebundenen Datei (Datenschutz)."""

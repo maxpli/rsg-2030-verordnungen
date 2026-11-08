@@ -9,6 +9,11 @@ Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem
 
 **Doku und Prüfbericht:**
 
+- **Sachleistungsstellen: «Stellen lesen» an die Tabelle Stellen angeglichen.** Dort stand noch aus 2026.1
+  «Nie über Träger addieren, weder im IST noch im PLAN». Seit der Tabelle Stellen gilt mit Beleg: IST nicht
+  addieren, PLAN schon – gemeinsame und zusätzliche Sachleistungsstellen sind verschiedene Stellen (Vorlage,
+  Tabellenband S.232; Wiens gedruckte Gesamtzeile ist ihre Summe). Jetzt sagt docs/DATEN.md an beiden Stellen
+  dasselbe. An den Daten ändert sich nichts.
 - **KFO: Richtwert ohne Zelle in der Vorlage.** Die ÖSG-Vorlage der RSG-Planungsmatrix hat keine KFO-Spalte, obwohl
   der ÖSG für die Unterzeile «- davon mit kieferorthopädischem Schwerpunkt» ein Soll-Intervall festlegt – anders als
   bei PUL, das eine Spalte hat. Begründet wird das in keinem der drei Bände. Dass die Länder trotzdem unterschiedlich
@@ -27,20 +32,26 @@ Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem
 **Webseite:**
 
 - **Neu: 59 statische Seiten ohne JavaScript** (`python -m rsg2030 lesefassung`, docs/WEB.md «Lesefassung»):
-  eine Indexseite mit allen 537 Zeilen «insgesamt», 9 Bundesländer, 32 Versorgungsregionen, 17 Fächer, dazu eine
-  Sitemap. Grund: In den Verordnungs-PDFs sind die Zahlen für Suchmaschinen und Abrufsysteme unerreichbar, und auf
-  dem Dashboard entstehen sie erst im Browser. Jede Seite trägt drei Schichten – Überblick mit dem Kasten «Was
-  diese Zahlen nicht sagen», die beiden Tabellen (Sachleistungsstellen 2030 und Versorgungsdichte gegen das
-  Soll-Intervall, IST und PLAN), und in `<details>` den Apparat: Fußnoten wörtlich mit Seitensprung, Korrekturregeln
-  mit Begründung, bekannte Abweichungen. Der Vorbehalt steht im Satz, nicht nur im Kasten. Adressen sind endgültig
-  (`/daten/`, `/bl/<kurz>/`, `/vr/<nr>/`, `/fach/<id>/`), weil GitHub Pages nicht umleiten kann. Genau ein
-  `Dataset`-Eintrag, auf der Indexseite. Der Bau bricht ab bei unausgefüllten Vorlagen und bei Urteilen, die die
-  Daten nicht tragen; 20 Tests prüfen Adressen, Zahlen, Fußnoten und Auffindbarkeit. Die Sitemap trägt als
-  `lastmod` den Tag des Release aus `CITATION.cff`, nicht das Baudatum; jede Tabelle hat eine `<caption>`.
-  Fächer, die im Soll-Intervall liegen und keinen eigenen Vorbehalt haben, stehen in einer Zeile zusammen statt
-  in je einem Satz, der nur die Spalte «Lage» wiederholt. Wo es offene Fragen zu einer Verordnung gibt,
-  steht ein Verweis auf `docs/offene_punkte.md` – nicht der Fragetext: Die Unsicherheit ist unsere, nicht
-  die des Landes.
+  ein Einstieg `/daten/` (Verzeichnis der Regionen und Fächer, Downloads, alle 537 Zeilen «insgesamt»
+  zugeklappt), 9 Bundesländer, 32 Versorgungsregionen, 17 Fächer, dazu eine Sitemap. Grund: In den
+  Verordnungs-PDFs sind die Zahlen für Suchmaschinen und Abrufsysteme unerreichbar, und auf dem Dashboard
+  entstehen sie erst im Browser. Jede Seite hat drei Tabellen mit je einer Einheit – Versorgungsdichte (IST, PLAN
+  2030, Soll-Intervall, Lage), ÄAVE (IST, PLAN 2030, Abstand zum Soll-Intervall) und Sachleistungsstellen PLAN 2030
+  –, darunter jeweils, was man zum Lesen braucht: was «unter» heißt (nur Sachleistung, ohne Wahlärzt:innen), die
+  Vorbehalte dieser Tabelle je einmal mit Zeichen an den Zeilen, Zuschnitt und Teilmengen. In `<details>` der
+  Apparat: Fußnoten wörtlich mit Seitensprung, Korrekturregeln mit Begründung, bekannte Abweichungen. Oben
+  Brotkrumen und die beiden Wege durch den Datensatz (nachschlagen, interaktiv vergleichen). Adressen sind
+  endgültig (`/daten/`, `/bl/<kurz>/`, `/vr/<nr>/`, `/fach/<id>/`), weil GitHub Pages nicht umleiten kann. Genau
+  ein `Dataset`-Eintrag, auf der Indexseite. Der Bau bricht ab bei unausgefüllten Vorlagen und bei Urteilen, die
+  die Daten nicht tragen; Tests prüfen Adressen, Zahlen, Vorbehalte, Fußnoten, Aufteilung der Tabellen und
+  Auffindbarkeit. Die Sitemap trägt als `lastmod` den Tag des Release aus `CITATION.cff`, nicht das Baudatum;
+  jede Tabelle hat eine `<caption>`. Wo es offene Fragen zu einer Verordnung gibt, steht ein Verweis auf
+  `docs/offene_punkte.md` – nicht der Fragetext: Die Unsicherheit ist unsere, nicht die des Landes.
+- **Quellen in der Fußzeile von Dashboard und Lesefassung**, wie LIZENZ_DATEN.md es verlangt: Bevölkerung von
+  Statistik Austria und ÖROK-Prognose (beide CC BY 4.0, bearbeitet), Verordnungen (RIS), ÖSG 2023. Bisher nannte
+  das Dashboard nur das Release.
+- **Das Dashboard verlinkt die Lesefassung:** aus der Detailspalte auf die Seite der Region und des Fachs, und fest
+  im HTML auf `/daten/`, damit Suchmaschinen ohne JavaScript die Seiten finden.
 - **Das Dashboard liest `?region=` und `?fach=`** aus der Adresse, damit die statischen Seiten mit vorbelegtem
   Zustand hierher verlinken können. Ohne Parameter verhält es sich genau wie vorher; unbekannte Werte werden
   verworfen, und die Adresse wird nie geschrieben. `data.json` enthält dafür je Region einen `slug` (Nummer der VR
@@ -60,8 +71,7 @@ Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem
   sich nicht.
 - **«Bis zur Untergrenze fehlen 0,0 ÄAVE» behoben.** Wo der ÄAVE-Abstand auf 0,0 rundet, nannte der Satz in
   Worten eine Zahl, die nichts sagt. Jetzt nennt er die Richtung: «knapp unter der Untergrenze – es fehlen weniger
-  als 0,05 ÄAVE Sachleistung». Betrifft 10 der 637 Zellen außerhalb des Soll-Intervalls, auf dem Dashboard und in
-  der Lesefassung.
+  als 0,05 ÄAVE Sachleistung». Betrifft 10 der 637 Zellen außerhalb des Soll-Intervalls, auf dem Dashboard.
 - **Auch ohne Wert führt die Herkunft in die Quelle.** Die Klappe «Woher kommt diese Zahl?» sagte bei einer Zelle
   ohne Wert nur, es gebe nichts herzuleiten – ohne PDF und Seite. Genau dort will man aber nachsehen, dass in der
   Matrix wirklich nichts steht. Jetzt nennt sie immer PDF, Seite und die Verordnung im RIS und dazu den Grund: Fach

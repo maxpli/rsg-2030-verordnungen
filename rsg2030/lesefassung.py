@@ -39,7 +39,7 @@ from oesg_methodik.bevoelkerung import lade_regionen
 from rsg2030.abgleich import gleiche_ab, paketversion
 from rsg2030.analyse_eingang import lade_matrix_long
 from rsg2030.config import LONG_DATEI, STELLEN_DATEI, VERSORGUNGSDICHTE_DATEI, ausgabe_dir
-from rsg2030.darstellung import KEIN_WERT, VORBEHALTE, Zelle, satz, zahl
+from rsg2030.darstellung import KEIN_WERT, VORBEHALTE, Zelle, zahl
 from rsg2030.korrekturen import lade_regeln
 from rsg2030.protokoll import einrichten, schreibe_laufprotokoll
 from rsg2030.web import LAND_SLUG, baue_daten, repo_url, seiten_commit, web_dir
@@ -189,19 +189,11 @@ class Aufbau:
 
     # --- Namen und Adressen ----------------------------------------------------------------------------------
 
-    def stellen_wert(self, rid: str, fach: str) -> tuple[object, object]:
-        """Gemeinsame Sachleistungsstellen 2030 dieses Fachs und die Obergrenze für vertragsärztliche Planstellen."""
+    def stellen_plan(self, rid: str, fach: str) -> dict[str, object]:
+        """Sachleistungsstellen 2030 dieses Fachs je Stellen-Zeile (gemeinsam, zusätzlich je Träger)."""
         s = self.stellen
-        treffer = s[
-            (s["Region_ID"] == rid)
-            & (s["Abschnitt"] == "PLAN")
-            & (s["Zeile_ID"] == "slst_gemeinsam")
-            & (s["Fach"] == fach)
-        ]
-        if treffer.empty:
-            return None, None
-        z = treffer.iloc[0]
-        return z["Stellen"], (None if pd.isna(z["Max_VAEP_Stellen"]) else z["Max_VAEP_Stellen"])
+        treffer = s[(s["Region_ID"] == rid) & (s["Abschnitt"] == "PLAN") & (s["Fach"] == fach)]
+        return {str(z.Zeile_ID): z.Stellen for z in treffer.itertuples() if z.Zeile_ID in STELLEN_PLAN}
 
     def quellen_liste(self) -> list[list[object]]:
         """Je Verordnungs-PDF Dateiname, RIS-Adresse und Adresse der Datei (aus `quellen.csv` abgeleitet)."""
@@ -235,21 +227,14 @@ class Aufbau:
 
 # --- Bausteine ------------------------------------------------------------------------------------------------
 
-LAGE_WORT = {"unter": "unter dem Soll-Intervall", "im": "im Soll-Intervall", "über": "über dem Soll-Intervall"}
-"""Lage in Worten. «unter» heißt nicht «unterversorgt» (docs/DATEN.md, Fallstrick 1) – das sagt der Kasten
-«Was diese Zahlen nicht sagen» auf jeder Seite, und der Satz je Fach nennt die Sachleistung ausdrücklich."""
-
 LAGE_KURZ = {"unter": "unter", "im": "im", "über": "über"}
 """Lage in der Tabelle: ein Wort, der Bezug steht im Spaltenkopf («Lage zum Soll-Intervall»). Ausgeschrieben
 bricht «unter dem Soll-Intervall» in jeder Zeile um und verdoppelt die Höhe der Tabelle. Weiterhin ein Wort,
 keine Farbe (docs/WEB.md, «Darstellungsregeln der Lesefassung»)."""
 
-LAGE_KOPF = "Lage PLAN 2030"
-
 TEILMENGEN_HINWEIS = (
-    '<p class="t2">Die Fächer PUL (Pulmologie) und KFO (Kieferorthopädie) stecken bereits in IM bzw. ZMK und '
-    "haben zusätzlich ein eigenes Soll-Intervall des ÖSG. Eine Summe über alle Fächer zählt sie deshalb doppelt; "
-    "für eine Summe die beiden weglassen.</p>"
+    '<p class="t2">PUL und KFO stecken bereits in IM bzw. ZMK und haben zusätzlich ein eigenes Soll-Intervall; '
+    "für eine Summe über alle Fächer beide weglassen.</p>"
 )
 """Steht unter jeder Tabelle, die Fächer auflistet (docs/DATEN.md, Fallstrick 4)."""
 
@@ -292,14 +277,14 @@ def _zuschnitt_zeile(zuschnitte: list[str]) -> str:
     if not zuschnitte:
         return ""
     return (
-        f'<p class="t2">{ZUSCHNITT_ZEICHEN} Diese Zeile ist im Zuschnitt des ÖSG gerechnet, nicht als Spalte der '
-        "Matrix: " + "; ".join(esc(z) for z in zuschnitte) + ". Ein Fach bedeutet hier also nicht überall dasselbe "
-        "wie im PDF – ohne diese Angabe vergleicht man Innere Medizin mit und ohne Pulmologie.</p>"
+        f'<p class="t2">{ZUSCHNITT_ZEICHEN} Im Zuschnitt des ÖSG gerechnet, nicht als Spalte der Matrix: '
+        + "; ".join(esc(z) for z in zuschnitte)
+        + ".</p>"
     )
 
 
 def _tabelle_stellen(a: Aufbau, rid: str) -> str:
-    """Sachleistungsstellen 2030 je Fach – nur PLAN, mit dem Maximalanteil als Stellenzahl."""
+    """Sachleistungsstellen 2030 je Fach – nur PLAN, gemeinsam und zusätzlich je Träger."""
     s = a.stellen[(a.stellen["Region_ID"] == rid) & (a.stellen["Abschnitt"] == "PLAN")]
     if s.empty:
         return ""
@@ -318,12 +303,11 @@ def _tabelle_stellen(a: Aufbau, rid: str) -> str:
         fid = str(f["id"])
         if not any((z, fid) in werte for z in STELLEN_PLAN):
             continue
+        g = werte.get(("slst_gemeinsam", fid))
         zellen = []
         for z in spalten:
             r = werte.get((z, fid))
             zellen.append(f'<td class="num">{num(r.Stellen) if r is not None else "–"}</td>')
-        g = werte.get(("slst_gemeinsam", fid))
-        maxv = None if g is None or pd.isna(g.Max_VAEP_Stellen) else g.Max_VAEP_Stellen
         zuschnitt = None if g is None else str(g.Zuschnitt)
         mark = ZUSCHNITT_ZEICHEN if _zuschnitt_abweichend(zuschnitt, fid) else ""
         if mark and zuschnitt is not None and zuschnitt not in zuschnitte:
@@ -331,13 +315,15 @@ def _tabelle_stellen(a: Aufbau, rid: str) -> str:
         zeilen.append(
             f'<tr><th scope="row">{esc(f["name"])} <span class="t2">({esc(fid)}{mark})</span></th>'
             + "".join(zellen)
-            + f'<td class="num">{num(maxv)}</td></tr>'
+            + "</tr>"
         )
+    # Ohne die Obergrenze für vertragsärztliche Planstellen: Die Matrix druckt sie je Träger-Zeile, eine Spalte für
+    # alle wäre eine eigene Rechnung, eine nur für die gemeinsamen Stellen missverständlich. Sie steht in der
+    # Tabelle Stellen (`Max_VAEP_Stellen`; docs/WEB.md, «Lesefassung»).
     kopf = (
-        "<thead><tr><th>Fach</th>"
+        '<thead><tr><th scope="col">Fach</th>'
         + "".join(f'<th scope="col" class="num">{esc(STELLEN_KOPF[z])}</th>' for z in spalten)
-        + '<th scope="col" class="num">davon maximal als vertragsärztliche Planstellen'
-        '<br><span class="t2">Obergrenze, kein Planwert</span></th></tr></thead>'
+        + "</tr></thead>"
     )
     zusatz = " und zusätzliche Stellen einzelner Träger" if len(spalten) > 1 else ""
     titel = _beschriftung(
@@ -353,21 +339,21 @@ def _tabelle_stellen(a: Aufbau, rid: str) -> str:
     hinweise = []
     if nur_null:
         hinweise.append(
-            '<p class="t2">Zusätzliche Stellen einzelner Träger: In der Matrix steht für jedes Fach 0 bei '
+            "<p>Zusätzliche Stellen einzelner Träger: In der Matrix steht für jedes Fach 0 bei "
             + _und([traeger[z] for z in nur_null])
             + "; diese Spalten sind deshalb nicht abgebildet.</p>"
         )
     gezeigt = [traeger[z] for z in spalten if z in traeger]
     if gezeigt:
-        hinweise.append(
-            '<p class="t2">«Zusätzliche» Stellen stehen nur Versicherten eines Trägers offen – nicht über Träger '
-            "addieren. " + "; ".join(gezeigt) + ".</p>"
-        )
+        hinweise.append(f"<p>{STELLEN_ZUSAMMEN} " + "; ".join(gezeigt) + ".</p>")
+    wien = f" {STELLEN_WIEN}" if a.region(rid)["land"] == "Wien" else ""
     return (
         f'<div class="scroll"><table class="t">{titel}{kopf}<tbody>{"".join(zeilen)}</tbody></table></div>'
+        f'<div class="lesehilfe"><p>{STELLEN_HILFE}{wien}</p>'
         + _zuschnitt_zeile(zuschnitte)
         + TEILMENGEN_HINWEIS
         + "".join(hinweise)
+        + "</div>"
     )
 
 
@@ -387,42 +373,6 @@ def _und(teile: list[str]) -> str:
     if not teile:
         return ""
     return teile[0] if len(teile) == 1 else ", ".join(teile[:-1]) + " und " + teile[-1]
-
-
-def _begriffe() -> str:
-    """Die vier Begriffe, ohne die keine Zahl der Seite lesbar ist – **vor** der Tabelle.
-
-    Wortlaut aus dem Glossar in docs/METHODIK.md, wo jeder Eintrag seine Quelle hat (ÖSG-Tabellenband S.12–13,
-    Textband S.227/S.38–39, S.232). Vorher stand eine Legende klein unter der Tabelle; dort liest sie niemand,
-    der die Kürzel nicht schon kennt. Zugeklappt, weil derselbe Block auf allen 59 Seiten steht: Offen schob er
-    die erste Zahl am Handy um eine Bildschirmhöhe nach unten. Im HTML steht er trotzdem ganz.
-    """
-    return """<details class="begriffe">
-<summary>Begriffe: ÄAVE, Versorgungsdichte, Soll-Intervall, Sachleistungsstellen</summary>
-<dl>
-<dt>ÄAVE</dt><dd>ärztliche ambulante Versorgungseinheit. Eine ÄAVE entspricht grundsätzlich einer durchschnittlich
-arbeitenden Kassenärztin bzw. einem Kassenarzt des Fachs – keine Kopfzahl.</dd>
-<dt>Versorgungsdichte (VD)</dt><dd>ÄAVE je 100.000 Einwohner:innen der Wohnbevölkerung.</dd>
-<dt>Soll-Intervall (VDmin–VDmax)</dt><dd>die Spanne, in der die Versorgungsdichte 2030 laut Österreichischem
-Strukturplan Gesundheit (ÖSG) liegen soll.</dd>
-<dt>Sachleistungsstellen</dt><dd>Planstellen für niedergelassene Vertragsärzt:innen und geplante ärztliche
-Vollzeitäquivalente in Ambulatorien. Niederösterreich nennt sie in seiner Matrix «Kassenstellen».</dd>
-</dl>
-</details>"""
-
-
-def _was_nicht() -> str:
-    """Kasten «Was diese Zahlen nicht sagen» – wörtlich die Vorbehalte aus docs/DATEN.md, Fallstricke 1 und 11."""
-    return """<aside class="kasten">
-<h2>Was diese Zahlen nicht sagen</h2>
-<ul>
-<li><b>Nur Sachleistung.</b> Gezählt sind Spitalsambulanzen und Niedergelassene mit Kassenvertrag – ohne
-Wahlärzt:innen, die in den Soll-Intervallen des ÖSG aber enthalten sind.</li>
-<li><b>Ohne Patientenströme.</b> Geteilt wird durch die Wohnbevölkerung der Region; Zentren versorgen ihr Umland
-mit und liegen deshalb eher höher.</li>
-<li><b>Im Soll-Intervall kein Unterschied.</b> Der ÖSG verlangt nur, dass die Dichte darin liegt.</li>
-</ul>
-</aside>"""
 
 
 def _seite_link(a: Aufbau, pdf: str, seite: int) -> str:
@@ -560,32 +510,6 @@ def _json(text: str) -> str:
     return '"' + str(text).replace("\\", "\\\\").replace('"', '\\"').replace("\n", " ") + '"'
 
 
-def _urheber(a: Aufbau, pfad: str, dashboard: str = "") -> str:
-    """Urheberblock: wer die Seiten erstellt hat, mit den Vorbehalten im selben Satz (docs/WEB.md)."""
-    meta = a.daten["meta"]
-    repo, version = str(meta["repo"]), esc(meta["version"])  # type: ignore[index]
-    rel = f"{repo}/releases/tag/{version}"
-    return f"""<h2 id="urheber">Wer diese Seiten erstellt hat</h2>
-<p><b>Max Plischke</b>, <a href="https://loesungswerk.at/rsg-2030" target="_blank" rel="noopener noreferrer">Lösungswerk</a>,
-ORCID <a href="https://orcid.org/0000-0002-7410-2611" target="_blank" rel="noopener noreferrer">0000-0002-7410-2611</a>.
-Ohne Auftrag erstellte, inoffizielle Aufbereitung amtlicher Daten; maßgeblich sind die Verordnungen im RIS.
-Angaben ohne Gewähr, Fehler bitte melden.</p>
-<p><b>Methode:</b> Die Planungsmatrizen aller neun Verordnungen sind aus den PDFs ausgelesen, jede Zelle zweimal
-unabhängig gelesen, jede Abweichung vom PDF mit einer dokumentierten Regel begründet; Versorgungsdichte, Lage,
-Position und ÄAVE-Abstand sind nach der Methode des ÖSG gerechnet
-(<a href="{repo}/blob/{version}/docs/METHODIK.md" target="_blank" rel="noopener noreferrer">Methodik</a>,
-<a href="{repo}/blob/{version}/docs/PRUEFUNG.md" target="_blank" rel="noopener noreferrer">Prüfkonzept</a>).</p>
-<p><b>Daten:</b> <a href="{rel}" target="_blank" rel="noopener noreferrer">Release {version}</a> ·
-Lizenz <a href="https://creativecommons.org/licenses/by/4.0/deed.de" target="_blank" rel="noopener noreferrer">CC BY 4.0</a> ·
-<a href="{repo}/blob/{version}/CITATION.cff" target="_blank" rel="noopener noreferrer">Zitieren</a> ·
-<a href="{repo}/issues/new?template=wert_weicht_ab.yml" target="_blank" rel="noopener noreferrer">Fehler melden</a> ·
-<a href="https://loesungswerk.at/impressum" target="_blank" rel="noopener noreferrer">Impressum</a> ·
-<a href="https://loesungswerk.at/datenschutz" target="_blank" rel="noopener noreferrer">Datenschutz</a></p>
-<p class="t2"><a href="{esc(a.hoch(pfad))}daten/">Alle Zahlen auf einer Seite</a> ·
-<a href="{repo}" target="_blank" rel="noopener noreferrer">Datensatz und Code</a> ·
-<a href="{esc(a.hoch(pfad))}{esc(dashboard)}">Interaktiv vergleichen</a></p>"""
-
-
 def _abstand(z: Zelle | None) -> str:
     """ÄAVE-Abstand wie in der Tabelle: 0 im Intervall, sonst mit Vorzeichen. Rundet der Abstand auf 0,0, stehen
     zwei Nachkommastellen da – «−0,0» sähe aus wie ein Fehler, und «0» hieße «im Intervall»."""
@@ -611,191 +535,334 @@ def _lage_zelle(z: Zelle | None) -> str:
     return f'<td class="lage"><strong>{wort}</strong></td>'
 
 
-def _tabelle_vd(a: Aufbau, rid: str) -> str:
-    """Versorgungsdichte im Vergleich zum Soll-Intervall, IST und PLAN, je Fach dieser Region.
-
-    Vorne, was die Frage beantwortet (Lage und ÄAVE-Abstand im PLAN 2030), dahinter die Zahlen, aus denen sie
-    entsteht – gruppiert nach Größe: erst die Versorgungsdichte mit dem Soll-Intervall, dann die ÄAVE.
-    """
-    zeilen, zuschnitte, fehlen = [], [], []
-    for f in a.faecher:
-        fid, dg = str(f["id"]), _stellen_vd(f)
-        i, p = a.zelle(rid, "IST", fid), a.zelle(rid, "PLAN", fid)
-        if i is None and p is None:
-            grund = a.kein_wert(rid, "PLAN", fid)
-            fehlen.append(f"<b>{esc(fid)}</b> {esc(f['name'])}: {grund or 'kein Wert in dieser Matrix.'}")
-            continue
-        mark = ZUSCHNITT_ZEICHEN if _zuschnitt_abweichend(p.zuschnitt if p else None, fid) else ""
-        if mark and p is not None and str(p.zuschnitt) not in zuschnitte:
-            zuschnitte.append(str(p.zuschnitt))
-        zeilen.append(
-            "<tr>"
-            f'<th scope="row">{esc(f["name"])} <span class="t2">({esc(fid)}{mark})</span></th>'
-            f"{_lage_zelle(p)}"
-            f'<td class="num">{_abstand(p)}</td>'
-            f'<td class="num">{num(a.wert(rid, "IST", fid, 0), dg)}</td>'
-            f'<td class="num">{num(a.wert(rid, "PLAN", fid, 0), dg)}</td>'
-            f'<td class="num">{num(f["min"], dg)}–{num(f["max"], dg)}</td>'
-            f'<td class="num">{num(a.wert(rid, "IST", fid, 1))}</td>'
-            f'<td class="num">{num(a.wert(rid, "PLAN", fid, 1))}</td>'
-            "</tr>"
-        )
-    jahr = esc(a.wert(rid, "IST", "AM", 3))
-    n = '<th scope="col" class="num">'
-    kopf = (
-        '<thead><tr><th scope="col" rowspan="2">Fach</th>'
-        '<th scope="colgroup" colspan="2" class="gruppe">PLAN 2030 zum Soll-Intervall</th>'
-        '<th scope="colgroup" colspan="3" class="gruppe">Versorgungsdichte (ÄAVE je 100.000)</th>'
-        '<th scope="colgroup" colspan="2" class="gruppe">ÄAVE</th></tr>'
-        f'<tr><th scope="col">Lage</th>{n}Abstand in ÄAVE</th>'
-        f"{n}IST {jahr}</th>{n}PLAN 2030</th>{n}Soll-Intervall</th>"
-        f"{n}IST {jahr}</th>{n}PLAN 2030</th></tr></thead>"
-    )
-    hinweise = [
-        '<p class="t2">Abstand in ÄAVE: so viele ÄAVE Sachleistung fehlen bis zur Untergrenze (−) bzw. liegen '
-        "über der Obergrenze (+); 0 heißt im Soll-Intervall.</p>"
-    ]
-    hinweise.append(_zuschnitt_zeile(zuschnitte))
-    hinweise.append(TEILMENGEN_HINWEIS)
-    if fehlen:
-        hinweise.append('<p class="t2">Ohne Wert in dieser Matrix: ' + " ".join(fehlen) + "</p>")
-    titel = _beschriftung(
-        f"Versorgungsdichte je Fach, {esc(a.region(rid)['name'])}: Lage zum Versorgungsdichte-Soll-Intervall des "
-        f"ÖSG im PLAN 2030, Versorgungsdichte und ÄAVE im IST {jahr} und im PLAN 2030"
-    )
-    return (
-        f'<div class="scroll"><table class="t t-gruppiert">{titel}{kopf}<tbody>{"".join(zeilen)}</tbody></table>'
-        "</div>" + "".join(hinweise)
-    )
-
-
-def _satz_kern(zelle: Zelle | None) -> str:
-    """Der Satz aus `darstellung.satz` ohne Beschriftung und ohne Absatz – derselbe Wortlaut wie im Dashboard,
-    hier mitten in einem längeren Satz. Am Satzanfang groß."""
-    s = satz(zelle, "§").replace("<p>§: ", "").replace("</p>", "")
-    for klein, gross in (("<b>im ", "<b>Im "), ("<b>knapp ", "<b>Knapp ")):
-        if s.startswith(klein):
-            s = gross + s[len(klein) :]
-    return s
-
-
-def _in_worten(a: Aufbau, rid: str) -> str:
-    """Je Fach ein Satz, aus den Daten abgeleitet; der Vorbehalt steht im Satz, nicht nur im Kasten.
-
-    Jeder Satz versteht sich **für sich**: Region, Fach, Wert, Soll-Intervall und dass nur die Sachleistung
-    gezählt ist. Ein Abrufsystem (Suchmaschine, Chatbot) zitiert oft einen einzelnen Listenpunkt, nicht die Seite;
-    «PLAN 2030: Bis zur Untergrenze fehlen 25,2 ÄAVE» allein sagt dann nicht, wo und in welchem Fach.
-
-    Vorbehalte, die für **jedes** Fach dieser Matrix gelten (z. B. «ohne Patientenströme»), stehen einmal vor der
-    Liste statt siebzehnmal darin: Sonst begraben sie die fachspezifischen, auf die es ankommt.
-    """
-    name = esc(a.region(rid)["name"])
-    mit_wert = [str(f["id"]) for f in a.faecher if (z := a.zelle(rid, "PLAN", str(f["id"]))) and z.lage]
-    if not mit_wert:
-        return ""
-    gemeinsam = set.intersection(*({k for k, _ in _kennungen(a, rid, fid)} for fid in mit_wert))
-    stuecke, ohne_befund = [], []
-    for f in a.faecher:
-        fid = str(f["id"])
-        if fid not in mit_wert:
-            continue
-        zelle = a.zelle(rid, "PLAN", fid)
-        eigen = " ".join(text for k, text in _kennungen(a, rid, fid) if k not in gemeinsam)
-        # Ein Satz «im Soll-Intervall» wiederholt nur die Spalte «Lage» und sagt nichts dazu. Solche Fächer
-        # kommen in eine Zeile – ihre Namen bleiben damit auf der Seite, ohne siebzehn hohle Sätze.
-        if zelle is not None and zelle.lage == "im" and not eigen:
-            ohne_befund.append(f"{esc(f['name'])} ({esc(fid)})")
-            continue
-        dg = _stellen_vd(f)
-        vd = num(a.wert(rid, "PLAN", fid, 0), dg)
-        stuecke.append(
-            f"<li><b>{esc(f['name'])} ({esc(fid)}), {name}:</b> Versorgungsdichte der Sachleistung im PLAN 2030 "
-            f"{vd} ÄAVE je 100.000 Einwohner:innen, Soll-Intervall des ÖSG {num(f['min'], dg)}–{num(f['max'], dg)}. "
-            f"{_satz_kern(zelle)} {eigen}</li>"
-        )
-    if ohne_befund:
-        stuecke.append(
-            f"<li><b>Im Soll-Intervall, ohne weitere Vorbehalte ({name}, PLAN 2030):</b> {_und(ohne_befund)}.</li>"
-        )
-    vorn = " ".join(text for k, text in _kennungen(a, rid, mit_wert[0]) if k in gemeinsam)
-    kopf = f'<p class="t2"><b>Für jedes Fach in {name} gilt:</b> {vorn}</p>' if vorn else ""
-    return kopf + f'<ul class="worte">{"".join(stuecke)}</ul>'
-
-
-def _zaehle(zellen: list[Zelle]) -> dict[str, int]:
-    return {k: sum(1 for z in zellen if z.lage == k) for k in ("im", "unter", "über")}
-
-
-def _lage_satz(zellen: list[Zelle], kopf: str, wovon: str) -> str:
-    """Der Satz der ersten Schicht: wie viele Fächer (bzw. Regionen) unter, im und über dem Soll-Intervall liegen.
-
-    Für sich verständlich (`kopf` nennt Region bzw. Fach), mit dem wichtigsten Vorbehalt im selben Satz. Jeder Teil
-    trägt seine eigene Präposition («3 darunter», «14 darin»): Hängt man sie hinten an, entsteht «14 im dem
-    Soll-Intervall».
-    """
-    n = _zaehle(zellen)
-    knapp = sum(1 for z in zellen if z.lage != "im" and abs(float(z.aave_abstand or 0)) < 1)
-    wort = {"im": "darin", "unter": "darunter", "über": "darüber"}
-    teile = [f"{n[k]} {wort[k]}" if n[k] else f"keine {wort[k]}" for k in ("im", "unter", "über")]
-    satzteil = (
-        f"<b>{kopf}:</b> Von {len(zellen)} {wovon} mit einem Wert liegen im PLAN 2030, gemessen am "
-        f"Versorgungsdichte-Soll-Intervall des ÖSG, {_und(teile)}; gezählt ist nur die Sachleistung, ohne "
-        "Wahlärzt:innen"
-    )
-    if knapp:
-        wem = _einem(wovon) if knapp == 1 else f"{knapp} {wovon}"
-        satzteil += (
-            f". Bei {wem} beträgt der Abstand zur Grenze weniger als eine ÄAVE, dort sind Lage und Position nicht "
-            "belastbar"
-        )
-    return f"<p>{satzteil}.</p>"
-
-
-def _einem(wovon: str) -> str:
-    """«bei einem Fach», «bei einer Versorgungsregion» – die Einzahl samt Artikel zu `wovon`."""
-    return {"Fächern": "einem Fach", "Versorgungsregionen": "einer Versorgungsregion"}[wovon]
-
-
-def _auf_einen_blick(zellen: list[Zelle], kopf: str, wovon: str) -> str:
-    """Die Antwort der Seite zuerst und groß: drei Zahlen, darunter derselbe Befund als Satz.
-
-    Die Zahlen sind Zählungen der Spalte «Lage» der veröffentlichten Tabelle – wie der Anteilsbalken des
-    Dashboards (docs/WEB.md, «Darstellungsregeln»), keine neue Kennzahl.
-    """
-    n = _zaehle(zellen)
-    teile = (("im", "im Soll-Intervall"), ("unter", "darunter"), ("über", "darüber"))
-    zahlen = "".join(f"<li><b>{n[k]}</b> <span>{t}</span></li>" for k, t in teile)
-    return (
-        f'<section class="blick" aria-label="Auf einen Blick"><ul class="blick-zahlen">{zahlen}</ul>'
-        f"{_lage_satz(zellen, kopf, wovon)}</section>"
-    )
-
-
 def _quellenzeile(a: Aufbau, rid: str) -> str:
     """Verordnung, Seite und RIS – die Seitenzahl auch als Text, weil `#page=` kein Standard des Web ist."""
     q = a.quelle(rid, "PLAN") or a.quelle(rid, "IST")
     if q is None:
-        return "–"
+        return ""
     pdf, seite, datei, ris = q
     return (
-        f'<span class="nb">{esc(pdf)}</span>, <b>Seite {seite}</b><br>'
+        f'<p class="quelle">Verordnung: <span class="nb">{esc(pdf)}</span>, <b>Seite {seite}</b> · '
         f'<a href="{esc(datei)}#page={seite}" target="_blank" rel="noopener noreferrer">Seite {seite} öffnen</a> · '
-        f'<a href="{esc(ris)}" target="_blank" rel="noopener noreferrer">Verordnung im RIS</a>'
+        f'<a href="{esc(ris)}" target="_blank" rel="noopener noreferrer">Verordnung im RIS</a></p>'
     )
 
 
-def _steckbrief(zeilen: list[tuple[str, str]]) -> str:
-    """Die Eckdaten einer Seite als kurze Liste statt als Absätze: in Sekunden erfasst, und jede Angabe hat einen
-    Namen, unter dem sie auch eine Maschine findet."""
-    return '<dl class="steckbrief">' + "".join(f"<dt>{k}</dt><dd>{v}</dd>" for k, v in zeilen) + "</dl>"
+LESEHILFE = (
+    "VD = ÄAVE je 100.000 Einwohner:innen; eine ÄAVE entspricht grundsätzlich einer durchschnittlich arbeitenden "
+    "Kassenärztin bzw. einem Kassenarzt des Fachs. Gezählt ist nur die Sachleistung (Kassenvertrag, Ambulatorien, "
+    "Spitalsambulanzen), ohne Wahlärzt:innen. Die Soll-Intervalle des ÖSG zählen Wahlärzt:innen mit, die Werte hier "
+    "nicht: Liegt ein Fach <b>unter</b> dem Intervall, kann es mit Wahlärzt:innen trotzdem darin liegen; liegt es "
+    "<b>über</b> dem Intervall, liegt es mit Wahlärzt:innen erst recht darüber. Innerhalb des Intervalls macht der "
+    "ÖSG keinen Unterschied."
+)
+"""Die eine Lesehilfe unter jeder Tabelle: was VD und ÄAVE sind, der wichtigste Vorbehalt und was «unter» deshalb
+heißt (docs/DATEN.md, Fallstricke 1 und 11, «Vergleich mit dem Soll-Intervall»). Steht direkt bei den Zahlen,
+nicht in einem Kasten darüber – wer eine Tabelle zitiert, nimmt den Text darunter eher mit als einen Kasten weiter
+oben."""
+
+QUELLEN = (
+    "Quellen: Verordnungen zu den RSG 2030 (RIS) · Bevölkerung: Statistik Austria – data.statistik.gv.at "
+    "(CC BY 4.0, bearbeitet) · Aufteilung 2030 auf Versorgungsregionen: ÖROK-Prognose 2021 (CC BY 4.0, bearbeitet) · "
+    "Soll-Intervalle und Versorgungsregionen: ÖSG 2023 (BMASGPK/GÖG)"
+)
+"""Namensnennung in der Fußzeile jeder Seite, Wortlaut nach LIZENZ_DATEN.md: Die Bevölkerungsdaten stehen unter
+CC BY 4.0 und gehen bearbeitet in die Versorgungsdichte ein; die Lizenz verlangt die Nennung bei jeder
+Veröffentlichung, ein Link auf die Methodik reicht dafür nicht. Derselbe Text steht in der Fußzeile des Dashboards
+(`web/app.js`; Test in tests/test_web.py)."""
+
+IST_HILFE = (
+    "Das Soll-Intervall gilt für 2030; am IST-Wert gemessen zeigt es den Abstand zur Norm 2030, keine Verletzung im "
+    "IST-Jahr."
+)
+"""Weil die VD IST in derselben Tabelle neben dem Soll-Intervall steht (docs/DATEN.md, Fallstrick 11)."""
+
+ABSTAND_HILFE = (
+    "Abstand zum Soll-Intervall: so viele ÄAVE Sachleistung fehlen im PLAN 2030 bis zur Untergrenze (−) oder liegen "
+    "über der Obergrenze (+); 0 heißt im Intervall. Die ÄAVE stehen so in der Verordnung – bei den Ländern, die in "
+    "SVE planen, als ÄAVE-Äquivalente –, die Fächer zugeschnitten wie in der Tabelle darüber."
+)
+"""Unter der ÄAVE-Tabelle: der Abstand ist in ÄAVE angegeben und steht bei seiner Einheit (docs/DATEN.md,
+«Vergleich mit dem Soll-Intervall»)."""
+
+STELLEN_HILFE = (
+    "Sachleistungsstellen sind Planstellen für Vertragsärzt:innen und geplante ärztliche Vollzeitäquivalente in "
+    "Ambulatorien; Niederösterreich nennt sie «Kassenstellen». Sie planen nur den niedergelassenen Bereich und die "
+    "Ambulatorien, nicht die Spitalsambulanzen – mit den ÄAVE der Versorgungsdichte deshalb nicht gegeneinander "
+    "rechnen. Die Fächer sind wie dort zugeschnitten, nur AM ohne die ZAE, die spitalsambulant sind."
+)
+"""Unter jeder Stellen-Tabelle. Sachleistung (ÄAVE, mit Spitalsambulanzen) und Sachleistungsstellen (extramural)
+sind «nicht zu verwechseln» (docs/METHODIK.md, «Begriffe»; Tabellenband S.232); AM ohne ZAE: docs/DATEN.md,
+Tabelle Stellen. Deshalb eine eigene Tabelle und keine Spalte neben den ÄAVE."""
+
+STELLEN_ZUSAMMEN = (
+    "Zusätzliche Stellen stehen nur den Versicherten eines Trägers offen. Anders als die IST-Planstellen sind "
+    "gemeinsame und zusätzliche Sachleistungsstellen verschiedene Stellen; zusammen ergeben sie alle geplanten Stellen."
+)
+"""docs/DATEN.md, Tabelle Stellen («IST nicht addieren, PLAN schon»). Die Summe selbst steht noch in keiner Datei
+(docs/offene_punkte.md, «alle Sachleistungsstellen als eigene Zeile»)."""
+
+STELLEN_WIEN = (
+    "Wien bewertet zusätzliche Sachleistungsstellen nach ihrer Versorgungswirksamkeit (Textteil S.19); eine Wiener "
+    "Sachleistungsstelle ist nicht unbedingt eine Stelle im Sinn einer Planstelle."
+)
+"""Nur auf Seiten mit Wiener Stellen (docs/DATEN.md, «Stellen lesen»; docs/METHODIK.md, «Stellen»)."""
+
+
+def _vorbehalte_je_zeile(zeilen: list[tuple[str, list[tuple[str, str]]]]) -> tuple[dict[str, str], str]:
+    """Vorbehalte einer Tabelle: jeder **einmal**, unter der Tabelle; an den Zeilen, für die er gilt, eine Zahl.
+
+    `zeilen` ist je Tabellenzeile (Schlüssel, [(Kennung, fertiger Text)]). Was für **jede** Zeile gilt (z. B.
+    «ohne Patientenströme» auf einer Regionsseite), steht ohne Zahl; der Rest nummeriert in der Reihenfolge des
+    ersten Auftretens. «Teil von» bleibt weg: Das sagt der Satz zu PUL und KFO, der unter jeder Tabelle steht.
+    Gleiche Kennung mit anderem Text (SVE: «Burgenland plant …», «Kärnten plant …») sind verschiedene Vorbehalte.
+    """
+    je_zeile = {k: [t for kennung, t in v if kennung != "teil_von"] for k, v in zeilen}
+    mengen = [set(v) for v in je_zeile.values()]
+    gemeinsam = set.intersection(*mengen) if mengen else set()
+    reihenfolge: list[str] = []
+    for v in je_zeile.values():
+        for t in v:
+            if t not in gemeinsam and t not in reihenfolge:
+                reihenfolge.append(t)
+    nummer = {t: i for i, t in enumerate(reihenfolge, start=1)}
+    zeichen = {k: "".join(f"<sup>{nummer[t]}</sup>" for t in v if t in nummer) for k, v in je_zeile.items()}
+    erste = next(iter(je_zeile.values()), [])
+    punkte = [f"<li>{t}</li>" for t in erste if t in gemeinsam]
+    punkte += [f"<li><sup>{nummer[t]}</sup> {t}</li>" for t in reihenfolge]
+    return zeichen, (f'<ul class="vorbehalte">{"".join(punkte)}</ul>' if punkte else "")
+
+
+def _ohne_wert(fehlen: list[str]) -> str:
+    return f'<p class="t2">Ohne Wert in dieser Matrix: {" ".join(fehlen)}</p>' if fehlen else ""
+
+
+def _tabelle_region(a: Aufbau, rid: str, titel: str) -> str:
+    """Die erste Tabelle einer Region: Versorgungsdichte im IST und im PLAN 2030, Soll-Intervall, Lage.
+
+    Eine Einheit je Tabelle: hier nur die VD (ÄAVE je 100.000), darunter die ÄAVE selbst mit dem Abstand zum
+    Soll-Intervall (`_tabelle_aave_region`), dann die Stellen. IST und PLAN nebeneinander, damit man eine
+    Veränderung sieht, ohne eine Differenz zu rechnen: beide Werte stehen so in der Tabelle Versorgungsdichte. Die
+    heiklen Fälle an der Grenze trägt die Zahl am Fach («weniger als 1 ÄAVE vom Intervall entfernt»), so bleibt die
+    Lage nicht allein stehen (docs/DATEN.md, «Vergleich mit dem Soll-Intervall»).
+    """
+    zuschnitte, fehlen, roh = [], [], []
+    faecher = []
+    for f in a.faecher:
+        fid = str(f["id"])
+        p = a.zelle(rid, "PLAN", fid)
+        if p is None and a.zelle(rid, "IST", fid) is None:
+            grund = a.kein_wert(rid, "PLAN", fid)
+            fehlen.append(f"<b>{esc(fid)}</b> {esc(f['name'])}: {grund or 'kein Wert in dieser Matrix.'}")
+            continue
+        faecher.append(f)
+        roh.append((fid, _kennungen(a, rid, fid)))
+    zeichen, vorbehalte = _vorbehalte_je_zeile(roh)
+    jahr = esc(a.wert(rid, "IST", "AM", 3))
+    zeilen = []
+    for f in faecher:
+        fid, dg = str(f["id"]), _stellen_vd(f)
+        p = a.zelle(rid, "PLAN", fid)
+        mark = ZUSCHNITT_ZEICHEN if _zuschnitt_abweichend(p.zuschnitt if p else None, fid) else ""
+        if mark and p is not None and str(p.zuschnitt) not in zuschnitte:
+            zuschnitte.append(str(p.zuschnitt))
+        zeilen.append(
+            f'<tr><th scope="row">{esc(f["name"])} <span class="t2">({esc(fid)}{mark})</span>{zeichen[fid]}</th>'
+            f'<td class="num">{num(a.wert(rid, "IST", fid, 0), dg)}</td>'
+            f'<td class="num">{num(a.wert(rid, "PLAN", fid, 0), dg)}</td>'
+            f'<td class="num">{num(f["min"], dg)}–{num(f["max"], dg)}</td>'
+            f"{_lage_zelle(p)}</tr>"
+        )
+    n = '<th scope="col" class="num">'
+    kopf = (
+        f'<thead><tr><th scope="col">Fach</th>{n}VD IST {jahr}</th>{n}VD PLAN 2030</th>{n}Soll-Intervall</th>'
+        '<th scope="col">Lage PLAN 2030</th></tr></thead>'
+    )
+    tabelle = (
+        f'<div class="scroll"><table class="t">{_beschriftung(titel)}{kopf}<tbody>{"".join(zeilen)}</tbody>'
+        "</table></div>"
+    )
+    return (
+        tabelle
+        + f'<div class="lesehilfe"><p>{LESEHILFE} {IST_HILFE}</p>'
+        + vorbehalte
+        + _zuschnitt_zeile(zuschnitte)
+        + TEILMENGEN_HINWEIS
+        + _ohne_wert(fehlen)
+        + "</div>"
+    )
+
+
+def _tabelle_aave_region(a: Aufbau, rid: str) -> str:
+    """Die zweite Tabelle einer Region: die ÄAVE im IST und im PLAN 2030 und der Abstand zum Soll-Intervall.
+
+    Die ÄAVE sind, was in der Verordnung steht – wer «Seite … öffnen» klickt, findet sie dort. Der Abstand ist in
+    ÄAVE angegeben und steht deshalb hier, bei seiner Einheit. Alle Werte aus der Tabelle Versorgungsdichte.
+    """
+    name = esc(a.region(rid)["name"])
+    jahr = esc(a.wert(rid, "IST", "AM", 3))
+    zeilen = []
+    for f in a.faecher:
+        fid = str(f["id"])
+        p = a.zelle(rid, "PLAN", fid)
+        if p is None and a.zelle(rid, "IST", fid) is None:
+            continue
+        mark = ZUSCHNITT_ZEICHEN if _zuschnitt_abweichend(p.zuschnitt if p else None, fid) else ""
+        zeilen.append(
+            f'<tr><th scope="row">{esc(f["name"])} <span class="t2">({esc(fid)}{mark})</span></th>'
+            f'<td class="num">{num(a.wert(rid, "IST", fid, 1))}</td>'
+            f'<td class="num">{num(a.wert(rid, "PLAN", fid, 1))}</td>'
+            f'<td class="num">{_abstand(p)}</td></tr>'
+        )
+    n = '<th scope="col" class="num">'
+    titel = _beschriftung(
+        f"{name}: ÄAVE der Sachleistung je Fach im IST {jahr} und im PLAN 2030, Abstand zum Soll-Intervall"
+    )
+    return (
+        f'<div class="scroll"><table class="t">{titel}<thead><tr><th scope="col">Fach</th>{n}ÄAVE IST {jahr}</th>'
+        f"{n}ÄAVE PLAN 2030</th>{n}Abstand PLAN 2030 zum Soll-Intervall</th></tr></thead>"
+        f"<tbody>{''.join(zeilen)}</tbody></table></div>"
+        f'<div class="lesehilfe"><p>{ABSTAND_HILFE}</p></div>'
+    )
+
+
+def seite_fach(a: Aufbau, f: dict[str, object]) -> Seite:
+    """Ein Fach über alle Versorgungsregionen – dieselben drei Tabellen wie auf der Seite einer Region, gekippt.
+    Kein Ranking, keine Österreich-Zahl."""
+    fid, name, dg = str(f["id"]), str(f["name"]), _stellen_vd(f)
+    regionen, ohne, roh = [], [], []
+    for r in a.regionen:
+        if r["ebene"] != "VR":
+            continue
+        rid = str(r["id"])
+        if a.zelle(rid, "PLAN", fid) is None and a.zelle(rid, "IST", fid) is None:
+            ohne.append(f"{esc(rid)} {esc(r['name'])}")
+            continue
+        regionen.append(r)
+        roh.append((rid, _kennungen(a, rid, fid)))
+    zeichen, vorbehalte = _vorbehalte_je_zeile(roh)
+    hoch = a.hoch(f"fach/{fid}/")
+    vd_zeilen, aave_zeilen, stellen_zeilen = [], [], []
+    stellen_je_region: dict[str, dict[str, object]] = {}
+    jahre: dict[str, list[str]] = {}
+    for r in regionen:
+        rid = str(r["id"])
+        p = a.zelle(rid, "PLAN", fid)
+        jahr = str(a.wert(rid, "IST", fid, 3))
+        land = str(r["land_name"])
+        if land not in jahre.setdefault(jahr, []):
+            jahre[jahr].append(land)
+        vd_zeilen.append(
+            f'<tr><th scope="row"><a href="{hoch}vr/{esc(rid)}/">{esc(rid)} {esc(r["name"])}</a>{zeichen[rid]}</th>'
+            f"<td>{esc(land)}</td>"
+            f'<td class="num">{num(a.wert(rid, "IST", fid, 0), dg)}</td>'
+            f'<td class="num">{num(a.wert(rid, "PLAN", fid, 0), dg)}</td>'
+            f"{_lage_zelle(p)}</tr>"
+        )
+        aave_zeilen.append(
+            f'<tr><th scope="row">{esc(rid)} {esc(r["name"])}</th>'
+            f'<td class="num">{num(a.wert(rid, "IST", fid, 1))}</td>'
+            f'<td class="num">{num(a.wert(rid, "PLAN", fid, 1))}</td>'
+            f'<td class="num">{_abstand(p)}</td></tr>'
+        )
+        stellen_je_region[rid] = a.stellen_plan(rid, fid)
+    # Wie auf der Seite einer Region: gemeinsame und zusätzliche Stellen je Träger. Im PLAN sind das verschiedene
+    # Stellen (docs/DATEN.md, Tabelle Stellen) – nur die gemeinsamen zu zeigen, verzerrte den Vergleich der Regionen
+    # dort, wo ein Land viele trägerspezifische Stellen plant. Eine Spalte mit lauter 0 (ÖGK) entfällt.
+    spalten = [
+        z
+        for z in STELLEN_PLAN
+        if z == "slst_gemeinsam"
+        or any(not pd.isna(w.get(z)) and float(str(w.get(z) or 0)) != 0 for w in stellen_je_region.values())
+    ]
+    for r in regionen:
+        rid = str(r["id"])
+        w = stellen_je_region[rid]
+        stellen_zeilen.append(
+            f'<tr><th scope="row">{esc(rid)} {esc(r["name"])}</th>'
+            + "".join(f'<td class="num">{num(w.get(z))}</td>' for z in spalten)
+            + "</tr>"
+        )
+    stellen_kopf = "".join(f'<th scope="col" class="num">{esc(STELLEN_KOPF[z])}</th>' for z in spalten)
+    ist_jahre = "; ".join(f"{esc(j)} in {_und([esc(x) for x in jahre[j]])}" for j in sorted(jahre))
+    teil = (
+        f'Teil von <a href="{hoch}fach/{esc(f["teil_von"])}/">{esc(f["teil_von"])}</a>, mit eigenem Soll-Intervall '
+        "(nicht addieren)"
+        if f["teil_von"]
+        else ""
+    )
+    soll = (
+        f'Soll-Intervall des ÖSG <b class="num">{num(f["min"], dg)} bis {num(f["max"], dg)}</b> ÄAVE je 100.000 '
+        "Einwohner:innen (ÖSG-Textband S.39)"
+    )
+    n = '<th scope="col" class="num">'
+    b_vd = (
+        f"{esc(name)} ({esc(fid)}): Versorgungsdichte der Sachleistung je Versorgungsregion im IST und im PLAN 2030, "
+        "Lage zum Soll-Intervall des ÖSG"
+    )
+    b_aave = f"{esc(name)} ({esc(fid)}): ÄAVE der Sachleistung je Versorgungsregion, Abstand zum Soll-Intervall"
+    b_stellen = (
+        f"{esc(name)} ({esc(fid)}): Sachleistungsstellen im PLAN 2030 je Versorgungsregion, gemeinsame aller Träger "
+        "und zusätzliche einzelner Träger"
+    )
+    rumpf = f"""<h1>{esc(name)} ({esc(fid)})</h1>
+{_kopfzeile([soll, teil])}
+<h2 id="vd">Versorgungsdichte: {esc(name)}</h2>
+<div class="scroll"><table class="t">{_beschriftung(b_vd)}<thead><tr><th scope="col">Versorgungsregion</th>
+<th scope="col">Bundesland</th>{n}VD IST</th>{n}VD PLAN 2030</th><th scope="col">Lage PLAN 2030</th></tr></thead>
+<tbody>{"".join(vd_zeilen)}</tbody></table></div>
+<div class="lesehilfe"><p>{LESEHILFE} {IST_HILFE} IST-Jahr: {ist_jahre}. Keine Summe und kein Österreich-Wert:
+Der ÖSG misst je Versorgungsregion.</p>
+{vorbehalte}
+{f'<p class="t2">Ohne Wert in der Matrix: {", ".join(ohne)}.</p>' if ohne else ""}</div>
+<h2 id="aave">ÄAVE: {esc(name)}</h2>
+<div class="scroll"><table class="t">{_beschriftung(b_aave)}<thead><tr><th scope="col">Versorgungsregion</th>
+{n}ÄAVE IST</th>{n}ÄAVE PLAN 2030</th>{n}Abstand PLAN 2030 zum Soll-Intervall</th></tr></thead>
+<tbody>{"".join(aave_zeilen)}</tbody></table></div>
+<div class="lesehilfe"><p>{ABSTAND_HILFE}</p></div>
+<h2 id="stellen">Sachleistungsstellen PLAN 2030: {esc(name)}</h2>
+<div class="scroll"><table class="t">{_beschriftung(b_stellen)}
+<thead><tr><th scope="col">Versorgungsregion</th>{stellen_kopf}</tr></thead>
+<tbody>{"".join(stellen_zeilen)}</tbody></table></div>
+<div class="lesehilfe"><p>{STELLEN_HILFE} {STELLEN_ZUSAMMEN} {STELLEN_WIEN}</p>
+{TEILMENGEN_HINWEIS}</div>"""
+    titel = f"Planstellen und Versorgungsdichte {name} 2030 | RSG 2030"
+    beschreibung = (
+        f"{name} ({fid}) in allen 32 Versorgungsregionen: Versorgungsdichte 2030 im Vergleich zum "
+        f"Soll-Intervall des ÖSG ({num(f['min'], dg)}–{num(f['max'], dg)} ÄAVE je 100.000)."
+    )
+    pfadleiste = (("RSG 2030", "daten/"), ("Fächer", "daten/#faecher"), (name, ""))
+    return Seite(f"fach/{fid}/", titel, beschreibung, rumpf, f"?fach={fid}", pfadleiste)
+
+
+def _urheber(a: Aufbau, pfad: str, dashboard: str = "") -> str:
+    """Fußzeile: wer die Seiten erstellt hat, mit den Vorbehalten im selben Satz, und die Links, die eine
+    veröffentlichte Seite braucht (docs/WEB.md, Entscheidung 15). Zwei Zeilen, Wortlaut wie im Dashboard. Die ORCID
+    steht in den strukturierten Daten (`creator`), nicht sichtbar auf jeder Seite; die Methode einmal auf /daten/."""
+    meta = a.daten["meta"]
+    repo, version = str(meta["repo"]), esc(meta["version"])  # type: ignore[index]
+    neu = 'target="_blank" rel="noopener noreferrer"'
+    return f"""<p>Inoffizielle Aufbereitung amtlicher Daten, erstellt von
+<a href="https://loesungswerk.at/max-plischke" {neu}>Max Plischke</a> (Lösungswerk), ohne Auftrag. Maßgeblich sind
+die Verordnungen im RIS; Angaben ohne Gewähr.</p>
+<p><a href="{repo}/releases/tag/{version}" {neu}>Release {version}</a> ·
+<a href="https://creativecommons.org/licenses/by/4.0/deed.de" {neu}>CC BY 4.0</a> ·
+<a href="{repo}/blob/{version}/docs/METHODIK.md" {neu}>Methodik</a> ·
+<a href="{repo}/blob/{version}/CITATION.cff" {neu}>Zitieren</a> ·
+<a href="{repo}/issues/new?template=wert_weicht_ab.yml" {neu}>Fehler melden</a> ·
+<a href="https://loesungswerk.at/impressum" {neu}>Impressum</a> ·
+<a href="https://loesungswerk.at/datenschutz" {neu}>Datenschutz</a></p>
+<p class="t2">{QUELLEN}</p>"""
+
+
+def _kopfzeile(teile: list[str]) -> str:
+    """Die Eckdaten in einer Zeile unter der Überschrift, getrennt durch Punkte."""
+    return f'<p class="eckdaten">{" · ".join(t for t in teile if t)}</p>'
 
 
 def seite_region(a: Aufbau, r: dict[str, object]) -> Seite:
-    """Eine Versorgungsregion oder ein Bundesland: Steckbrief, Antwort, Tabellen, Apparat.
-
-    Reihenfolge: zuerst, was die Seite beantwortet (wie viele Fächer unter, im, über dem Soll-Intervall), dann die
-    Tabelle, die es belegt, dann die Sätze je Fach, die Stellen und zuletzt der Apparat (docs/WEB.md, «Lesefassung»).
-    """
+    """Eine Versorgungsregion oder ein Bundesland: Eckdaten, Quelle, die Tabelle mit ihren Vorbehalten, dann zum
+    Aufklappen der Apparat (docs/WEB.md, «Lesefassung»)."""
     rid, ebene = str(r["id"]), str(r["ebene"])
     name = str(r["name"])
     nummer = f" (VR {rid})" if ebene == "VR" else ""
@@ -804,73 +871,48 @@ def seite_region(a: Aufbau, r: dict[str, object]) -> Seite:
     bev_ist, bev_plan = a.wert(rid, "IST", "AM", 2), a.wert(rid, "PLAN", "AM", 2)
     hoch = a.hoch(a.pfad(r))
     land_pfad = f"bl/{LAND_SLUG[str(r['land'])]}/"
-
-    # Kurz halten: Dass die VR-Zahl geschätzt ist, muss dastehen; wie sie geschätzt ist, steht in der Methodik.
-    bev_hinweis = "für die Region geschätzt" if ebene == "VR" else "Prognose der Statistik Austria"
+    # Dass die VR-Zahl geschätzt ist, muss dastehen; wie sie geschätzt ist, steht in der Methodik
+    geschaetzt = " (für die Region geschätzt)" if ebene == "VR" else ""
     bevoelkerung = (
-        f'<span class="num">{_tausend(bev_ist)}</span> am 1.1.{esc(jahr_ist)} → '
-        f'<span class="num">{_tausend(bev_plan)}</span> zum 1.1.2030 <span class="t2">({bev_hinweis})</span>'
+        f"Wohnbevölkerung {_tausend(bev_plan)} zum 1.1.2030{geschaetzt}, {_tausend(bev_ist)} am 1.1.{esc(jahr_ist)}"
     )
     if ebene == "VR":
         bezirke = a.bezirke(rid)
-        eckdaten = [
-            ("Bundesland", f'<a href="{hoch}{land_pfad}">{esc(r["land_name"])}</a>'),
-            (
-                "Bezirk" if len(bezirke) == 1 else "Bezirke",
-                f'{esc(", ".join(bezirke))}<br><span class="t2">Geplant wird je Versorgungsregion; Zahlen für '
-                "einzelne Bezirke gibt es nicht.</span>",
-            ),
-            ("Wohnbevölkerung", bevoelkerung),
-            ("Verordnung", _quellenzeile(a, rid)),
+        eck = [
+            f'<a href="{hoch}{land_pfad}">{esc(r["land_name"])}</a>',
+            f"{'Bezirk' if len(bezirke) == 1 else 'Bezirke'} {esc(', '.join(bezirke))} "
+            "(geplant wird je Versorgungsregion, nicht je Bezirk)",
+            bevoelkerung,
         ]
-        unterzeile = f"Versorgungsregion {esc(rid)} in {esc(r['land_name'])}"
-        pfadleiste: tuple[tuple[str, str], ...] = (
-            ("RSG 2030", "daten/"),
-            (str(r["land_name"]), land_pfad),
-            (name, ""),
-        )
+        pfadleiste: tuple[tuple[str, str], ...] = (("RSG 2030", "daten/"), (str(r["land_name"]), land_pfad), (name, ""))
         weiter = [
-            f'<a href="{hoch}vr/{v}/">{esc(v)} {esc(a.region(v)["name"])}</a>'
+            f'<a href="{hoch}vr/{v}/">{esc(a.region(v)["name"])}</a>'
             for v in a.vr_des_landes(str(r["land_name"]))
             if v != rid
         ]
         verweis = (
-            f'<p class="weiter"><b>Weitere Regionen in {esc(r["land_name"])}:</b> {" · ".join(weiter)}</p>'
-            if weiter
-            else ""
-        )
-        klein = (
-            '<p class="t2">In kleinen Versorgungsregionen verschiebt eine einzige ÄAVE die Dichte stark; dort sind '
-            "Lage und Position nicht belastbar. Der ÄAVE-Abstand zeigt, um wie wenig es oft geht.</p>"
+            f'<p class="weiter">Weitere Regionen in {esc(r["land_name"])}: {" · ".join(weiter)}</p>' if weiter else ""
         )
     else:
         vr = a.vr_des_landes(str(r["land_name"]))
-        liste = " · ".join(f'<a href="{hoch}vr/{v}/">{esc(v)} {esc(a.region(v)["name"])}</a>' for v in vr)
-        eckdaten = [
-            ("Versorgungsregionen", liste),
-            ("Wohnbevölkerung", bevoelkerung),
-            ("Verordnung", _quellenzeile(a, rid)),
-        ]
-        unterzeile = f"Bundesland mit {len(vr)} Versorgungsregionen"
+        liste = ", ".join(f'<a href="{hoch}vr/{v}/">{esc(a.region(v)["name"])}</a>' for v in vr)
+        eck = [f"Bundesland mit {len(vr)} Versorgungsregionen: {liste}", bevoelkerung]
         pfadleiste = (("RSG 2030", "daten/"), (name, ""))
         verweis = ""
-        klein = ""
-
-    zellen = [z for f in a.faecher if (z := a.zelle(rid, "PLAN", str(f["id"]))) and z.lage]
+    beschriftung = (
+        f"{esc(name)}{esc(nummer)}: Versorgungsdichte der Sachleistung je Fach im IST und im PLAN 2030, Lage zum "
+        "Soll-Intervall des ÖSG"
+    )
     rumpf = f"""<h1>{esc(name)}{esc(nummer)}</h1>
-<p class="unterzeile">{unterzeile} · ambulante ärztliche Versorgung laut RSG 2030</p>
-{_steckbrief(eckdaten)}
-{_auf_einen_blick(zellen, f"{esc(name)}{esc(nummer)}", "Fächern")}
-{_was_nicht()}
-<h2 id="vd">Versorgungsdichte je Fach: {esc(name)}</h2>
-{_begriffe()}
-{_tabelle_vd(a, rid)}
-{klein}
-<h3>Je Fach in Worten: {esc(name)}, PLAN 2030</h3>
-{_in_worten(a, rid)}
-<h2 id="stellen">Sachleistungsstellen 2030 je Fach: {esc(name)}</h2>
+{_kopfzeile(eck)}
+{_quellenzeile(a, rid)}
+<h2 id="vd">Versorgungsdichte: {esc(name)}</h2>
+{_tabelle_region(a, rid, beschriftung)}
+<h2 id="aave">ÄAVE: {esc(name)}</h2>
+{_tabelle_aave_region(a, rid)}
+<h2 id="stellen">Sachleistungsstellen PLAN 2030: {esc(name)}</h2>
 {_tabelle_stellen(a, rid)}
-<h2 id="apparat">Herkunft, Fußnoten und Korrekturen</h2>
+<h2 id="herkunft">Herkunft</h2>
 {_fussnoten(a, r)}
 {_korrekturen(a, r)}
 {_abweichungen(a, r)}
@@ -881,83 +923,6 @@ def seite_region(a: Aufbau, r: dict[str, object]) -> Seite:
         "Versorgungsdichte-Soll-Intervall des ÖSG – aus der Verordnung zum RSG 2030."
     )
     return Seite(a.pfad(r), titel, beschreibung, rumpf, f"?region={r['slug']}", pfadleiste)
-
-
-def seite_fach(a: Aufbau, f: dict[str, object]) -> Seite:
-    """Ein Fach über alle Versorgungsregionen – dieselben Werte, gekippt. Kein Ranking, keine Österreich-Zahl."""
-    fid, name, dg = str(f["id"]), str(f["name"]), _stellen_vd(f)
-    zeilen, ohne, zellen = [], [], []
-    for r in a.regionen:
-        if r["ebene"] != "VR":
-            continue
-        rid = str(r["id"])
-        p, i = a.zelle(rid, "PLAN", fid), a.zelle(rid, "IST", fid)
-        if p is None and i is None:
-            ohne.append(f"{esc(rid)} {esc(r['name'])}")
-            continue
-        if p is not None and p.lage:
-            zellen.append(p)
-        stellen, maxv = a.stellen_wert(rid, fid)
-        zeilen.append(
-            f'<tr><th scope="row"><a href="{a.hoch(f"fach/{fid}/")}vr/{esc(rid)}/">{esc(rid)} {esc(r["name"])}</a>'
-            f"</th><td>{esc(r['land_name'])}</td>"
-            f"{_lage_zelle(p)}"
-            f'<td class="num">{_abstand(p)}</td>'
-            f'<td class="num">{num(a.wert(rid, "IST", fid, 0), dg)}</td>'
-            f'<td class="num">{num(a.wert(rid, "PLAN", fid, 0), dg)}</td>'
-            f'<td class="num">{esc(a.wert(rid, "IST", fid, 3))}</td>'
-            f'<td class="num">{num(stellen)}</td><td class="num">{num(maxv)}</td></tr>'
-        )
-    eckdaten = [
-        (
-            "Soll-Intervall des ÖSG",
-            f'<b class="num">{num(f["min"], dg)} bis {num(f["max"], dg)}</b> ÄAVE je 100.000 Einwohner:innen '
-            '<span class="t2">(ÖSG-Textband S.39)</span>',
-        ),
-    ]
-    if f["teil_von"]:
-        eckdaten.append(
-            (
-                "Teil von",
-                f'<a href="{a.hoch(f"fach/{fid}/")}fach/{esc(f["teil_von"])}/">{esc(f["teil_von"])}</a>: '
-                f"Die ÄAVE von {esc(fid)} stecken schon in {esc(f['teil_von'])}, das Fach hat zusätzlich ein eigenes "
-                "Soll-Intervall. Nicht addieren.",
-            )
-        )
-    n = '<th scope="col" class="num">'
-    rumpf = f"""<h1>{esc(name)} ({esc(fid)})</h1>
-<p class="unterzeile">in den 32 Versorgungsregionen · ambulante ärztliche Versorgung laut RSG 2030</p>
-{_steckbrief(eckdaten)}
-{_auf_einen_blick(zellen, f"{esc(name)} ({esc(fid)})", "Versorgungsregionen")}
-{_was_nicht()}
-<h2>{esc(name)} je Versorgungsregion</h2>
-{_begriffe()}
-<div class="scroll"><table class="t t-gruppiert">{
-        _beschriftung(
-            f"{esc(name)} ({esc(fid)}) in den 32 Versorgungsregionen: Lage zum Soll-Intervall des ÖSG im PLAN 2030, "
-            "Versorgungsdichte im IST und im PLAN 2030 und Sachleistungsstellen 2030"
-        )
-    }<thead><tr><th scope="col" rowspan="2">Versorgungsregion</th><th scope="col" rowspan="2">Bundesland</th>
-<th scope="colgroup" colspan="2" class="gruppe">PLAN 2030 zum Soll-Intervall</th>
-<th scope="colgroup" colspan="3" class="gruppe">Versorgungsdichte (ÄAVE je 100.000)</th>
-<th scope="colgroup" colspan="2" class="gruppe">Sachleistungsstellen 2030</th></tr>
-<tr><th scope="col">Lage</th>{n}Abstand in ÄAVE</th>{n}IST</th>{n}PLAN 2030</th>{n}IST-Jahr</th>
-{n}gemeinsam (alle Träger)</th>{n}davon maximal als vertragsärztliche Planstellen</th></tr></thead>
-<tbody>{"".join(zeilen)}</tbody></table></div>
-<p class="t2">Das IST-Jahr unterscheidet sich je Bundesland (2022 oder 2023) und steht in der Tabelle;
-niedergelassene ÄAVE sind zwischen den beiden Gruppen nur mit Vorsicht vergleichbar. Die Stellen sind
-gemeinsame Sachleistungsstellen aller Träger; zusätzliche trägerspezifische Stellen stehen auf der Seite der
-Region, und nie über Träger addieren.
-Keine Summe und kein Österreich-Wert: Der ÖSG misst die Versorgungsdichte je Versorgungsregion, und ein
-Österreich-IST würde zwei Jahre mischen.</p>
-{f'<p class="t2">Ohne Wert in der Matrix: {", ".join(ohne)}.</p>' if ohne else ""}"""
-    titel = f"Planstellen und Versorgungsdichte {name} 2030 | RSG 2030"
-    beschreibung = (
-        f"{name} ({fid}) in allen 32 Versorgungsregionen: Versorgungsdichte 2030 im Vergleich zum "
-        f"Soll-Intervall des ÖSG ({num(f['min'], dg)}–{num(f['max'], dg)} ÄAVE je 100.000)."
-    )
-    pfadleiste = (("RSG 2030", "daten/"), ("Fächer", "daten/#faecher"), (name, ""))
-    return Seite(f"fach/{fid}/", titel, beschreibung, rumpf, f"?fach={fid}", pfadleiste)
 
 
 def _pfadleiste(a: Aufbau, s: Seite) -> tuple[str, str]:
@@ -1119,21 +1084,15 @@ def seite_index(a: Aufbau) -> Seite:
 </script>"""
     rumpf = f"""{dataset}
 <h1>Versorgungsdichte und Planstellen 2030 je Region und Fach</h1>
-<p class="unterzeile">Die Planungsmatrizen der RSG-2030-Verordnungen aller neun Bundesländer, zum Nachschlagen</p>
 <p>Was die Verordnungen zu den Regionalen Strukturplänen Gesundheit (RSG) 2030 für die ambulante ärztliche
-Versorgung festlegen: je Bundesland, Versorgungsregion und Fach die geplanten ÄAVE und Sachleistungsstellen, die
-Versorgungsdichte und ihre Lage zum Versorgungsdichte-Soll-Intervall des Österreichischen Strukturplans Gesundheit
-(ÖSG). Jede Zahl mit Verordnung und Seite. Zum Vergleichen über alle Regionen und Fächer auf einmal:
-<a href="../">interaktive Matrix</a>.</p>
-{_was_nicht()}
+Versorgung festlegen, je Versorgungsregion und Fach, mit Verordnung und Seite zu jeder Zahl. Zum Vergleichen über
+alle Regionen auf einmal: <a href="../">interaktive Matrix</a>.</p>
+<p class="t2">{LESEHILFE}</p>
 <h2 id="regionen">Nach Region</h2>
-<p class="t2">32 Versorgungsregionen in 9 Bundesländern. Geplant wird je Versorgungsregion; die Seite eines
-Bundeslands zeigt dessen eigene Matrix.</p>
 {_verzeichnis_regionen(a)}
 <h2 id="faecher">Nach Fach</h2>
-<p class="t2">17 Fächer mit einem Soll-Intervall des ÖSG; je Fach alle Versorgungsregionen in einer Tabelle.</p>
 {_verzeichnis_faecher(a)}
-<h2 id="herunterladen">Herunterladen</h2>
+<h2 id="herunterladen">Daten und Quellen</h2>
 <p><a href="{
         rel
     }/RSG_2030_Versorgungsdichte.csv" target="_blank" rel="noopener noreferrer">Versorgungsdichte (CSV)</a> ·
@@ -1141,36 +1100,33 @@ Bundeslands zeigt dessen eigene Matrix.</p>
 <a href="{rel}/RSG_2030_Planungsmatrizen.csv" target="_blank" rel="noopener noreferrer">Planungsmatrizen (CSV)</a> ·
 <a href="{rel}/RSG_2030_Planungsmatrizen.xlsx" target="_blank" rel="noopener noreferrer">Excel-Mappe</a> ·
 <a href="{rel}/Pruefbericht.md" target="_blank" rel="noopener noreferrer">Prüfbericht</a></p>
-<p><b>Vor der Verwendung bitte lesen:</b>
+<p>Die Planungsmatrizen aller neun Verordnungen sind aus den PDFs ausgelesen, jede Zelle zweimal unabhängig
+gelesen, jede Abweichung vom PDF mit einer dokumentierten Regel begründet; Versorgungsdichte, Lage und ÄAVE-Abstand
+sind nach der Methode des ÖSG gerechnet.</p>
+<p>Vor der Verwendung bitte lesen:
 <a href="{repo}/blob/{version}/docs/DATEN.md#fallstricke" target="_blank" rel="noopener noreferrer">Fallstricke</a> ·
 <a href="{repo}/blob/{version}/docs/METHODIK.md" target="_blank" rel="noopener noreferrer">Methodik</a> ·
 <a href="{repo}/blob/{version}/docs/PRUEFUNG.md" target="_blank" rel="noopener noreferrer">Prüfkonzept</a></p>
 {_quellen_uebersicht(a)}
-<h2 id="nicht">Was dieser Datensatz nicht tut</h2>
-<ul>
-<li><b>Er interpretiert nicht.</b> Die Werte stehen so da, wie die Verordnungen sie drucken; jede Abweichung vom
-PDF ist eine dokumentierte Regel mit Begründung.</li>
-<li><b>Er rechnet nichts nach ÖSG-Methode nach, was nicht in den Dateien steht.</b> Versorgungsdichte, Lage,
-Position und ÄAVE-Abstand sind die einzigen Kennzahlen; sie stehen in der veröffentlichten Tabelle.</li>
-<li><b>Keine Österreich-Werte.</b> Der ÖSG misst je Versorgungsregion, und ein Österreich-IST würde zwei
-IST-Jahre mischen (2022 und 2023, je nach Bundesland).</li>
-<li><b>Keine Stellen im Vergleich IST → PLAN.</b> IST-Planstellen und PLAN-Sachleistungsstellen zählen
-Verschiedenes; der Vergleich bräuchte Annahmen und wäre eine Auswertung, keine Lesung.</li>
-<li><b>Keine Daten von außerhalb</b> der Verordnungen, der ÖSG-Richtwerte und der amtlichen Bevölkerungsdaten.</li>
-</ul>
-<h2 id="alle">Alle Werte in einer Tabelle</h2>
-<p class="t2">Alle {len(zeilen)} Zeilen «ÄAVE insgesamt» der Tabelle Versorgungsdichte, PLAN 2030 – zum Durchsuchen
-im Browser. Zum Rechnen die CSV oben.</p>
-{_begriffe()}
-<details class="alle"><summary>Tabelle mit allen {len(zeilen)} Werten aufklappen</summary>
+<details><summary>Was dieser Datensatz nicht tut</summary><ul>
+<li>Er interpretiert nicht: Die Werte stehen so da, wie die Verordnungen sie drucken; jede Abweichung vom PDF ist
+eine dokumentierte Regel mit Begründung.</li>
+<li>Versorgungsdichte, Lage, Position und ÄAVE-Abstand sind die einzigen Kennzahlen; sie stehen in der
+veröffentlichten Tabelle.</li>
+<li>Keine Österreich-Werte: Der ÖSG misst je Versorgungsregion, und ein Österreich-IST würde zwei IST-Jahre mischen
+(2022 und 2023, je nach Bundesland).</li>
+<li>Kein Vergleich der Stellen IST → PLAN: IST-Planstellen und PLAN-Sachleistungsstellen zählen Verschiedenes.</li>
+<li>Keine Daten von außerhalb der Verordnungen, der ÖSG-Richtwerte und der amtlichen Bevölkerungsdaten.</li>
+</ul></details>
+<details class="alle"><summary>Alle {len(zeilen)} Werte in einer Tabelle (PLAN 2030)</summary>
 <div class="scroll"><table class="t t-index">{
         _beschriftung(
             f"Versorgungsdichte PLAN 2030 je Versorgungsregion und Fach, alle {len(zeilen)} Zeilen «ÄAVE insgesamt» der "
             "Tabelle Versorgungsdichte, im Vergleich zum Soll-Intervall des ÖSG"
         )
     }<thead><tr><th scope="col" class="num">VR</th><th scope="col">Region</th>
-<th scope="col">Fach</th><th scope="col" class="num">ÄAVE PLAN</th><th scope="col" class="num">VD PLAN</th><th scope="col" class="num">VDmin</th>
-<th scope="col" class="num">VDmax</th><th scope="col">Lage</th><th scope="col" class="num">Abstand</th></tr></thead>
+<th scope="col">Fach</th><th scope="col" class="num">ÄAVE PLAN 2030</th><th scope="col" class="num">VD PLAN 2030</th><th scope="col" class="num">VDmin</th>
+<th scope="col" class="num">VDmax</th><th scope="col">Lage PLAN 2030</th><th scope="col" class="num">Abstand PLAN 2030</th></tr></thead>
 <tbody>{"".join(zeilen)}</tbody></table></div>
 </details>"""
     return Seite(
