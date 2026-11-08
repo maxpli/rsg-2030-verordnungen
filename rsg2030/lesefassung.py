@@ -231,8 +231,10 @@ class Aufbau:
         return next(f for f in self.faecher if str(f["id"]) == fid)
 
     def bezirke(self, rid: str) -> list[str]:
+        """Bezirke der Region nach Bezirkskennzahl, wie in der Regionalen Gliederung des ÖSG: Alphabetisch stünde
+        «Wien 10.» vor «Wien 2.». Die Namen bleiben wie in der Quelle."""
         z = self.regionen_csv[self.regionen_csv["VR"].astype(str) == rid]
-        return sorted(set(z["Bezirk_Name"].astype(str)))
+        return z.sort_values("Bezirk")["Bezirk_Name"].astype(str).drop_duplicates().tolist()
 
     def vr_des_landes(self, land_name: str) -> list[str]:
         z = self.regionen_csv[self.regionen_csv["Bundesland"] == land_name]

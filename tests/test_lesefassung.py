@@ -374,6 +374,16 @@ def test_bundesland_nennt_die_ebene_des_soll_intervalls(seiten, aufbau):
         assert seiten[aufbau.pfad(r)].count(text) == (1 if r["ebene"] == "BL" else 0), r["id"]
 
 
+def test_bezirke_nach_kennzahl(seiten, aufbau):
+    """Die Bezirke stehen wie in der Regionalen Gliederung des ÖSG, nicht alphabetisch («Wien 2.» vor «Wien 10.»)."""
+    g = aufbau.regionen_csv
+    for vr in g["VR"].unique():
+        soll = g[g["VR"] == vr].sort_values("Bezirk")["Bezirk_Name"].astype(str).tolist()
+        assert aufbau.bezirke(str(vr)) == soll, vr
+    wien = seiten["vr/91/"]
+    assert wien.index("Wien 2., Leopoldstadt") < wien.index("Wien 10., Favoriten")
+
+
 def test_fachseite_nennt_die_ist_jahre_im_kopf(seiten, aufbau):
     """Spaltenköpfe mit dem IST-Jahr (docs/WEB.md, «Aufbau»); auf Fachseiten die Jahre der Länder, die das Fach haben."""
     tab = pd.read_csv(ausgabe_dir() / VERSORGUNGSDICHTE_DATEI, dtype={"Region_ID": str})
