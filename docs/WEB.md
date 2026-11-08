@@ -77,7 +77,7 @@ gegenüber den PDFs ist nicht die Abschrift, sondern der Vergleich: Versorgungsd
 
 | Adresse | Inhalt |
 |---|---|
-| `/daten/` | der Einstieg: wofür der Datensatz da ist, Verzeichnis der Regionen (je Bundesland) und der Fächer (mit Soll-Intervall), Downloads, die neun Verordnungen, «Was dieser Datensatz nicht tut»; am Ende alle 537 Zeilen «insgesamt» in einer zugeklappten Tabelle – und der **einzige** `Dataset`-Eintrag des Werks |
+| `/daten/` | der Einstieg: wofür der Datensatz da ist, der Hauptvorbehalt in einem Halbsatz (die ganze Lesehilfe steht bei den Zahlen, nicht vor dem Verzeichnis), Verzeichnis der Regionen (je Bundesland) und der Fächer (mit Soll-Intervall), Downloads, die neun Verordnungen, «Was dieser Datensatz nicht tut»; am Ende alle 537 Zeilen «insgesamt» in einer zugeklappten Tabelle, mit denselben Spalten wie die Tabelle Versorgungsdichte einer Region und derselben Lesehilfe darunter – ein Abrufsystem liest meist nur eine Seite und kann eine Frage über alle Regionen nur hier mit einem Abruf beantworten – und der **einzige** `Dataset`-Eintrag des Werks |
 | `/bl/<kurz>/` | 9 Bundesländer: Eckdaten mit den Versorgungsregionen, Quelle, die drei Tabellen (Versorgungsdichte, ÄAVE, Sachleistungsstellen), Apparat |
 | `/vr/<nr>/` | 32 Versorgungsregionen: dasselbe, in den Eckdaten die Bezirke und der Hinweis, dass auf Ebene der Region geplant wird |
 | `/fach/<id>/` | 17 Fächer: dieselben drei Tabellen gekippt, je Versorgungsregion eine Zeile |
@@ -92,14 +92,15 @@ Versorgungsregion kann umbenannt werden, ihre Nummer nicht. Die Kürzel der Län
 | Was | Regel |
 |---|---|
 | Zwei Wege, eine Aufgabe je Weg | **Nachschlagen** (diese Seiten): «Was gilt für meine Region, mein Fach?» – eine Tabelle mit Quelle, ohne Farben, ohne Vergleich über viele Regionen. **Vergleichen** (Dashboard): Muster über alle Regionen und Fächer. Beide stehen auf jeder Seite oben nebeneinander («Nachschlagen: Regionen und Fächer», «Vergleichen: interaktive Matrix»), und die Detailspalte des Dashboards verlinkt auf die Seite der Region und des Fachs. Das Dashboard trägt außerdem einen festen Link auf `/daten/` im HTML, damit Suchmaschinen ohne JavaScript die Seiten finden |
-| Kopf einer Seite | Brotkrumen (`RSG 2030 › Steiermark › Graz`, auch als `BreadcrumbList`), die Überschrift ist der Name («Graz (VR 61)»), darunter **eine** Zeile Eckdaten (Bundesland, Bezirke, Wohnbevölkerung) und **eine** Zeile Quelle (Verordnung, Seite, RIS) |
+| Kopf einer Seite | Brotkrumen (`RSG 2030 › Steiermark › Graz`, auch als `BreadcrumbList`), die Überschrift ist der Name («Graz (VR 61)»), darunter **eine** Zeile Eckdaten (Bundesland, Bezirke, Wohnbevölkerung), die weiteren Regionen des Landes und **eine** Zeile Quelle (Verordnung, Seite, RIS) |
+| Breite und Klappen | Text höchstens 70 Zeichen breit, überall – im Inhalt, in den Klappen, in der Fußzeile –, nur Tabellen und Verzeichnisse breiter. Klappen (Herkunft, Anhang) als Liste mit dünnen Linien, nicht als graue Flächen: Sie sind Nebensache und sollen nicht schwerer wirken als die Tabellen |
 | Aufbau | **Weniger ist hier mehr: Die Tabellen sind die Antwort.** Kopf, Eckdaten, Quelle; dann **drei Tabellen, je eine Einheit**: Versorgungsdichte, ÄAVE, Sachleistungsstellen – je mit Überschrift (ohne Jahr, wo IST und PLAN darin stehen; «PLAN 2030» bei den Stellen, die es nur im PLAN gibt), Spaltenköpfe immer mit «IST 2022/2023» bzw. «PLAN 2030» und dem, was man zum Lesen braucht, direkt darunter. Zum Aufklappen nur noch die Herkunft: Fußnoten, Korrekturen, Abweichungen, offene Fragen – zugeklappt, aber im HTML und damit indexierbar. Eine frühere Fassung hatte große Zählzahlen, einen Antwortsatz, einen Kasten, Begriffe und je Fach einen Satz; das wiederholte die Tabelle in Prosa und las sich wie generierter Text. Eine spätere mischte ÄAVE, VD und Stellen in einer Tabelle und versteckte das IST |
 | Was auf die Seite gehört | **Text nur dort, wo die Tabelle etwas nicht sagen kann** – nicht Text über unsere Entscheidungen. Warum die IST-Planstellen fehlen, warum es keine Österreich-Zahl gibt, wie die VR-Bevölkerung geschätzt ist: Das steht in METHODIK.md. Unter jeder Tabelle steht eine Lesehilfe: was VD, ÄAVE und Sachleistungsstellen sind (Wortlaut des Glossars in METHODIK.md), dass nur die Sachleistung gezählt ist, ohne Wahlärzt:innen, und dass der ÖSG im Intervall keinen Unterschied macht |
 | Interaktiv vergleichen | ein Link **oben in der Bereichsleiste** und in der Fußzeile, nicht als Kasten im Text, mit vorbelegtem Zustand (`?region=41`, `?fach=PSY`). Der Schlüssel `slug` steht in `data.json` und ist derselbe wie in den Adressen. Ohne Parameter verhält sich das Dashboard wie vorher, und es schreibt die Adresse nie |
 | Vorbehalte bei der Tabelle | Die Vorbehalte, die für Zellen **dieser** Tabelle gelten, stehen direkt darunter, **jeder einmal**; an den Zeilen, für die er gilt, eine hochgestellte Zahl. Was für jede Zeile gilt (auf einer Regionsseite z. B. «ohne Patientenströme», «plant in SVE»), steht ohne Zahl. Texte wörtlich aus `darstellung.py`. «Teil von» entfällt hier, das sagt der Satz zu PUL und KFO unter jeder Tabelle. Unter der Tabelle statt in einem Kasten darüber: Wer eine Tabelle zitiert, nimmt den Text darunter eher mit |
 | Links nach außen | `target="_blank" rel="noopener noreferrer"` wie im Dashboard: Ein Sprung in eine 200-seitige PDF oder ins RIS-Portal soll die Seite nicht ersetzen, und niemand erfährt, von welcher Seite jemand kam. Interne Links (Region, Fach, Index, Dashboard) bleiben im selben Fenster und tragen kein `rel` |
 | Tabellenbeschriftung | jede Tabelle hat eine `<caption>`, die Region bzw. Fach, Abschnitt und Bezugsgröße nennt: Daran benennen Bildschirmleser und Text-Extraktoren die Tabelle |
-| Tabelle Versorgungsdichte | je Fach (bzw. je Versorgungsregion) **VD IST, VD PLAN 2030, Soll-Intervall, Lage PLAN 2030**. IST und PLAN nebeneinander, damit man eine Veränderung sieht, ohne eine Differenz zu rechnen – beide Werte stehen so in der Tabelle. Darunter, dass das Soll-Intervall für 2030 gilt und der IST-Wert daran gemessen den Abstand zur Norm zeigt (Fallstrick 11); auf der Fachseite, welches Land welches IST-Jahr hat. Die Beschriftung nennt Region bzw. Fach und «Sachleistung», damit die Tabelle auch allein zitiert verständlich ist |
+| Tabelle Versorgungsdichte | je Fach (bzw. je Versorgungsregion) **VD IST, VD PLAN 2030, Soll-Intervall, Lage zum Soll-Intervall PLAN 2030**. IST und PLAN nebeneinander, damit man eine Veränderung sieht, ohne eine Differenz zu rechnen – beide Werte stehen so in der Tabelle. Darunter, dass das Soll-Intervall für 2030 gilt und der IST-Wert daran gemessen den Abstand zur Norm zeigt (Fallstrick 11); auf der Fachseite, welches Land welches IST-Jahr hat. Die Beschriftung nennt Region bzw. Fach und «Sachleistung», damit die Tabelle auch allein zitiert verständlich ist |
 | Keine Farben | «unter» und «über» stehen kräftig, «im» zurückhaltend – über die Schrift, nicht über eine Farbe; das Wort trägt die Aussage. Die Lage steht als Wort in der Tabelle: «unter», «im», «über», neben der Spalte «Soll-Intervall» – ausgeschrieben («unter dem Soll-Intervall») brach sie in jeder Zeile um und verdoppelte die Höhe der Tabelle. In den Sätzen steht sie ausgeschrieben. Ohne Farbe braucht es keine Farbprüfung, und der Text bleibt vollständig, wenn ihn eine Maschine liest |
 | Zuschnitt | ein Zeichen (◆) an den betroffenen Zeilen, aufgelöst in einer Zeile unter der Tabelle – je Tabelle eigens, weil AM bei den ÄAVE die ZAE enthält und bei den Stellen nicht (DATEN.md, «Warum AM hier anders zugeschnitten ist») |
 | Stellen: Spalten mit lauter 0 | Eine Spalte «zusätzlich ÖGK/SVS/BVAEB», in der für **jedes** Fach der Region 0 steht, entfällt; ein Satz unter der Tabelle nennt den Träger und dass dort 0 steht. Die Information bleibt, und die Tabelle passt am Handy ohne Scrollen. Die gemeinsamen Stellen stehen immer da |
@@ -135,6 +136,23 @@ Versorgungsregion kann umbenannt werden, ihre Nummer nicht. Die Kürzel der Län
 | eine Adresse ändert sich und bricht alle Links | Test: Adressen sind Nummern und Kürzel nach festem Muster |
 | die Seite lädt etwas von fremden Servern, oder ein Link verrät die Herkunft | Test: kein `<script>` außer JSON-LD, nur bekannte Ziele, jeder Link nach außen mit `target="_blank" rel="noopener noreferrer"` – und jeder interne Link **ohne** `target` |
 | die Seiten sind unverständlich oder im Ton falsch | der Herausgeber: drei Seiten lesen (eine Region, ein Fach, die Indexseite), am Desktop und am Handy |
+
+## Wörter für das Soll-Intervall
+
+Für Dashboard und Lesefassung gleich, damit neue Texte nicht auseinanderlaufen. Grundlage: Der ÖSG nennt das
+Intervall «Versorgungsdichte-Soll-Intervall» (Textband S.38, Legende S.37) und seine Grenzen in der Tabelle der
+Richtwerte «VDmin» und «VDmax» (Textband S.39); das Glossar in METHODIK.md verbindet beide.
+
+| Gemeint ist | Wort | Beispiele |
+|---|---|---|
+| das Intervall als Ganzes | **Soll-Intervall** (beim ersten Vorkommen «Soll-Intervall des ÖSG») | Spaltenkopf «Soll-Intervall», Lage «unter dem Soll-Intervall», Fließtext |
+| eine einzelne Grenze als Zahl oder Begriff; die Erklärung «(dort VDmin–VDmax)» einmal in der Lesehilfe, nicht in Spaltenköpfen | **VDmin / VDmax** – die Spaltennamen des ÖSG, die man dort und in der CSV wiederfindet | Hanteldiagramm «VDmin 34,9», Position «0 = VDmin, 1 = VDmax», Spalten, wenn die Grenzen getrennt stehen |
+| eine Grenze im Satz in Worten | **Untergrenze / Obergrenze** – unsere Umschreibung, kein ÖSG-Begriff, nur wo ein Satz natürlicher liest | «Bis zur Untergrenze fehlen 13,5 ÄAVE Sachleistung» (`darstellung.py`) |
+| die Lage in einer schmalen Spalte | **unterhalb / innerhalb / oberhalb**, mit «Lage zum Soll-Intervall» im Kopf – Wörter, die für sich stehen («im» allein ist kein Deutsch) | Tabellen der Lesefassung |
+
+Das Dashboard schreibt in Legende und Detailspalte «unter VDmin» / «über VDmax». Das ist richtig und bleibt: Die
+Pillen sind schmal, und eine längere Lage änderte die Gestaltung für einen kleinen Gewinn. Neue Texte folgen der
+Tabelle oben.
 
 ## Der Satz und die Vorbehalte stehen einmal
 
