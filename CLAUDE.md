@@ -104,7 +104,7 @@ rsg2030/              der Datensatz; __main__.py ruft die main() der Module auf
   lesefassung.py        «lesefassung»: 59 statische Seiten, Sitemap, robots.txt, JSON-LD (Dataset nur auf /daten/)
   eingaben/2026/        von Hand gepflegte Eingaben: seiten, korrekturen, bekannte_abweichungen, manuell.xlsx, fussnoten.csv, zweitlesung/, freigabe.xlsx
 tests/                pytest; Fixture `pipeline` = baue_pipeline() einmal je Testlauf
-web/                  Webseite (kein Python): index.html, app.js, style.css, kacheln.csv, faecher.csv, fonts/,
+web/                  Webseite (kein Python): index.html, app.js, style.css, Icon-Dateien, kacheln.csv, faecher.csv, fonts/,
                         lesefassung/lesefassung.css (docs/WEB.md)
 ```
 

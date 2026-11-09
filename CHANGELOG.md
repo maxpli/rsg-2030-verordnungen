@@ -5,6 +5,14 @@ Hier steht, was sich zwischen Versionen an den **Daten** ändert – jede Änder
 Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem Umstellen den Abschnitt
 «Schnittstelle» der neuen Version. Versionen: `<Verordnungsstand>.<Nummer>`.
 
+## 2026.4 – in Arbeit
+
+**Webseite:**
+
+- **Icon, Name der Website und Vorschau beim Teilen** (docs/WEB.md, «Kopf für Suche und Vorschau»): Das Zeichen des
+  Herausgebers als Icon auf allen Seiten, `WebSite` mit dem Namen «RSG 2030» auf der Startseite, Open Graph auf
+  Dashboard und Seiten. Ohne JavaScript verweist die Startseite jetzt auf `/daten/`. An den Daten ändert sich nichts.
+
 ## 2026.3 – Spalten gegen die ÖSG-Vorlage
 
 Keine Datenänderung: Die drei Tabellen sind Byte für Byte dieselben wie in 2026.2. Grund für die neue Version ist der

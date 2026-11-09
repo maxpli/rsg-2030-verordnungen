@@ -287,6 +287,47 @@ in die Versorgungsdichte ein; die Lizenz verlangt die Nennung bei jeder Veröffe
 reicht dafür nicht."""
 
 
+SEITENNAME = "RSG 2030"
+"""Kurzer Name der Website: Google zeigt ihn über dem Treffer, die Vorschau beim Teilen als Absender."""
+VORSCHAU_BILD = "https://loesungswerk.at/assets/rsg-2030-og.jpg"
+"""Das Bild beim Teilen eines Links: die Matrix PLAN 2030 mit Titel, ohne einzelne Zahlen. Der Herausgeber erzeugt es
+aus den Daten, nach einer Datenänderung also dort neu bauen. Es liegt dort, weil nur Vorschaudienste es laden, nie der
+Browser beim Lesen (docs/WEB.md)."""
+VORSCHAU_BILD_ALT = (
+    "Matrix der Versorgungsdichte je Bundesland und Fach, RSG 2030 im Vergleich zum Soll-Intervall des ÖSG"
+)
+
+
+def icon_links(hoch: str = "") -> str:
+    """Die Verweise auf das Icon. `hoch` führt von der Seite zur Wurzel; die Dateien liegen dort (`web.ICONS`)."""
+    return "\n".join(
+        (
+            f'<link rel="icon" href="{hoch}favicon.ico" sizes="48x48">',
+            f'<link rel="icon" href="{hoch}icon.svg" type="image/svg+xml">',
+            f'<link rel="apple-touch-icon" href="{hoch}apple-touch-icon.png">',
+        )
+    )
+
+
+def vorschau_meta(titel: str, beschreibung: str, url: str) -> str:
+    """Die Open-Graph-Angaben einer Seite: wie ein geteilter Link aussieht, für das Ranking ohne Bedeutung."""
+    angaben = (
+        ("og:locale", "de_AT"),
+        ("og:type", "website"),
+        ("og:site_name", SEITENNAME),
+        ("og:title", titel),
+        ("og:description", beschreibung),
+        ("og:url", url),
+        ("og:image", VORSCHAU_BILD),
+        ("og:image:width", "1200"),
+        ("og:image:height", "630"),
+        ("og:image:type", "image/jpeg"),
+        ("og:image:alt", VORSCHAU_BILD_ALT),
+    )
+    zeilen = [f'<meta property="{k}" content="{escape(v)}">' for k, v in angaben]
+    return "\n".join([*zeilen, '<meta name="twitter:card" content="summary_large_image">'])
+
+
 def fusszeile(repo: str, version: str, commit: str) -> str:
     """Die Fußzeile beider Darstellungen, Dashboard und Lesefassung (docs/WEB.md, Entscheidung 15): wer sie erstellt
     hat, mit den Vorbehalten im selben Satz; die Links, die eine veröffentlichte Seite braucht; die Namensnennung.

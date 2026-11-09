@@ -487,6 +487,45 @@ def test_dashboard_hat_eine_adresse_fuer_die_suche():
     assert f'<link rel="canonical" href="{BASIS_STANDARD}/">' in html
 
 
+def test_startseite_traegt_icon_namen_und_vorschau():
+    """Google liest Icon und Namen der Website nur von der Startseite. `index.html` ist fest geschrieben; der Test
+    bindet sie an die Bausteine, aus denen die Lesefassung ihre Köpfe baut (docs/WEB.md, «Kopf für Suche und Vorschau»)."""
+    from types import SimpleNamespace
+
+    from rsg2030.darstellung import icon_links, vorschau_meta
+    from rsg2030.lesefassung import BASIS_STANDARD, _website
+
+    html = (WEB / "index.html").read_text(encoding="utf-8")
+    assert 'href="data:,"' not in html
+    assert icon_links() in html
+    titel = re.search(r"<title>(.*?)</title>", html)
+    beschreibung = re.search(r'<meta name="description" content="([^"]+)"', html)
+    assert titel and beschreibung
+    assert vorschau_meta(titel[1], beschreibung[1], f"{BASIS_STANDARD}/") in html
+    ld = re.search(r'<script type="application/ld\+json">\s*(.*?)\s*</script>', html, re.S)
+    assert ld
+    site = json.loads(ld[1])
+    soll = _website(SimpleNamespace(basis=BASIS_STANDARD))  # type: ignore[arg-type]
+    assert {k: site[k] for k in ("@type", "@id", "url", "name", "alternateName", "inLanguage")} == {
+        k: soll[k] for k in ("@type", "@id", "url", "name", "alternateName", "inLanguage")
+    }
+
+
+def test_icon_liegt_neben_der_seite():
+    """Die Dateien gehen mit auf die Seite; von einem fremden Server lädt sie nichts."""
+    from rsg2030.web import ICONS, SEITE
+
+    for name in ICONS:
+        assert name in SEITE
+        assert (WEB / name).stat().st_size > 0, name
+
+
+def test_ohne_javascript_fuehrt_die_startseite_zu_den_seiten():
+    html = (WEB / "index.html").read_text(encoding="utf-8")
+    teil = re.search(r"<noscript>(.*?)</noscript>", html, re.S)
+    assert teil and 'href="daten/"' in teil[1]
+
+
 def test_dashboard_verlinkt_die_lesefassung_fest_im_html():
     """Ein Link, unauffällig unter «Über diese Daten», fest im HTML: Crawler ohne JavaScript sehen nur das, und Links
     von außen zeigen aufs Dashboard, nicht auf die Seiten (docs/WEB.md, «Zwei Wege»)."""

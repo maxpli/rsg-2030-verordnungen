@@ -40,12 +40,22 @@ from oesg_methodik.bevoelkerung import lade_regionen
 from rsg2030.abgleich import gleiche_ab, paketversion
 from rsg2030.analyse_eingang import lade_matrix_long
 from rsg2030.config import LONG_DATEI, STELLEN_DATEI, VERSORGUNGSDICHTE_DATEI, ausgabe_dir
-from rsg2030.darstellung import KEIN_WERT, VORBEHALTE, Zelle, fusszeile, lesbar, zahl
+from rsg2030.darstellung import (
+    KEIN_WERT,
+    SEITENNAME,
+    VORBEHALTE,
+    Zelle,
+    fusszeile,
+    icon_links,
+    lesbar,
+    vorschau_meta,
+    zahl,
+)
 from rsg2030.fussnoten import MIT_VERWEIS
 from rsg2030.korrekturen import lade_regeln
 from rsg2030.protokoll import einrichten, schreibe_laufprotokoll
 from rsg2030.quellen import lade_quellen, ogd_pdf_url
-from rsg2030.web import LAND_SLUG, baue_daten, repo_url, seiten_commit, web_dir
+from rsg2030.web import ICONS, LAND_SLUG, baue_daten, repo_url, seiten_commit, web_dir
 
 log = logging.getLogger(__name__)
 
@@ -582,7 +592,8 @@ def _website(a: Aufbau) -> dict[str, object]:
         "@type": "WebSite",
         "@id": f"{a.basis}/#website",
         "url": f"{a.basis}/",
-        "name": DATENSATZ_NAME,
+        "name": SEITENNAME,
+        "alternateName": DATENSATZ_NAME,
         "inLanguage": "de-AT",
         "publisher": PERSON,
     }
@@ -1117,6 +1128,8 @@ def _dokument(a: Aufbau, s: Seite) -> str:
 <title>{esc(s.titel)}</title>
 <meta name="description" content="{esc(s.beschreibung)}">
 <link rel="canonical" href="{esc(a.basis)}/{esc(s.pfad)}">
+{icon_links(a.hoch(s.pfad))}
+{vorschau_meta(s.titel.removesuffix(f" | {SEITENNAME}"), s.beschreibung, f"{a.basis}/{s.pfad}")}
 <link rel="stylesheet" href="{esc(a.stil(s.pfad))}">
 {_webpage(a, s)}
 {ld_pfad}
@@ -1343,6 +1356,8 @@ def baue_lesefassung(basis: str = BASIS_STANDARD) -> Path:
     shutil.copyfile(web_dir() / "lesefassung" / "lesefassung.css", ziel / "lesefassung.css")
     # Dieselben Schriften wie das Dashboard, aus demselben Ordner – auch wenn «web» nicht vorher lief
     shutil.copytree(web_dir() / "fonts", ziel / "fonts", dirs_exist_ok=True)
+    for icon in ICONS:
+        shutil.copyfile(web_dir() / icon, ziel / icon)
     log.info(f"{len(seiten)} Seiten: 1 Index, {sum(1 for s in seiten if s.pfad.startswith('bl/'))} Bundesländer, "
              f"{sum(1 for s in seiten if s.pfad.startswith('vr/'))} Versorgungsregionen, "
              f"{sum(1 for s in seiten if s.pfad.startswith('fach/'))} Fächer")  # fmt: skip

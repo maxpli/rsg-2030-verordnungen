@@ -40,7 +40,11 @@ from rsg2030.schema import QUELLEN, massgeblicher_block, matrix_long
 
 log = logging.getLogger(__name__)
 
-SEITE = ("index.html", "app.js", "style.css", "fonts")
+ICONS = ("favicon.ico", "icon.svg", "apple-touch-icon.png")
+"""Das Icon der Website, neben `index.html`: Die Seiten laden nichts von fremden Servern. Kopien vom Herausgeber; ändert
+sich das Zeichen dort, hier von Hand ersetzen."""
+
+SEITE = ("index.html", "app.js", "style.css", "fonts", *ICONS)
 """Dateien und Ordner aus `web/`, die zur Seite gehören (die CSV-Dateien dort sind Eingaben für `data.json`)."""
 
 SPALTEN = [

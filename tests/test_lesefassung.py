@@ -18,7 +18,7 @@ import pytest
 from conftest import ROOT
 
 from rsg2030.config import VERSORGUNGSDICHTE_DATEI, ausgabe_dir
-from rsg2030.darstellung import VORBEHALTE, lesbar, zahl
+from rsg2030.darstellung import VORBEHALTE, VORSCHAU_BILD, icon_links, lesbar, zahl
 from rsg2030.lesefassung import (
     LAND_SLUG,
     VERBOTEN,
@@ -381,6 +381,18 @@ def test_jede_seite_sagt_dass_die_vd_gerechnet_ist(seiten):
         assert html.count("Die VD steht nicht in der Verordnung. Sie ist gerechnet") >= 1, pfad
         assert "Statistik Austria und ÖROK" in html, pfad
     assert "zu jeder Zahl" not in seiten["daten/"]
+
+
+def test_jede_seite_hat_icon_und_vorschau(seiten):
+    """Icon relativ zur Wurzel; die Vorschau nennt die eigene Adresse und einen Titel ohne den Namen der Website, den
+    `og:site_name` schon sagt (docs/WEB.md, «Kopf für Suche und Vorschau»)."""
+    for pfad, html in seiten.items():
+        hoch = "../" * pfad.count("/")
+        assert icon_links(hoch) in html, pfad
+        assert f'<meta property="og:url" content="{BASIS}/{pfad}">' in html, pfad
+        assert f'<meta property="og:image" content="{VORSCHAU_BILD}">' in html, pfad
+        titel = re.search(r'<meta property="og:title" content="([^"]+)"', html)
+        assert titel and titel[1] and "| RSG 2030" not in titel[1], pfad
 
 
 def test_bezirke_nach_kennzahl(seiten, aufbau):

@@ -155,7 +155,8 @@ Ohne GitHub-Konto: E-Mail an [max.plischke@loesungswerk.at](mailto:max.plischke@
 - Jede Version gehört zu einem **Verordnungsstand** (heute `2026`, Ordner `rsg2030/eingaben/2026/`). Was sich zwischen
   Versionen an den Daten ändert, steht mit Grund in [CHANGELOG.md](CHANGELOG.md).
 - Zitieren: [CITATION.cff](CITATION.cff) (GitHub zeigt daraus «Cite this repository»).
-- Lizenz: Code MIT ([LICENSE](LICENSE)); die erzeugten Daten CC BY 4.0 mit Quellenangabe
+- Lizenz: Code MIT ([LICENSE](LICENSE)), ausgenommen das Zeichen von Lösungswerk (`web/favicon.ico`, `web/icon.svg`,
+  `web/apple-touch-icon.png`); die erzeugten Daten CC BY 4.0 mit Quellenangabe
   ([LIZENZ_DATEN.md](LIZENZ_DATEN.md)). Die Werte stammen aus frei verwendbaren Quellen (Verordnungen, Open Data von
   Statistik Austria und ÖROK unter CC BY 4.0); aus dem ÖSG sind einzelne Angaben mit Quellenangabe übernommen
   (Richtwerte, Regionen), die ÖSG-Dateien selbst werden nur verlinkt. Die Lizenz jeder Quelldatei steht im Register.
