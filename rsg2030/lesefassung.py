@@ -30,7 +30,7 @@ import logging
 import re
 import shutil
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import cast
 
@@ -124,6 +124,8 @@ class Seite:
     """Abfrageteil für den Link auf das Dashboard, z. B. «?region=41» – vorbelegter Zustand statt Standardansicht."""
     pfadleiste: tuple[tuple[str, str], ...] = ()
     """Brotkrumen: (Name, Pfad ab der Wurzel); der letzte Eintrag ist die Seite selbst, mit leerem Pfad."""
+    thema: str = field(kw_only=True)
+    """Worum es geht, für den Titel beim Teilen: «RSG 2030: <thema>» (docs/WEB.md, «Kopf für Suche und Vorschau»)."""
 
 
 def _long_je_zelle(long: pd.DataFrame) -> pd.DataFrame:
@@ -1005,13 +1007,13 @@ Der ÖSG misst je Versorgungsregion.</p>
 <tbody>{"".join(stellen_zeilen)}</tbody></table></div>
 <div class="lesehilfe"><p>{STELLEN_HILFE} {STELLEN_ZUSAMMEN} {STELLEN_WIEN}</p>
 {TEILMENGEN_HINWEIS}</div>"""
-    titel = f"Planstellen und Versorgungsdichte {name} 2030 | RSG 2030"
+    titel = f"Versorgungsdichte und Planstellen {name} 2030 | {SEITENNAME}"
     beschreibung = (
         f"{name} ({fid}) in allen 32 Versorgungsregionen: Versorgungsdichte 2030 im Vergleich zum "
         f"Soll-Intervall des ÖSG ({num(f['min'])}–{num(f['max'])} ÄAVE je 100.000)."
     )
     pfadleiste = (("RSG 2030", "daten/"), ("Fächer", "daten/#faecher"), (name, ""))
-    return Seite(f"fach/{fid}/", titel, beschreibung, rumpf, f"?fach={fid}", pfadleiste)
+    return Seite(f"fach/{fid}/", titel, beschreibung, rumpf, f"?fach={fid}", pfadleiste, thema=name)
 
 
 def _urheber(a: Aufbau) -> str:
@@ -1032,7 +1034,7 @@ def seite_region(a: Aufbau, r: dict[str, object]) -> Seite:
     rid, ebene = str(r["id"]), str(r["ebene"])
     name = str(r["name"])
     nummer = f" (VR {rid})" if ebene == "VR" else ""
-    titel = f"Planstellen und Versorgungsdichte {name}{nummer} 2030 | RSG 2030"
+    titel = f"Versorgungsdichte und Planstellen {name}{nummer} 2030 | {SEITENNAME}"
     jahr_ist = a.wert(rid, "IST", "AM", 3)
     bev_ist, bev_plan = a.wert(rid, "IST", "AM", 2), a.wert(rid, "PLAN", "AM", 2)
     hoch = a.hoch(a.pfad(r))
@@ -1086,10 +1088,10 @@ def seite_region(a: Aufbau, r: dict[str, object]) -> Seite:
 {_abweichungen(a, r)}
 {_offene_fragen(a, r)}"""
     beschreibung = (
-        f"Sachleistungsstellen und Versorgungsdichte 2030 für {name}{nummer} je Fach, verglichen mit dem "
-        "Versorgungsdichte-Soll-Intervall des ÖSG – aus der Verordnung zum RSG 2030."
+        f"Sachleistungsstellen und ÄAVE aus der Verordnung zum RSG 2030, daraus gerechnet die Versorgungsdichte 2030 "
+        f"für {name}{nummer} je Fach, verglichen mit dem Versorgungsdichte-Soll-Intervall des ÖSG."
     )
-    return Seite(a.pfad(r), titel, beschreibung, rumpf, f"?region={r['slug']}", pfadleiste)
+    return Seite(a.pfad(r), titel, beschreibung, rumpf, f"?region={r['slug']}", pfadleiste, thema=f"{name}{nummer}")
 
 
 def _pfadleiste(a: Aufbau, s: Seite) -> tuple[str, str]:
@@ -1129,7 +1131,7 @@ def _dokument(a: Aufbau, s: Seite) -> str:
 <meta name="description" content="{esc(s.beschreibung)}">
 <link rel="canonical" href="{esc(a.basis)}/{esc(s.pfad)}">
 {icon_links(a.hoch(s.pfad))}
-{vorschau_meta(s.titel.removesuffix(f" | {SEITENNAME}"), s.beschreibung, f"{a.basis}/{s.pfad}")}
+{vorschau_meta(f"{SEITENNAME}: {s.thema}", s.beschreibung, f"{a.basis}/{s.pfad}")}
 <link rel="stylesheet" href="{esc(a.stil(s.pfad))}">
 {_webpage(a, s)}
 {ld_pfad}
@@ -1222,8 +1224,8 @@ def seite_index(a: Aufbau) -> Seite:
     rumpf = f"""{dataset}
 <h1>Versorgungsdichte und Planstellen 2030 je Region und Fach</h1>
 <p>Was die Verordnungen zu den Regionalen Strukturplänen Gesundheit (RSG) 2030 für die ambulante ärztliche
-Versorgung festlegen, je Versorgungsregion und Fach, mit Verordnung und Seite als Beleg. Zum Vergleichen über
-alle Regionen auf einmal: <a href="../">interaktive Matrix</a>.</p>
+Versorgung festlegen, mit Verordnung und Seite als Beleg, und die daraus gerechnete Versorgungsdichte, je
+Versorgungsregion und Fach. Zum Vergleichen über alle Regionen auf einmal: <a href="../">interaktive Matrix</a>.</p>
 <p>Gezählt ist nur die Sachleistung, ohne Wahlärzt:innen; was das für den Vergleich mit dem ÖSG heißt, steht unter
 jeder Tabelle.</p>
 <h2 id="regionen">Nach Region</h2>
@@ -1276,10 +1278,11 @@ SVE, Umbuchungen, Fußnoten), stehen auf der Seite der jeweiligen Region.</p>
 </details>"""
     return Seite(
         "daten/",
-        "Versorgungsdichte und Planstellen 2030 je Region und Fach | RSG 2030",
-        "Alle Werte der RSG-2030-Verordnungen: Versorgungsdichte je Versorgungsregion und Fach im Vergleich zum "
-        "Soll-Intervall des ÖSG, dazu Sachleistungsstellen – maschinenlesbar, mit Quelle je Wert.",
+        f"Versorgungsdichte und Planstellen 2030 je Region und Fach | {SEITENNAME}",
+        "Daten aus den RSG-2030-Verordnungen: die daraus gerechnete Versorgungsdichte je Versorgungsregion und Fach "
+        "im Vergleich zum Soll-Intervall des ÖSG, dazu Sachleistungsstellen – maschinenlesbar, mit Quelle je Wert.",
         rumpf,
+        thema="Versorgungsdichte und Planstellen je Region und Fach",
     )
 
 

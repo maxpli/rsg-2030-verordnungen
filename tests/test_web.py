@@ -501,7 +501,12 @@ def test_startseite_traegt_icon_namen_und_vorschau():
     titel = re.search(r"<title>(.*?)</title>", html)
     beschreibung = re.search(r'<meta name="description" content="([^"]+)"', html)
     assert titel and beschreibung
+    assert titel[1].startswith("RSG-2030-Daten: ")
     assert vorschau_meta(titel[1], beschreibung[1], f"{BASIS_STANDARD}/") in html
+    # Die VD steht nicht in der Verordnung, und die Seite ist nicht die Sammlung der Verordnungen
+    h1 = re.search(r"<h1>(.*?)</h1>", html)
+    assert h1 and "gerechnet" in h1[1]
+    assert 'id="eyebrow">RSG-2030-Daten<' in html
     ld = re.search(r'<script type="application/ld\+json">\s*(.*?)\s*</script>', html, re.S)
     assert ld
     site = json.loads(ld[1])

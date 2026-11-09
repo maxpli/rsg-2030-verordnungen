@@ -384,15 +384,31 @@ def test_jede_seite_sagt_dass_die_vd_gerechnet_ist(seiten):
 
 
 def test_jede_seite_hat_icon_und_vorschau(seiten):
-    """Icon relativ zur Wurzel; die Vorschau nennt die eigene Adresse und einen Titel ohne den Namen der Website, den
-    `og:site_name` schon sagt (docs/WEB.md, «Kopf für Suche und Vorschau»)."""
+    """Icon relativ zur Wurzel; die Vorschau nennt die eigene Adresse und einen kurzen Titel, der Seitentitel für die
+    Suche behält die gesuchten Begriffe (docs/WEB.md, «Kopf für Suche und Vorschau»)."""
     for pfad, html in seiten.items():
         hoch = "../" * pfad.count("/")
         assert icon_links(hoch) in html, pfad
         assert f'<meta property="og:url" content="{BASIS}/{pfad}">' in html, pfad
         assert f'<meta property="og:image" content="{VORSCHAU_BILD}">' in html, pfad
         titel = re.search(r'<meta property="og:title" content="([^"]+)"', html)
-        assert titel and titel[1] and "| RSG 2030" not in titel[1], pfad
+        assert titel and titel[1].startswith("RSG-2030-Daten: "), pfad
+        assert titel[1].count("2030") == 1 and "|" not in titel[1], pfad
+        assert "<title>Versorgungsdichte und Planstellen " in html and " | RSG-2030-Daten</title>" in html, pfad
+    for pfad, soll in {
+        "daten/": "RSG-2030-Daten: Versorgungsdichte und Planstellen je Region und Fach",
+        "bl/burgenland/": "RSG-2030-Daten: Burgenland",
+        "vr/12/": "RSG-2030-Daten: Burgenland-Süd (VR 12)",
+        "fach/ZMK/": "RSG-2030-Daten: Zahn-, Mund- und Kieferheilkunde (inkl. KFO)",
+    }.items():
+        assert f'<meta property="og:title" content="{soll}">' in seiten[pfad], pfad
+
+
+def test_beschreibung_sagt_dass_die_vd_gerechnet_ist(seiten):
+    """Google zeigt die Beschreibung ohne die Lesehilfe: Auch dort darf die VD nicht als Inhalt der Verordnung stehen."""
+    for pfad, html in seiten.items():
+        if pfad.startswith(("bl/", "vr/", "daten/")):
+            assert re.search(r'<meta name="description" content="[^"]*daraus gerechnet', html), pfad
 
 
 def test_bezirke_nach_kennzahl(seiten, aufbau):

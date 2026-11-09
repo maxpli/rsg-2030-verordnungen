@@ -74,7 +74,7 @@ const pill = (w) => `<span class="pill"><i class="k-${klasse(w)}"></i>${lageText
 /* Kopf und Fußzeile. Die Fußzeile kommt fertig aus data.json (rsg2030/darstellung.py, fusszeile): derselbe Text
    wie in der Lesefassung – wer sie erstellt hat, die Links, die Namensnennung, die die Lizenz der Bevölkerungsdaten
    verlangt (LIZENZ_DATEN.md; docs/WEB.md, Entscheidung 15). Die Prüfsummen stehen im Release und in data.json, nicht hier. */
-document.getElementById("eyebrow").textContent = `RSG-2030-Verordnungen · Release ${M.version}`;
+document.getElementById("eyebrow").textContent = `RSG-2030-Daten · Release ${M.version}`;
 document.getElementById("footer").innerHTML = D.fusszeile;
 
 /* Über diese Daten: der Weg von der Seite in den Datensatz. Alle Links auf das Release, aus dem die Daten der Seite

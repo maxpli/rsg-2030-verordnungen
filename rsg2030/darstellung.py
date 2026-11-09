@@ -287,8 +287,9 @@ in die Versorgungsdichte ein; die Lizenz verlangt die Nennung bei jeder Veröffe
 reicht dafür nicht."""
 
 
-SEITENNAME = "RSG 2030"
-"""Kurzer Name der Website: Google zeigt ihn über dem Treffer, die Vorschau beim Teilen als Absender."""
+SEITENNAME = "RSG-2030-Daten"
+"""Kurzer Name der Website: Google zeigt ihn über dem Treffer, die Vorschau beim Teilen als Absender. Nicht «RSG 2030»:
+So allein klänge er nach dem amtlichen Plan eines Landes (docs/WEB.md, «Kopf für Suche und Vorschau»)."""
 VORSCHAU_BILD = "https://loesungswerk.at/assets/rsg-2030-og.jpg"
 """Das Bild beim Teilen eines Links: die Matrix PLAN 2030 mit Titel, ohne einzelne Zahlen. Der Herausgeber erzeugt es
 aus den Daten, nach einer Datenänderung also dort neu bauen. Es liegt dort, weil nur Vorschaudienste es laden, nie der

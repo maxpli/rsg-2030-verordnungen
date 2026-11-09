@@ -10,8 +10,11 @@ Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem
 **Webseite:**
 
 - **Icon, Name der Website und Vorschau beim Teilen** (docs/WEB.md, «Kopf für Suche und Vorschau»): Das Zeichen des
-  Herausgebers als Icon auf allen Seiten, `WebSite` mit dem Namen «RSG 2030» auf der Startseite, Open Graph auf
+  Herausgebers als Icon auf allen Seiten, `WebSite` mit dem Namen «RSG-2030-Daten» auf der Startseite, Open Graph auf
   Dashboard und Seiten. Ohne JavaScript verweist die Startseite jetzt auf `/daten/`. An den Daten ändert sich nichts.
+- **Titel:** Die Startseite nennt die interaktive Matrix. Die Seiten heißen einheitlich «Versorgungsdichte und
+  Planstellen …», beim Teilen kurz «RSG-2030-Daten:» mit Region oder Fach. Der Name allein klang nach dem amtlichen
+  Plan. Überschrift und Beschreibungen sagen jetzt, dass die Versorgungsdichte gerechnet ist.
 
 ## 2026.3 – Spalten gegen die ÖSG-Vorlage
 
