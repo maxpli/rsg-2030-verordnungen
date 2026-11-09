@@ -721,6 +721,8 @@ def _quellenzeile(a: Aufbau, rid: str) -> str:
 
 
 LESEHILFE = (
+    "Die VD steht nicht in der Verordnung. Sie ist gerechnet: ÄAVE aus der Verordnung, geteilt durch die "
+    "Wohnbevölkerung von Statistik Austria und ÖROK. Lage und Abstand folgen daraus mit dem Soll-Intervall des ÖSG. "
     "VD = ÄAVE je 100.000 Einwohner:innen; eine ÄAVE entspricht grundsätzlich einer durchschnittlich arbeitenden "
     "Kassenärztin bzw. einem Kassenarzt des Fachs. Gezählt ist nur die Sachleistung (Kassenvertrag, Ambulatorien, "
     "Spitalsambulanzen), ohne Wahlärzt:innen. Die Soll-Intervalle des ÖSG (dort VDmin–VDmax) zählen Wahlärzt:innen "
@@ -728,7 +730,8 @@ LESEHILFE = (
     "innerhalb liegen; steht <b>«oberhalb»</b>, liegt es mit Wahlärzt:innen erst recht oberhalb. Innerhalb des "
     "Intervalls macht der ÖSG keinen Unterschied."
 )
-"""Die eine Lesehilfe unter jeder Tabelle: was VD und ÄAVE sind, der wichtigste Vorbehalt und was «unter» deshalb
+"""Die eine Lesehilfe unter jeder Tabelle: dass die VD gerechnet ist – über der Tabelle steht nur die Verordnung, und
+die hat keine VD-Zeile –, was VD und ÄAVE sind, der wichtigste Vorbehalt und was «unter» deshalb
 heißt (docs/DATEN.md, Fallstricke 1 und 11, «Vergleich mit dem Soll-Intervall»). Steht direkt bei den Zahlen,
 nicht in einem Kasten darüber – wer eine Tabelle zitiert, nimmt den Text darunter eher mit als einen Kasten weiter
 oben."""
@@ -1206,7 +1209,7 @@ def seite_index(a: Aufbau) -> Seite:
     rumpf = f"""{dataset}
 <h1>Versorgungsdichte und Planstellen 2030 je Region und Fach</h1>
 <p>Was die Verordnungen zu den Regionalen Strukturplänen Gesundheit (RSG) 2030 für die ambulante ärztliche
-Versorgung festlegen, je Versorgungsregion und Fach, mit Verordnung und Seite zu jeder Zahl. Zum Vergleichen über
+Versorgung festlegen, je Versorgungsregion und Fach, mit Verordnung und Seite als Beleg. Zum Vergleichen über
 alle Regionen auf einmal: <a href="../">interaktive Matrix</a>.</p>
 <p>Gezählt ist nur die Sachleistung, ohne Wahlärzt:innen; was das für den Vergleich mit dem ÖSG heißt, steht unter
 jeder Tabelle.</p>

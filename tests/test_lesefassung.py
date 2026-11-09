@@ -374,6 +374,15 @@ def test_bundesland_nennt_die_ebene_des_soll_intervalls(seiten, aufbau):
         assert seiten[aufbau.pfad(r)].count(text) == (1 if r["ebene"] == "BL" else 0), r["id"]
 
 
+def test_jede_seite_sagt_dass_die_vd_gerechnet_ist(seiten):
+    """Über der Tabelle steht nur die Verordnung, und die Matrizen haben keine VD-Zeile: Unter jeder Tabelle der VD
+    steht deshalb, dass sie gerechnet ist und woher die Bevölkerung kommt (docs/WEB.md, «Was auf die Seite gehört»)."""
+    for pfad, html in seiten.items():
+        assert html.count("Die VD steht nicht in der Verordnung. Sie ist gerechnet") >= 1, pfad
+        assert "Statistik Austria und ÖROK" in html, pfad
+    assert "zu jeder Zahl" not in seiten["daten/"]
+
+
 def test_bezirke_nach_kennzahl(seiten, aufbau):
     """Die Bezirke stehen wie in der Regionalen Gliederung des ÖSG, nicht alphabetisch («Wien 2.» vor «Wien 10.»)."""
     g = aufbau.regionen_csv
