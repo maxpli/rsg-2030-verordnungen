@@ -68,10 +68,11 @@ jobs:
         with:
           path: daten_original
           key: ${{ steps.quellen.outputs.cache-primary-key }}
-      - name: Auslesen, prüfen, Versorgungsdichte
+      - name: Auslesen, prüfen, Versorgungsdichte, Stellen
         run: |
           python -m rsg2030 daten
           python -m rsg2030 versorgungsdichte
+          python -m rsg2030 stellen
       - name: Langsame Tests (Pipeline, Prüfsummen, Bevölkerung, Seitenregister)
         run: pytest -m slow
 
