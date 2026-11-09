@@ -62,7 +62,7 @@ ZMK mit KFO; nur die ZAE gehören bei den Stellen nicht zu AM) – ein Fach bede
 Die Tabelle Planungsmatrizen bleibt bei den Fachspalten der Verordnung, wie gedruckt.
 Jede Spalte ist in [docs/DATEN.md](docs/DATEN.md) beschrieben.
 
-Beispiel aus der Versorgungsdichte, Version 2026.2 (Innere Medizin einschließlich Pulmologie,
+Beispiel aus der Versorgungsdichte, Version 2026.3 (Innere Medizin einschließlich Pulmologie,
 [docs/METHODIK.md](docs/METHODIK.md) R4; PLAN 2030, Zeile «insgesamt»):
 
 | Land | ÄAVE | Bevölkerung 1.1.2030 | Versorgungsdichte | Soll-Intervall (ÖSG) | Lage | Position | ÄAVE-Abstand |
@@ -103,10 +103,10 @@ python3.13 -m venv .venv
 aus, prüft sie und rechnet die Versorgungsdichte. Am Ende steht:
 
 ```
-   ✓ RSG_2030_Planungsmatrizen.csv entspricht Version 2026.2 (SHA-256 …)
+   ✓ RSG_2030_Planungsmatrizen.csv entspricht Version 2026.3 (SHA-256 …)
 FREIGEGEBEN
-   ✓ RSG_2030_Versorgungsdichte.csv entspricht Version 2026.2 (SHA-256 …)
-   ✓ RSG_2030_Stellen.csv entspricht Version 2026.2 (SHA-256 …)
+   ✓ RSG_2030_Versorgungsdichte.csv entspricht Version 2026.3 (SHA-256 …)
+   ✓ RSG_2030_Stellen.csv entspricht Version 2026.3 (SHA-256 …)
 ```
 
 Die Ergebnisse liegen dann in `daten_ergebnis/`, die Quellen in `daten_original/`. `alles` besteht aus drei
@@ -177,7 +177,7 @@ Ohne GitHub-Konto: E-Mail an [max.plischke@loesungswerk.at](mailto:max.plischke@
 
 Zwei Pakete: `oesg_methodik/` (die ÖSG-Regeln, unabhängig vom Datensatz) und `rsg2030/` (der Datensatz). Andere
 Projekte binden das Paket in einer festen Version ein:
-`rsg-2030-verordnungen @ git+https://github.com/maxpli/rsg-2030-verordnungen@2026.2` (Datenordner: Arbeitsordner
+`rsg-2030-verordnungen @ git+https://github.com/maxpli/rsg-2030-verordnungen@2026.3` (Datenordner: Arbeitsordner
 oder `RSG2030_DATEN`). Was in den veröffentlichten Dateien steht, bitte dort lesen, nicht mit Funktionen des Pakets
 nachrechnen. Vor dem Umstellen auf eine neue Version: Abschnitt «Schnittstelle» im [CHANGELOG](CHANGELOG.md) – dort
 steht, was sich an den importierbaren Namen geändert hat.

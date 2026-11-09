@@ -5,7 +5,13 @@ Hier steht, was sich zwischen Versionen an den **Daten** ändert – jede Änder
 Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem Umstellen den Abschnitt
 «Schnittstelle» der neuen Version. Versionen: `<Verordnungsstand>.<Nummer>`.
 
-## 2026.3 – in Arbeit
+## 2026.3 – Spalten gegen die ÖSG-Vorlage
+
+Keine Datenänderung: Die drei Tabellen sind Byte für Byte dieselben wie in 2026.2. Grund für die neue Version ist der
+Abgleich der Planungsmatrizen mit der ÖSG-Vorlage (Tabellenband S.239). Der Prüfbericht nennt jetzt je Land, welche
+Fachspalten zusätzlich sind oder fehlen. Neu beschrieben ist auch, was daraus folgt: Ein weggelassenes Fach fehlt auch
+in den Kennzahlen, so MKG in Kärnten (docs/DATEN.md, Fallstrick 13). Für KFO hat die Vorlage keine Spalte, obwohl der
+ÖSG dafür ein Soll-Intervall festlegt (docs/METHODIK.md, R4).
 
 **Doku und Prüfbericht:**
 

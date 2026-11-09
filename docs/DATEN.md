@@ -94,7 +94,7 @@ Jede beantwortet eine andere Frage; erst zusammen geben sie ein richtiges Bild.
 | Wo liegt sie, vergleichbar über Fächer und Regionen? | `Position_im_Intervall`: 0 = VDmin, 1 = VDmax | «… knapp unter der Untergrenze (Position −0,07).» |
 | Wie viel ist das in ÄAVE? | `AAVE_Abstand_Intervall`: 0 im Intervall, negativ = fehlt bis VDmin, positiv = über VDmax | «Bis zur Untergrenze fehlen 13,5 ÄAVE Sachleistung.» |
 
-Beispiele (PLAN 2030, Version 2026.2):
+Beispiele (PLAN 2030, Version 2026.3):
 
 | Region, Fach | VD | Soll-Intervall | Lage | Position | ÄAVE-Abstand | Was es heißt |
 |---|---:|---|---|---:|---:|---|
