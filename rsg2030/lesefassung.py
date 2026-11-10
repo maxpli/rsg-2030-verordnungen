@@ -1248,7 +1248,7 @@ sind nach der Methode des ÖSG gerechnet.</p>
 <a href="{repo}/blob/{version}/docs/METHODIK.md" target="_blank" rel="noopener noreferrer">Methodik</a> ·
 <a href="{repo}/blob/{version}/docs/PRUEFUNG.md" target="_blank" rel="noopener noreferrer">Prüfkonzept</a></p>
 {_quellen_uebersicht(a)}
-<details><summary>Bewusst weggelassen</summary><ul>
+<details><summary>Bewusst weggelassen</summary><div data-nosnippet><ul>
 <li><b>Eine Bewertung.</b> Die Zahlen sagen, wo ein Fach zum Soll-Intervall liegt, nicht, ob die Versorgung reicht.</li>
 <li><b>Weitere Kennzahlen.</b> Gerechnet sind nur Versorgungsdichte, Lage, Position im Intervall und ÄAVE-Abstand.
 Die ÄAVE kommen aus den Verordnungen; wo der ÖSG Fächer zusammenfasst, sind die Spalten der Matrix addiert, und wo
@@ -1260,7 +1260,7 @@ Krankenversicherungsträger, im PLAN Sachleistungsstellen: Planstellen und ärzt
 Ambulatorien.</li>
 <li><b>Daten aus anderen Quellen.</b> Verwendet sind nur die Verordnungen, die Richtwerte des ÖSG und die
 Bevölkerungsdaten von Statistik Austria und ÖROK.</li>
-</ul></details>
+</ul></div></details>
 <details class="alle"><summary>Alle {len(zeilen)} Werte in einer Tabelle (PLAN 2030)</summary>
 <div class="scroll"><table class="t t-index">{
         _beschriftung(
