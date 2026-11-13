@@ -78,6 +78,16 @@ zusammengezählt: KFO 12,1, gesamt 951,3.
    (Bundesland 4 von 12 Fächern mit Prozentsatz, VR 41 6 von 12); aus einer anderen Zahl folgt der Wert nicht
    (Bundesland = VR 41). Es ist also eine Lesart, keine Herleitung. Folge: Das gesamt-% der Zeile wird abgeleitet.
    *Frage: Welcher Maximalanteil gilt?*
+4. **Sachleistungsstellen addieren? (Glossar, S.3):** Zu den Sachleistungsstellen steht derselbe Satz wie zu den
+   vertragsärztlichen Planstellen (S.2): «Die Werte innerhalb einer Fachgruppe dürfen spaltenweise nicht addiert
+   werden.» Bei den Planstellen ist klar, warum: Dieselbe Stelle steht bei ÖGK, SVS und BVAEB. Bei den
+   Sachleistungsstellen ist der Satz mehrdeutig. Er kann meinen, dass gemeinsame und zusätzliche Stellen nicht
+   addiert werden – das passte nicht zum Wort «zusätzliche» der ÖSG-Vorlage (Tabellenband S.239) und nicht zu Wien,
+   das die Summe im PLAN ohne Vorbehalt druckt ([METHODIK.md](METHODIK.md), «Stellen»). Er kann auch nur die
+   %-Zeilen des Blocks meinen, oder er ist vom Eintrag zu den Planstellen übernommen. Wir haben in OÖ nichts
+   addiert; die Daten sind davon nicht betroffen. Betroffen wäre eine Summe aller Sachleistungsstellen (unten,
+   «Mögliche Erweiterung»).
+   *Frage: Dürfen gemeinsame und zusätzliche Sachleistungsstellen addiert werden?*
 
 ### Steiermark (Anlage 1, S.1)
 
@@ -137,7 +147,18 @@ DAA; METHODIK R8).
 *Frage: Mit dem DAA welchen Jahres sind die niedergelassenen ÄAVE der Verordnung gerechnet, in Oberösterreich und in
 den übrigen Ländern?*
 
-Niederösterreich, Salzburg, Wien: keine offene Frage zur eigenen Verordnung.
+### Wien (Textteil S.19)
+
+**Bewertete Sachleistungsstellen:** Zusätzliche Sachleistungsstellen werden nach ihrer Versorgungswirksamkeit
+bewertet (Quartalserstpatient:innen je Stelle, eingefroren über die RSG-Periode), «Planstellen von einzelnen
+Krankenversicherungsträgern werden im Verhältnis dazu bewertet», PVE bekommen einen «Aufwertungsfaktor». Zahlen dazu
+stehen weder im Textteil noch in der Methodenbeschreibung ([METHODIK.md](METHODIK.md), «Stellen»). Wir übernehmen
+die gedruckten Stellen; ob eine Wiener Sachleistungsstelle einer gezählten Stelle entspricht, lässt sich nicht
+prüfen.
+*Frage: Mit welchen Faktoren sind die Stellen in der Matrix bewertet, und welche Zeilen betrifft das – nur die über
+den Ist-Stand hinaus geplanten oder alle?*
+
+Niederösterreich, Salzburg: keine offene Frage zur eigenen Verordnung.
 
 ## GÖG-Gliederung: Landkarte von 2019 oder jeweils aktuelle Bezirke?
 
@@ -171,11 +192,13 @@ eigene, gekennzeichnete Größe, nicht als Wert der Verordnungen. Eine solche Qu
 
 ## Mögliche Erweiterung: alle Sachleistungsstellen als eigene Zeile in der Tabelle Stellen
 
-Im PLAN sind gemeinsame und zusätzliche Sachleistungsstellen verschiedene Stellen und dürfen addiert werden
-(DATEN.md, Tabelle Stellen, «Drei Dinge, die beim Summieren schiefgehen»). Die Summe steht aber in keiner Datei:
-Wer alle geplanten Stellen einer Region braucht, rechnet sie heute selbst – und nach der Regel «Andere Projekte
-lesen die veröffentlichten Dateien» (CLAUDE.md) fehlt sie damit in den Dateien. Auch die Lesefassung zeigt deshalb
-gemeinsame und zusätzliche Stellen nur nebeneinander ([WEB.md](WEB.md), «Lesefassung»).
+Im PLAN sind gemeinsame und zusätzliche Sachleistungsstellen nach der Vorlage verschiedene Stellen und dürfen
+addiert werden (DATEN.md, Tabelle Stellen, «Drei Dinge, die beim Summieren schiefgehen»); ein Satz im Glossar von OÖ
+lässt sich anders lesen (oben, Oberösterreich, Punkt 4), und Stellen mit zwei von drei Trägern können doppelt stehen
+(METHODIK.md, «Stellen»). Die Summe steht aber nur für Wien in den Dateien, weil Wien sie druckt (Zeile
+`slst_gesamt`). Wer alle geplanten Stellen einer Region eines anderen Landes braucht, rechnet sie heute selbst – und
+nach der Regel «Andere Projekte lesen die veröffentlichten Dateien» (CLAUDE.md) fehlt sie damit in den Dateien. Auch
+die Lesefassung zeigt deshalb gemeinsame und zusätzliche Stellen nur nebeneinander ([WEB.md](WEB.md), «Lesefassung»).
 
 Vorschlag: eine Zeile `slst_alle` = `slst_gemeinsam` + `slst_zus_oegk` + `slst_zus_svs` + `slst_zus_bvaeb`, je Region,
 Fach und PLAN, im selben Zuschnitt; ohne `slst_eva` (Teilmenge der gemeinsamen) und ohne Wiens gedruckte
@@ -189,6 +212,12 @@ summiert – wie bei den übrigen Zeilen). Zu klären bzw. zu dokumentieren:
 - **Datenänderung:** neue Zeile in `RSG_2030_Stellen.csv` → neue Prüfsumme, Eintrag in CHANGELOG.md, neue Version;
   DATEN.md (Spalte `Zeile_ID` der Tabelle Stellen) nachziehen.
 - **Danach die Lesefassung:** `slst_alle` als Spalte «alle Sachleistungsstellen 2030» neben den Teilen.
+- **Je Träger:** Zeilen `slst_oegk`, `slst_svs`, `slst_bvaeb` = gemeinsam + zusätzlich des Trägers, als Gegenstück zu
+  `planstellen_<träger>` im IST, mit `Max_VAEP_Stellen` wie oben. Dazu eine Spalte mit vertragsärztlichen Planstellen
+  je 100.000 Einwohner:innen (IST `Stellen`, PLAN `Max_VAEP_Stellen`; Bevölkerung wie bei der Versorgungsdichte, R7),
+  gefüllt nur, wo IST und PLAN gleich definiert sind – also nicht bei der SVS in ZMK. Vor dem Bau: Plan mit «welcher
+  Fehler, wer findet ihn» und Entscheidung des Herausgebers; METHODIK «Stellen», «Entscheidung», müsste dann sagen,
+  dass wir vergleichbare Bausteine liefern, aber keine Differenz.
 
 ## Webseite
 

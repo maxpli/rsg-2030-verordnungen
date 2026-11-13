@@ -15,6 +15,26 @@ Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem
 - **Titel:** Die Startseite nennt die interaktive Matrix. Die Seiten heißen einheitlich «Versorgungsdichte und
   Planstellen …», beim Teilen kurz «RSG-2030-Daten:» mit Region oder Fach. Der Name allein klang nach dem amtlichen
   Plan. Überschrift und Beschreibungen sagen jetzt, dass die Versorgungsdichte gerechnet ist.
+- **Offene Fragen auch bei Wien:** Die Seiten zu Wien (Land, VR 91–93) zeigen jetzt den Verweis «Offene Fragen zu
+  dieser Verordnung», weil docs/offene_punkte.md einen Abschnitt zu Wien hat (bewertete Sachleistungsstellen, unten).
+
+**Doku:**
+
+- **Stellen IST und PLAN vergleichen** (docs/METHODIK.md, «Stellen»; docs/DATEN.md, «Stellen lesen»): Die
+  IST-Planstellen zählen nur den niedergelassenen Bereich; gleich definiert ist im PLAN nur Stellen × Maximalanteil,
+  und der ist laut ÖSG eine Obergrenze («davon maximal», Tabellenband S.239), kein Zielwert. Der Rest der
+  Sachleistungsstellen ist für Ambulatorien (Handrechnung Steiermark, AM). Die Zuordnung je Träger (gemeinsam +
+  zusätzlich) folgt aus der ÖSG-Definition («zusätzliche Sachleistungsstellen einzelner KV-Träger») und den
+  Glossaren; den Vergleich mit den IST-Planstellen stützen Wien und die Zahlen. Offen bleiben Stellen mit SVS- und
+  BVAEB-, aber ohne ÖGK-Vertrag. Was die
+  Länder dazu sagen, ergänzt um OÖ, Tirol, Steiermark und Wien; die Wiener Methodenbeschreibung (nicht Teil der
+  Verordnung) als Gegencheck. Neu als Hinweis: Die SVS hat im IST keine ZMK-Planstellen (kein Stellenplan mit der
+  Zahnärztekammer). Neue Tests in `tests/test_stellen.py`: SVS in ZMK samt Fußnote, Handrechnung Steiermark AM,
+  ÖGK-Planstellen auch bei SVS und BVAEB.
+- **Neue offene Fragen** (docs/offene_punkte.md): OÖ, ob gemeinsame und zusätzliche Sachleistungsstellen addiert
+  werden dürfen (ein mehrdeutiger Satz im Glossar); Wien, mit welchen Faktoren die Stellen bewertet sind.
+- Drei Seitenangaben ohne Bandnamen zeigten auf eine leere Seite (252); richtig ist S.232 des Tabellenbands. Ohne
+  Bandnamen prüft `tests/test_zitate.py` sie nicht, deshalb blieben sie stehen. Die Daten sind unverändert.
 
 ## 2026.3 – Spalten gegen die ÖSG-Vorlage
 

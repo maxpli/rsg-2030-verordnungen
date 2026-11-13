@@ -46,3 +46,6 @@ Textband;12;"KFO Kieferorthopädie";KFO steht im Textband nur im Abkürzungsverz
 Textband;38;Die Versorgungsdichte soll in jeder Versorgungsregion;Soll-Intervall gilt je Versorgungsregion, nicht je Bundesland
 Textband;215;Die Planungsrichtwerte beziehen sich grundsätzlich auf Bundeslandebene;Großgeräte: Landesebene ausdrücklich genannt (Gegenstück zur Versorgungsdichte)
 Methodenband;24;werden auf Ebene der Bundesländer;Bettenmessziffern: Landesebene ausdrücklich genannt (Gegenstück zur Versorgungsdichte)
+Tabellenband;232;Davon ist jeweils der Maximalanteil für vertragsärztliche Planstellen in Prozent auszuweisen;Sachleistungsstellen: Maximalanteil vertragsärztlicher Planstellen je Zeile (Stellen)
+Tabellenband;239;davon maximal als vertragsärztliche Planstellen in %;Vorlage: Maximalanteil ist eine Obergrenze («davon maximal») (Stellen)
+Textband;76;davon jeweils maximal als vertragsärztliche Planstellen in Prozent;Maximalanteil ist eine Obergrenze («maximal») (Stellen)

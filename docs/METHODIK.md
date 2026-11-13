@@ -541,7 +541,7 @@ Ihre Versorgungswirksamkeit ist «als Rahmenbedingung» mitzuberücksichtigen (T
 - Die Matrix gliedert die ÄAVE im IST nach spitalsambulant, niedergelassen, selbständige Ambulatorien,
   Kassenambulatorien und insgesamt, dazu die Teilmengen VGF und PVE (Tabellenband S.231); im PLAN nach spitalsambulant,
   «niedergelassenen ÄrztInnen (mit Kassenvertrag) und in selbständigen Ambulatorien tätigen ÄrztInnen … gesamt» und
-  insgesamt (S.252). In beiden Abschnitten gibt es also spitalsambulant, extramural (im IST die Summe der drei
+  insgesamt (S.232). In beiden Abschnitten gibt es also spitalsambulant, extramural (im IST die Summe der drei
   extramuralen Zeilen, [DATEN.md](DATEN.md#zeilen)) und insgesamt.
 - PVE: «In der Allgemeinmedizin (AM) und der Kinder- und Jugendheilkunde (KIJU) ist im IST-Stand … und im PLAN-Stand …
   die tatsächliche (IST-Stand) bzw. die Mindestanzahl (PLAN-Stand) der ÄAVE … in Primärversorgungseinheiten (PVE)
@@ -568,31 +568,92 @@ extramural fasst sie zusammen), VGF (im PLAN nur in OÖ und der Steiermark), Wah
 ### Stellen – nicht in der Tabelle Versorgungsdichte
 
 **Was der ÖSG sagt.** IST: «Anzahl der vertragsärztlichen Planstellen je KV-Träger» (Tabellenband S.231). PLAN:
-Sachleistungsstellen, «Planstellen für niedergelassene VertragsärztInnen und der geplanten ärztlichen
-Vollzeitäquivalente in Ambulatorien», «für gemeinsame Sachleistungsstellen aller KV-Träger und für die zusätzlichen
-Sachleistungsstellen einzelner KV-Träger. Davon ist jeweils der Maximalanteil für vertragsärztliche Planstellen in
-Prozent auszuweisen» (S.252). Als endgültig sieht der ÖSG das nicht: In der Liste der Matrix-Inhalte spricht er
-vom «Vorliegen einer detaillierten Definition von Sachleistungsstellen» als etwas Künftigem (Textband S.76, bei der
-optionalen Zeile «ÄAVE gesamt»).
+Sachleistungsstellen, «aus den PLAN-ÄAVE … abgeleitet», sie «umfassen Planstellen für niedergelassene
+VertragsärztInnen und der geplanten ärztlichen Vollzeitäquivalente in Ambulatorien», «für gemeinsame
+Sachleistungsstellen aller KV-Träger und für die zusätzlichen Sachleistungsstellen einzelner KV-Träger. Davon ist
+jeweils der Maximalanteil für vertragsärztliche Planstellen in Prozent auszuweisen» (S.232). Die Vorlage nennt die
+Zeile «- davon maximal als vertragsärztliche Planstellen in %» (S.239), der Textband «davon jeweils maximal als
+vertragsärztliche Planstellen in Prozent» (S.76). Stellen × Maximalanteil ist also eine **Obergrenze**: Höchstens so
+viele der Stellen dürfen vertragsärztliche Planstellen sein, also «Planstellen für niedergelassene VertragsärztInnen»;
+der Rest ist mindestens für Ambulatorien vorgesehen. Ob die Obergrenze ausgeschöpft werden soll, sagt der ÖSG nicht.
+Als endgültig sieht der ÖSG die Definition nicht: In der Liste der Matrix-Inhalte spricht er vom «Vorliegen einer
+detaillierten Definition von Sachleistungsstellen» als etwas Künftigem (Textband S.76, bei der optionalen Zeile
+«ÄAVE gesamt»).
+
+**Was daraus für den Vergleich folgt.** Die IST-Planstellen zählen nur den niedergelassenen Bereich: Der ÖSG stellt
+den «Planstellen für niedergelassene VertragsärztInnen» die «ärztlichen Vollzeitäquivalente in Ambulatorien» gegenüber
+(S.232), die Glossare ebenso («Planstellen des niedergelassenen Bereichs», Steiermark Anlage 1 S.65, OÖ Anlage S.3),
+und Wien zählt auf, was eine vertragsärztliche Planstelle ist: Einzelverträge, Gesellschafter:innen von Gruppenpraxen
+und PVE, angestellte Ärzt:innen in Einzel- und Gruppenpraxen und PVE (Textteil S.18).
+Ambulatorien stehen im IST nur als ÄAVE (Zeilen `selbst_amb`, `kassen_amb`) und als Standorte, nicht als Stellen.
+Gleich definiert sind deshalb die IST-Planstellen und im PLAN Stellen × Maximalanteil – das aber als Obergrenze. Der
+Rest der Sachleistungsstellen ist mindestens für Ambulatorien. Vorbehalt: Wien rechnet zu den Planstellen auch
+«Sonstige anzurechnende Stellen soweit in der jeweiligen Landeszielsteuerungskommission vereinbart» (Textteil S.18);
+was das ist, steht nicht da.
 
 **Was die Länder dazu sagen.**
 - Steiermark, Glossar (Anlage 1 S.65): vertragsärztliche Planstellen sind «Planstellen des jeweiligen
   Krankenversicherungsträgers …, die Werte dürfen nicht addiert werden»; Sachleistungsstellen «entspricht der Summe von
   Planstellen des niedergelassenen Bereichs und der VZÄ in selbständige Ambulatorien mit Kassenvertrag und kasseneigene
   Ambulatorien; Zuordnung zu KV-Träger(n) abhängig von Zugänglichkeit für Versicherte des/der KV-Träger».
+- Oberösterreich, Glossar (Anlage S.2–3): Planstellen und Sachleistungsstellen wie in der Steiermark, und bei
+  **beiden** der Satz «Die Werte innerhalb einer Fachgruppe dürfen spaltenweise nicht addiert werden». Bei den
+  Sachleistungsstellen ist er mehrdeutig; gemeint sein könnten gemeinsame und zusätzliche Stellen, aber auch nur die
+  %-Zeilen des Blocks ([offene_punkte.md](offene_punkte.md), Oberösterreich). Für Betten nennt das Glossar eine
+  «Bettenobergrenze», für ambulante Betreuungsplätze eine «Mindestanzahl», für Sachleistungsstellen keins von beiden;
+  die Vorgaben sind «bis spätestens 31.12.2030 umzusetzen» (Anlage S.1).
 - Tirol (Erläuternde Bemerkungen S.8): neue Sachleistungsstellen und unbesetzte Planstellen werden «dem IST 2023
-  addiert, um einen vollständigen PLAN 2030 zu erhalten». Die Steiermark (Erläuterungen S.5): AM-Planstellen sollen
-  «auf 614 Sachleistungsstellen angehoben werden» (IST 603 ÖGK-Planstellen).
-- Wien (Textteil S.19): Zusätzliche Sachleistungsstellen werden nach ihrer Versorgungswirksamkeit bewertet
-  (Quartalserstpatient:innen je Stelle, «Aufwertungsfaktor» für PVE). Eine Wiener Sachleistungsstelle ist also nicht
-  unbedingt eine Stelle im Sinn einer IST-Planstelle.
+  addiert, um einen vollständigen PLAN 2030 zu erhalten»; die KJP-Einzelverträge werden «im Rahmen der Änderung von
+  Planstellen zu SLS» erst planbar. Ein VZÄ in selbständigen Ambulatorien wird «direkt als ein ÄAVE» übernommen (S.7).
+- Steiermark (Erläuterungen S.5): AM-Planstellen sollen «auf 614 Sachleistungsstellen angehoben werden» (IST 603
+  ÖGK-Planstellen). Die Erläuterung zählt also alle Sachleistungsstellen. Laut Matrix dürfen davon höchstens 583,3
+  vertragsärztliche Planstellen sein (95 %; Tabelle Stellen, `Max_VAEP_Stellen`), mindestens 30,7 sind also für
+  Ambulatorien – in AM gab es im IST keine (ÄAVE in Ambulatorien 0, Ambulatorien-Standorte 0; Anlage 1 S.1).
+  Gegenüber den 603 Planstellen im IST heißt das: Sachleistungsstellen insgesamt +11, vertragsärztliche Planstellen
+  höchstens −19,7. Das sind zwei Antworten auf zwei Fragen, kein Widerspruch (Handrechnung: `tests/test_stellen.py`).
+- Wien, Textteil: vertragsärztliche Planstellen sind Einzelverträge, Gesellschafter:innen von Gruppenpraxen und PVE,
+  angestellte Ärzt:innen in Einzel- und Gruppenpraxen und PVE und «sonstige anzurechnende Stellen» (S.18).
+  Zusätzliche Sachleistungsstellen werden nach ihrer Versorgungswirksamkeit bewertet (Quartalserstpatient:innen je
+  Stelle, «Aufwertungsfaktor» für PVE); «Planstellen von einzelnen Krankenversicherungsträgern werden im Verhältnis
+  dazu bewertet»; eine Reduktion zusätzlicher SVS- und BVAEB-Stellen soll die gemeinsamen erhöhen (S.19). Eine
+  Wiener Sachleistungsstelle ist also nicht unbedingt eine Stelle im Sinn einer IST-Planstelle. Zugleich nennt der
+  Textteil sie «Sachleistungsstellen (ehemals Planstellen)» (S.20). Wien druckt in beiden Abschnitten eine
+  Gesamtzeile: im IST mit dem Hinweis «ohne Bereinigung von Doppelzählungen» (Anlage S.33, Fußnote (14)), im PLAN
+  ohne einen solchen Hinweis.
+- Wien, Methodenbeschreibung (BDO, «RSG Wien 2030 – Methodenbeschreibung», Dezember 2025,
+  <https://www.wien.gv.at/pdf/ma24/gesundheitsfonds/rsg-wien-2030-methodenbeschreibung.pdf>; Seiten im PDF, gedruckt
+  eine weniger). **Nicht Teil der Verordnung** und nicht im Quellenregister; hier nur als Gegencheck, wie Wien zu den
+  gedruckten Zahlen kam. Für andere Länder gibt es in unseren Quellen nichts Vergleichbares.
+  - Der Maximalanteil ist der Rest nach Abzug der geplanten Sachleistungsstellen «in Ambulatorien und eigenen
+    Einrichtungen», «in einzelnen Fächern und Versorgungsregionen … in Absprache … angepasst» (S.28). In Wien ist
+    Stellen × Maximalanteil also die Zahl der als vertragsärztliche Planstellen vorgesehenen Stellen, nicht nur eine
+    Grenze.
+  - Für Ambulatorien gilt «1 ÄAVE = 1 Sachleistungsstelle» (S.27).
+  - «In Summe 3.546 SLS» (S.28) – dieselbe Zahl wie die gedruckte Gesamtzeile.
+  - Berücksichtigt wurden «zusätzliche IST-Planstellen der SVS/BVAEB (Teilkassenverträge)» (S.27), mit einer
+    «Fortschreibung der BVAEB/SVS-Kassenplanstellen 2022»; ein Abbau ist «nicht berücksichtigt» (S.28, Fußnote 18).
+  - Grundlage der übrigen PLAN-Stellen sind die Planstellen 2016, mit der Bevölkerung bis 2030 hochgerechnet, weil die
+    Planstellen 2022 «erst spät im Planungsprozess vorlagen» (S.27); in AM, GGH, KIJU und ZMK sind 100 % der
+    Wahlärzt:innen 2022 in die Sachleistung übernommen (S.27). Der Schritt IST 2022 → PLAN 2030 enthält in Wien also
+    mehr als Ausbau.
+  - Zur Bewertung nach Versorgungswirksamkeit (Textteil S.19) nennt sie keine Zahlen.
 - Burgenland, Salzburg, Tirol (Fußnote an den technischen Fächern): «Für Ambulatorien können derzeit keine
   Sachleistungsstellen ausgewiesen werden.»
 
-**Lesart je Träger.** Gemeinsame Stellen stehen den Versicherten aller Träger offen, zusätzliche nur denen eines
-Trägers (Glossar Steiermark). PLAN je Träger wäre dann gemeinsam + zusätzlich, verglichen mit den IST-Planstellen
-desselben Trägers. Die Daten stützen das: Die zusätzlichen ÖGK-Sachleistungsstellen sind in allen Matrizen 0 oder «-»,
-und IST SVS minus IST ÖGK ist ungefähr die Zahl der zusätzlichen SVS-Stellen im PLAN (AM, Bundesland):
+**Lesart je Träger.** Der ÖSG stellt «gemeinsame Sachleistungsstellen aller KV-Träger» den «zusätzlichen
+Sachleistungsstellen einzelner KV-Träger» gegenüber (Tabellenband S.232; Vorlage S.239; Textband S.76: «je
+KV-Träger»). «Zusätzlich» heißt also: über die gemeinsamen hinaus, für einzelne Träger. Wem eine Stelle zugeordnet
+ist, hängt laut den Glossaren von der «Zugänglichkeit für Versicherte» ab (Steiermark Anlage 1 S.65, OÖ Anlage
+S.3). Für die Versicherten eines Trägers sind im PLAN also gemeinsame + zusätzliche Stellen vorgesehen. Unser Schritt
+ist nur, das mit den IST-Planstellen desselben Trägers zu vergleichen. Dafür sprechen:
+- Wien: Eine Reduktion zusätzlicher SVS- und BVAEB-Stellen soll die gemeinsamen erhöhen (Textteil S.19) – zwei
+  getrennte Töpfe; laut Methodenbeschreibung sind die zusätzlichen Stellen die «zusätzlichen IST-Planstellen der
+  SVS/BVAEB» (oben);
+- die Zahlen: BVAEB hat in jeder Zelle mindestens so viele Planstellen wie die ÖGK, die SVS ebenso außer in ZMK (kein
+  Stellenplan, [DATEN.md](DATEN.md#stellen-lesen)) und in drei kleinen Zellen (OÖ VR 41 IM, VR 44 ORTR; Tirol VR 72
+  KJP; Test `tests/test_stellen.py`). Das passt dazu, dass ÖGK-Stellen auch SVS- und BVAEB-Verträge haben; die
+  einzelnen Stellen zeigt die Matrix nicht. Die zusätzlichen ÖGK-Sachleistungsstellen sind in allen Matrizen 0 oder
+  «-», und IST SVS minus IST ÖGK ist ungefähr die Zahl der zusätzlichen SVS-Stellen im PLAN (AM, Bundesland):
 
 | Land | IST SVS − ÖGK | PLAN zus. SVS | IST BVAEB − ÖGK | PLAN zus. BVAEB |
 |---|---:|---:|---:|---:|
@@ -603,13 +664,22 @@ und IST SVS minus IST ÖGK ist ungefähr die Zahl der zusätzlichen SVS-Stellen 
 | Tirol | 20 | 22 | 13 | 13 |
 | Wien | 29 | 33 | 13 | 13 |
 
-Das ist eine Beobachtung, keine Regel aus dem ÖSG.
+**Offen bleibt eine Lücke der Vorlage:** Eine Stelle mit SVS- und BVAEB-Vertrag, aber ohne ÖGK-Vertrag, ist weder
+«gemeinsam» noch «zusätzlich» für einen einzigen Träger. Im IST steht sie bei SVS und bei BVAEB; das meint Wien mit
+«ohne Bereinigung von Doppelzählungen». Werden die zusätzlichen Stellen aus dem IST fortgeschrieben, wie in Wien, kann
+sie im PLAN in beiden zusätzlichen Zeilen stehen. Das ist eine Lesart; belegen lässt es sich nicht.
 
-**Entscheidung: keine Stellen in der Tabelle Versorgungsdichte.** Ein Vergleich IST → PLAN braucht mehrere Annahmen:
-die Lesart je Träger; dass Sachleistungsstellen (mit Ambulatorien-VZÄ, in Wien bewertet) mit Planstellen vergleichbar
-sind; dass die Obergrenze für Kassenpraxen (Stellen × Maximalanteil, je Zeile und Fach, erst danach summiert) ein Plan
-ist; dass die IST-Planstellen unbesetzte Stellen enthalten. Das ist eine Auswertung, keine Lesung. Die Stellen bleiben
-in der Tabelle Planungsmatrizen; wie man sie liest: [DATEN.md](DATEN.md#stellen-lesen).
+**Entscheidung: keine Stellen in der Tabelle Versorgungsdichte.** Ein Vergleich IST → PLAN braucht Annahmen:
+- die Lesart je Träger, mit der Lücke für Stellen mit zwei von drei Trägern (oben);
+- dass die Obergrenze für vertragsärztliche Planstellen (Stellen × Maximalanteil) das ist, was geplant ist. Gleich
+  definiert wie das IST ist nur sie; alle Sachleistungsstellen enthalten zusätzlich Ambulatorien, die im IST nur als
+  ÄAVE stehen (oben, «Was daraus für den Vergleich folgt»; Beispiel Steiermark, AM);
+- dass Wiens bewertete Sachleistungsstellen wie gezählte gelten;
+- bei der SVS: Sie hat im IST keine ZMK-Planstellen ([DATEN.md](DATEN.md#stellen-lesen)).
+
+Dazu enthalten die IST-Planstellen unbesetzte Stellen: Ein Plus an Stellen ist kein Plus an Ärzt:innen. Das ist eine
+Auswertung, keine Lesung. Die Stellen stehen in der Tabelle Stellen (im ÖSG-Zuschnitt) und in der Tabelle
+Planungsmatrizen; wie man sie liest: [DATEN.md](DATEN.md#stellen-lesen).
 
 ---
 

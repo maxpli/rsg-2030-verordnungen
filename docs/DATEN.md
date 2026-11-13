@@ -361,26 +361,48 @@ Oberösterreich weist ZMK ohne Kieferorthopädie aus; die Wahlärzt:innen in KFO
 
 ### Stellen lesen
 
-Die Stellen stehen nur in der Tabelle Planungsmatrizen, nicht in der Tabelle Versorgungsdichte: Ein Vergleich IST → PLAN
-braucht Annahmen, die jede Auswertung selbst festlegen muss ([METHODIK.md](METHODIK.md), «Stellen»). Was beim Lesen
-gilt:
+Die Stellen stehen in der Tabelle Planungsmatrizen (je Matrixspalte) und in der Tabelle Stellen (im ÖSG-Zuschnitt),
+nicht in der Tabelle Versorgungsdichte: Ein Vergleich IST → PLAN braucht Annahmen, die jede Auswertung selbst festlegen
+muss ([METHODIK.md](METHODIK.md), «Stellen»). Was beim Lesen gilt:
 
 - **IST und PLAN zählen Verschiedenes.** IST `planstellen_<träger>` sind vertragsärztliche Planstellen laut
   Stellenplan, in OÖ ausdrücklich besetzte und unbesetzte. PLAN `slst_*` sind Sachleistungsstellen: Planstellen
   **und** ärztliche VZÄ in Ambulatorien (Tabellenband S.232). Wien bewertet zusätzliche Sachleistungsstellen nach
   ihrer Versorgungswirksamkeit (Textteil S.19).
+- **Was man mit den IST-Planstellen vergleichen kann.** Die IST-Planstellen zählen nur den niedergelassenen Bereich;
+  Ambulatorien stehen im IST nur als ÄAVE und Standorte. Gleich definiert ist im PLAN deshalb nur der Teil, der
+  höchstens vertragsärztliche Planstelle sein darf (Tabelle Stellen, `Max_VAEP_Stellen` von gemeinsam und zusätzlich
+  des Trägers) – laut ÖSG eine Obergrenze, kein Zielwert (unten, «Die %-Zeile …»). Der Rest der
+  Sachleistungsstellen ist mindestens für Ambulatorien. Beispiel Steiermark, AM, wo es im IST keine Ambulatorien
+  gab: 603 Planstellen → 614 Sachleistungsstellen, davon höchstens 583,3 vertragsärztliche Planstellen und
+  mindestens 30,7 in Ambulatorien. Insgesamt +11, vertragsärztliche Planstellen höchstens −19,7 – zwei Antworten
+  auf zwei Fragen ([METHODIK.md](METHODIK.md), «Stellen»).
 - **Gemeinsam und zusätzlich.** `slst_gemeinsam` steht den Versicherten aller Träger offen, `slst_zus_<träger>` nur
   denen eines Trägers (Steiermark, Glossar Anlage 1 S.65). Für einen Träger sind es also gemeinsam + zusätzlich; bei
-  der ÖGK ist «zusätzlich» überall 0 oder «-». Dass IST `planstellen_<träger>` und PLAN gemeinsam + zusätzlich
-  zueinander passen, ist eine Beobachtung, keine Regel (Zahlen: METHODIK, «Stellen»).
-- **IST nicht über Träger addieren, PLAN schon.** Eine IST-Planstelle hat meist Verträge mit mehreren Trägern und
-  steht in mehreren Zeilen. Die PLAN-Sachleistungsstellen dagegen sind verschiedene Stellen: gemeinsame und
-  zusätzliche zusammen ergeben alle geplanten Stellen ([Tabelle Stellen](#rsg_2030_stellencsv), «Drei Dinge, die
-  beim Summieren schiefgehen»).
-- **Die %-Zeile gehört zur Zeile darüber.** `slst_gemeinsam_max_vaep_prozent` sagt, wie viele der gemeinsamen Stellen
-  höchstens Kassenpraxis sein dürfen, `slst_zus_svs_max_vaep_prozent` nur für die zusätzlichen SVS-Stellen
-  (Tabellenband S.232: «jeweils»). Höchstzahl Kassenpraxen eines Trägers = gemeinsam × % + zusätzlich × %, je Fach
-  gerechnet und erst danach summiert; das gesamt-% ist ein gewichtetes Mittel und dafür nicht geeignet.
+  der ÖGK ist «zusätzlich» überall 0 oder «-». Die Zuordnung folgt aus der ÖSG-Definition
+  («zusätzliche Sachleistungsstellen einzelner KV-Träger», Tabellenband S.232) und den Glossaren. Dass IST
+  `planstellen_<träger>` und PLAN gemeinsam + zusätzlich zueinander passen, ist unser Schritt; Wien und die Zahlen
+  stützen ihn (METHODIK, «Stellen», Lesart je Träger).
+- **IST nicht über Träger addieren; PLAN nach Vorlage schon.** Eine IST-Planstelle hat meist Verträge mit mehreren
+  Trägern und steht in mehreren Zeilen. Die PLAN-Sachleistungsstellen sind nach der Vorlage verschiedene Stellen
+  («zusätzliche»). Wien druckt in beiden Abschnitten eine Summe: im IST mit dem Hinweis «ohne Bereinigung von
+  Doppelzählungen» (Zeile `planstellen_oegk_svs_bvaeb`), im PLAN ohne (Zeile `slst_gesamt`). Zwei Vorbehalte: Stellen
+  mit SVS- und BVAEB-, aber ohne ÖGK-Vertrag haben in der Vorlage keinen Platz und können im PLAN doppelt stehen
+  ([METHODIK.md](METHODIK.md), «Stellen»); und das Glossar von OÖ schreibt auch zu den Sachleistungsstellen «Die Werte
+  innerhalb einer Fachgruppe dürfen spaltenweise nicht addiert werden» (Anlage S.3) – mehrdeutig
+  ([offene_punkte.md](offene_punkte.md), Oberösterreich).
+- **Die %-Zeile gehört zur Zeile darüber und ist eine Obergrenze.** `slst_gemeinsam_max_vaep_prozent` sagt, wie viele
+  der gemeinsamen Stellen **höchstens** Kassenpraxis sein dürfen, `slst_zus_svs_max_vaep_prozent` nur für die
+  zusätzlichen SVS-Stellen (Tabellenband S.232: «jeweils»; Vorlage S.239: «davon maximal»). Ob die Obergrenze
+  ausgeschöpft werden soll, sagt der ÖSG nicht; Wien leitet den Anteil als Rest nach den geplanten Ambulatorien ab
+  ([METHODIK.md](METHODIK.md), «Stellen»). Höchstzahl Kassenpraxen eines Trägers = gemeinsam × % + zusätzlich × %, je
+  Fach gerechnet und erst danach summiert; das gesamt-% ist ein gewichtetes Mittel und dafür nicht geeignet.
+- **SVS in ZMK:** Die SVS hat im IST keine ZMK-Planstellen, in keinem Land und keiner Region («-», «0», «x» oder
+  «n.v.»). Alle Länder außer Vorarlberg (dort «n.v.») erklären das in einer Fußnote: «Im Gesamtvertrag der SVS mit
+  der Zahnärztekammer ist derzeit kein Stellenplan vereinbart» (z. B. Burgenland Anlage 1 S.1, Fußnote (6)); KFO hat
+  SVS-Planstellen. Im PLAN stecken die ZMK-Stellen in den gemeinsamen Sachleistungsstellen. Ein Vergleich IST → PLAN
+  der SVS geht deshalb nur ohne ZMK; im Fach ZMK der Tabelle Stellen (ZMK + KFO) sind die SVS-Planstellen nur die
+  KFO. Test: `tests/test_stellen.py::test_svs_hat_im_ist_keine_zmk_planstellen`.
 - **Technische Fächer:** In Burgenland, Salzburg und Tirol steht an den technischen Fächern «Für Ambulatorien können
   derzeit keine Sachleistungsstellen ausgewiesen werden» (Fußnote); dort sind die Sachleistungsstellen nur Planstellen.
 - **KFO in Oberösterreich:** Die 32 KFO-Planstellen stammen aus der Fußnote zu ZMK, nicht aus der Matrix
@@ -415,7 +437,7 @@ liest, sollte wissen, dass dort in diesen Ländern die ärztlichen VZÄ dieser A
 | Zeichen in der Vorlage | an | Text | Bedeutung für die Daten |
 |---|---|---|---|
 | (1) | NCH | in Regiomed nicht berücksichtigt | NCH-ÄAVE «werden nur im spitalsambulanten Bereich ausgewiesen» (Tabellenband S.232); kein Richtwert |
-| (2) | KJC, PCH | zugeordnet zu CH | deren ÄAVE sind in CH enthalten (S.252: «ÄAVE für PCH sind unter der CH subsummiert»); in allen Ländern stehen bei KJC und PCH 0 ÄAVE (Prüfung `kjc_pch_in_ch`); die Kennzahlen zählen sie zu CH |
+| (2) | KJC, PCH | zugeordnet zu CH | deren ÄAVE sind in CH enthalten (Tabellenband S.232: «ÄAVE für PCH sind unter der CH subsummiert»); in allen Ländern stehen bei KJC und PCH 0 ÄAVE (Prüfung `kjc_pch_in_ch`); die Kennzahlen zählen sie zu CH |
 | (3) | ORTR | davon in Unfallchirurgie (UC) … | Teilmenge von ORTR |
 | (4) | AM | davon in Akut-Ordinationen EVA … | Teilmenge von AM |
 | (5) | SON/IDB | spitalsambulant = ZAE; … extramural = sonstige/interdisziplinäre Angebote | SON/IDB spitalsambulant sind die ZAE; der AM-Richtwert enthält sie (Textband S.39), die Kennzahlen zählen sie zu AM (METHODIK R5) |
@@ -477,11 +499,12 @@ ZMK inklusive KFO.
 
 **Drei Dinge, die beim Summieren schiefgehen:**
 
-- **IST nicht addieren, PLAN schon.** Dieselbe Planstelle hat meist Verträge mit mehreren Trägern und steht in
-  mehreren `planstellen_…`-Zeilen; «die Werte dürfen nicht addiert werden» (Tabellenband S.231). Die
+- **IST nicht addieren, PLAN nach Vorlage schon.** Dieselbe Planstelle hat meist Verträge mit mehreren Trägern und
+  steht in mehreren `planstellen_…`-Zeilen; «die Werte dürfen nicht addiert werden» (Tabellenband S.231). Die
   PLAN-Sachleistungsstellen dagegen sind verschiedene Stellen – die Vorlage nennt sie «Gemeinsame
   Sachleistungsstellen aller KV-Träger» und «**zusätzliche** ÖGK-/SVS-/BVAEB-Sachleistungsstellen», und Wiens
-  gedruckte Gesamtzeile ist in allen 27 Fachspalten genau ihre Summe.
+  gedruckte Gesamtzeile ist in allen 27 Fachspalten genau ihre Summe. Vorbehalte (doppelt stehende Stellen,
+  Glossar von OÖ): [Stellen lesen](#stellen-lesen).
 - **`slst_eva` ist eine Teilmenge** von `slst_gemeinsam` («- davon in EVA»), nicht dazuzählen.
 - **PUL und KFO nicht mitsummieren:** Sie stecken schon in IM bzw. ZMK (wie in der Tabelle Versorgungsdichte,
   Fallstrick 4). Und: Die Fächer ohne Richtwert (NCH, AN, STR, RAD, NUK, PMR, PAT, LAB, SON/IDB) sind in dieser

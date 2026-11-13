@@ -13,6 +13,7 @@ from conftest import pruefe_ausgabe
 from oesg_methodik.faecher import MATRIXSPALTEN, OESG_ANALYSEKERN, ZAE, teile
 from oesg_methodik.stellen_eingang import IST_ZEILEN, PLAN_ZEILEN, SPALTEN, TEILMENGEN, pruefe
 from rsg2030.analyse_eingang import lade_matrix_long, stellen_eingang
+from rsg2030.fussnoten import lade as lade_fussnoten
 from rsg2030.schema import matrix_long
 from rsg2030.stellen import ohne_anteil
 
@@ -123,6 +124,64 @@ def test_wien_gesamtzeile_ist_die_summe_ihrer_teile(stellen):
     p = w.pivot_table(index="Fach", columns="Zeile_ID", values="Stellen")
     teile_zeilen = ["slst_gemeinsam", "slst_zus_oegk", "slst_zus_svs", "slst_zus_bvaeb"]
     assert p["slst_gesamt"].round(6).equals(p[teile_zeilen].sum(axis=1).round(6))
+
+
+@pytest.mark.slow
+def test_svs_hat_im_ist_keine_zmk_planstellen():
+    """Die SVS hat mit der Zahnärztekammer keinen Stellenplan (Fußnote, z. B. Burgenland Anlage 1 S.1, (6)): In
+    keiner Matrix steht eine SVS-Planstelle in ZMK. Im PLAN stecken die ZMK-Stellen in den gemeinsamen
+    Sachleistungsstellen – ein Vergleich IST → PLAN der SVS geht deshalb nur ohne ZMK (docs/DATEN.md, «Stellen lesen»).
+    Druckte ein Land doch eine Zahl, stimmte dieser Hinweis nicht mehr. Die Fußnote steht in allen Ländern außer
+    Vorarlberg, das «n.v.» druckt."""
+    lang = lade_matrix_long()
+    z = lang[(lang["Zeile_ID"] == "planstellen_svs") & (lang["Fach"] == "ZMK")]
+    assert set(z["Land"]) == set(lang["Land"])
+    assert z["Wert"].fillna(0).eq(0).all(), z[["Land", "Ebene", "Region_ID", "Wert", "Roh"]].to_string()
+    fn = lade_fussnoten()
+    mit_fussnote = set(fn[fn["Text"].str.contains("Gesamtvertrag der SVS mit der Zahnärztekammer", na=False)]["Land"])
+    assert mit_fussnote == set(lang["Land"]) - {"Vorarlberg"}
+
+
+@pytest.mark.slow
+def test_handrechnung_steiermark_am(stellen):
+    """Steiermark, AM, Bundesland (Anlage 1 S.1): 603 ÖGK-Planstellen, im IST keine Ambulatorien (ÄAVE 0, Standorte 0);
+    PLAN 614 gemeinsame Sachleistungsstellen, davon höchstens 95 % vertragsärztlich. Also höchstens 583,3
+    vertragsärztliche Planstellen und mindestens 30,7 Stellen in Ambulatorien: insgesamt +11, vertragsärztliche
+    Planstellen höchstens −19,7 (docs/METHODIK.md, «Stellen»)."""
+    ist = _zelle(stellen, "Steiermark", "BL", "Steiermark", "IST", "planstellen_oegk", "AM")
+    plan = _zelle(stellen, "Steiermark", "BL", "Steiermark", "PLAN", "slst_gemeinsam", "AM")
+    assert ist["Stellen"] == pytest.approx(603)
+    assert plan["Stellen"] == pytest.approx(614)
+    assert plan["Max_VAEP_Stellen"] == pytest.approx(614 * 0.95)
+    assert plan["Stellen"] - plan["Max_VAEP_Stellen"] == pytest.approx(30.7)
+    assert plan["Max_VAEP_Stellen"] - ist["Stellen"] == pytest.approx(-19.7)
+    m = matrix_long(lade_matrix_long(), "Steiermark", "BL")
+    amb = m[
+        (m["Abschnitt"] == "IST")
+        & (m["Fach"] == "AM")
+        & m["Zeile_ID"].isin(["selbst_amb", "kassen_amb", "amb_standorte"])
+    ]
+    assert len(amb) == 3 and amb["Wert"].eq(0).all(), amb.to_string()
+
+
+# Zellen, in denen die SVS weniger Planstellen hat als die ÖGK – außer ZMK, wo die SVS keinen Stellenplan hat.
+# Als Literale, damit eine neue Ausnahme auffällt (docs/METHODIK.md, «Stellen», Lesart je Träger).
+SVS_UNTER_OEGK = {("OÖ", "41", "IM"), ("OÖ", "44", "ORTR"), ("Tirol", "72", "KJP")}
+
+
+@pytest.mark.slow
+def test_oegk_planstellen_sind_auch_svs_und_bvaeb_planstellen():
+    """Die ÖGK-Stellen sind fast immer auch SVS- und BVAEB-Stellen: BVAEB hat in jeder Zelle mindestens so viele
+    Planstellen wie die ÖGK, die SVS ebenso außer in ZMK und den Zellen in `SVS_UNTER_OEGK`. Das stützt die Lesart
+    je Träger (gemeinsame Stellen = ÖGK-Stellen, zusätzliche = Überschuss eines Trägers)."""
+    lang = lade_matrix_long()
+    p = lang[lang["Zeile_ID"].str.startswith("planstellen_") & (lang["Fach"] != "gesamt")]
+    t = p.pivot_table(index=["Land", "Region_ID", "Fach"], columns="Zeile_ID", values="Wert", aggfunc="first").fillna(0)
+    assert t.index.size > 0
+    assert (t["planstellen_bvaeb"] >= t["planstellen_oegk"] - 1e-9).all()
+    unter = t[(t["planstellen_svs"] < t["planstellen_oegk"] - 1e-9)].reset_index()
+    unter = {(r.Land, str(r.Region_ID), r.Fach) for r in unter.itertuples() if r.Fach != "ZMK"}
+    assert unter == SVS_UNTER_OEGK
 
 
 @pytest.fixture(scope="module")
