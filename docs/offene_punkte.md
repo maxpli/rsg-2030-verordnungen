@@ -245,20 +245,23 @@ Was an der Webseite ([WEB.md](WEB.md)) noch offen ist.
    sich je Bundesland wiederholt. Offen ist auch, wie weit es die Matrix am Handy braucht: Wer einen Wert nachsieht,
    tippt die Zelle an und liest Fach und Region im Klartext in der Detailspalte.
 
-6. **Ein `Dataset`-Eintrag – entschieden: auf `/daten/`, nicht auf loesungswerk.at.** Zwei Einträge für denselben
-   Datensatz konkurrieren in der Suche (Google Dataset Search). Der Eintrag auf `/daten/` wird bei jedem Bau aus dem
+6. **Ein `Dataset`-Eintrag – entschieden: auf der Startseite (`/#dataset`; bis November 2026 auf `/daten/`, WEB.md,
+   «Adressen»), nicht auf loesungswerk.at.** Zwei Einträge für denselben
+   Datensatz konkurrieren in der Suche (Google Dataset Search). Der Eintrag auf der Startseite wird bei jedem Bau aus dem
    Release erzeugt (Version, Datum aus `CITATION.cff`, Downloads; ein Test prüft, dass `release.yml` jede Datei
    anhängt), der auf loesungswerk.at musste je Release nachgezogen werden. Übernommen von dort: gemessene Größen
    (`variableMeasured`), Schlagwörter, Excel-Mappe als Download und die Person mit derselben Kennung
    (`https://loesungswerk.at/#max-plischke`), damit beide Seiten als Werk desselben Menschen erkannt werden. Die
    anderen Seiten der Lesefassung zeigen mit `isBasedOn` auf den Datensatz (WEB.md, «Strukturierte Daten»).
    Auf loesungswerk.at/rsg-2030 (eigenes Repo): `Dataset` entfernt, die Seite verweist mit `about` auf
-   `/daten/#dataset`, die Links zeigen auf `rsg.loesungswerk.at`. Offen, nach dem Veröffentlichen beider Seiten:
-   - Sitemap in der Search Console einreichen (Domain-Property `loesungswerk.at`, Bestätigung per DNS, deckt die
-     Subdomain ab), für `/daten/` und loesungswerk.at/rsg-2030 «Indexierung beantragen».
-   - Rich Results Test für `/daten/` (ein Datensatz) und für loesungswerk.at/rsg-2030 (keiner mehr).
-   - Dass Google den alten Eintrag auf loesungswerk.at noch eine Weile in Dataset Search zeigt, ist normal; er
-     verschwindet beim nächsten Crawl der Seite, der neue erscheint, sobald `/daten/` gecrawlt ist.
+   `/daten/#dataset`, die Links zeigen auf `rsg.loesungswerk.at`. Offen, nach dem Veröffentlichen der neuen
+   Startseite (WEB.md, «Adressen»):
+   - Auf loesungswerk.at (eigenes Repo): `about` auf `https://rsg.loesungswerk.at/#dataset`, oder die Seite
+     `/rsg-2030` per 301 auf `https://rsg.loesungswerk.at/` umleiten – das wird erwogen; dann auch der Link in
+     README («Lösungswerk») und das Feld «Website» des Repositorys nachziehen.
+   - Sitemap in der Search Console neu einreichen (Domain-Property `loesungswerk.at`, Bestätigung per DNS, deckt die
+     Subdomain ab).
+   - Rich Results Test für `/` (ein Datensatz) und für loesungswerk.at/rsg-2030 (keiner).
 
 7. **Sachleistungsstellen ins Dashboard?** Sie stehen heute nur auf den Seiten der Lesefassung. Kämen sie in die
    Detailspalte, hätte das Dashboard alles, was die Seiten zeigen – die Seiten blieben für Suchmaschinen und zum

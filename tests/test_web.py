@@ -480,29 +480,32 @@ def test_herkunft_zitiert_die_tabelle_planungsmatrizen():
 
 
 def test_dashboard_hat_eine_adresse_fuer_die_suche():
-    """`canonical` auf die Wurzel der Lesefassungs-Domain: Links mit ?region=…&fach=… sind keine eigenen Seiten."""
+    """`canonical` auf /matrix/ der eigenen Domain: Links mit ?region=…&fach=… sind keine eigenen Seiten."""
     from rsg2030.lesefassung import BASIS_STANDARD
+    from rsg2030.web import MATRIX
 
     html = (WEB / "index.html").read_text(encoding="utf-8")
-    assert f'<link rel="canonical" href="{BASIS_STANDARD}/">' in html
+    assert f'<link rel="canonical" href="{BASIS_STANDARD}/{MATRIX}">' in html
 
 
-def test_startseite_traegt_icon_namen_und_vorschau():
-    """Google liest Icon und Namen der Website nur von der Startseite. `index.html` ist fest geschrieben; der Test
-    bindet sie an die Bausteine, aus denen die Lesefassung ihre Köpfe baut (docs/WEB.md, «Kopf für Suche und Vorschau»)."""
+def test_dashboard_traegt_icon_namen_und_vorschau():
+    """Dieselben Angaben wie jede Seite der Lesefassung: Icon (von der Wurzel), Name der Website, Vorschau beim Teilen.
+    `index.html` ist fest geschrieben; der Test bindet sie an die Bausteine, aus denen die Lesefassung ihre Köpfe baut
+    (docs/WEB.md, «Kopf für Suche und Vorschau»)."""
     from types import SimpleNamespace
 
     from rsg2030.darstellung import icon_links, vorschau_meta
     from rsg2030.lesefassung import BASIS_STANDARD, _website
+    from rsg2030.web import MATRIX
 
     html = (WEB / "index.html").read_text(encoding="utf-8")
     assert 'href="data:,"' not in html
-    assert icon_links() in html
+    assert icon_links("../") in html
     titel = re.search(r"<title>(.*?)</title>", html)
     beschreibung = re.search(r'<meta name="description" content="([^"]+)"', html)
     assert titel and beschreibung
     assert titel[1].startswith("RSG-2030-Daten: ")
-    assert vorschau_meta(titel[1], beschreibung[1], f"{BASIS_STANDARD}/") in html
+    assert vorschau_meta(titel[1], beschreibung[1], f"{BASIS_STANDARD}/{MATRIX}") in html
     # Die VD steht nicht in der Verordnung, und die Seite ist nicht die Sammlung der Verordnungen
     h1 = re.search(r"<h1>(.*?)</h1>", html)
     assert h1 and "gerechnet" in h1[1]
@@ -516,27 +519,55 @@ def test_startseite_traegt_icon_namen_und_vorschau():
     }
 
 
-def test_icon_liegt_neben_der_seite():
-    """Die Dateien gehen mit auf die Seite; von einem fremden Server lädt sie nichts."""
-    from rsg2030.web import ICONS, SEITE
+def test_icon_liegt_an_der_wurzel():
+    """Die Dateien gehen mit auf die Seite, an die Wurzel (dort sucht Google das Icon); von einem fremden Server lädt
+    sie nichts."""
+    from rsg2030.web import GETEILT, ICONS
 
     for name in ICONS:
-        assert name in SEITE
+        assert name in GETEILT
         assert (WEB / name).stat().st_size > 0, name
 
 
-def test_ohne_javascript_fuehrt_die_startseite_zu_den_seiten():
+def test_bau_legt_das_dashboard_unter_matrix_ab_und_laesst_die_startseite_stehen(tmp_path):
+    """«web» legt nur seine eigenen Dateien ab: das Dashboard unter matrix/, Icon und Schriften an der Wurzel. Die
+    Startseite gehört der Lesefassung und bleibt stehen, auch wenn «web» nach ihr läuft; was bis November 2026 vom
+    Dashboard an der Wurzel lag, räumt der Bau weg. Jeder relative Pfad des Dashboards findet danach seine Datei."""
+    from rsg2030 import web
+
+    (tmp_path / "index.html").write_text("Startseite der Lesefassung", encoding="utf-8")
+    for alt in web.FRUEHER_AN_DER_WURZEL:
+        (tmp_path / alt).write_text("alt", encoding="utf-8")
+    matrix = web.lege_dateien_ab(tmp_path)
+    (matrix / "data.json").write_text("{}", encoding="utf-8")  # schreibt baue_seite danach
+
+    assert matrix == tmp_path / web.MATRIX
+    assert (tmp_path / "index.html").read_text(encoding="utf-8") == "Startseite der Lesefassung"
+    assert not any((tmp_path / alt).exists() for alt in web.FRUEHER_AN_DER_WURZEL)
+    html = (matrix / "index.html").read_text(encoding="utf-8")
+    css = (matrix / "style.css").read_text(encoding="utf-8")
+    js = (matrix / "app.js").read_text(encoding="utf-8")
+    pfade = re.findall(r'(?:href|src)="([^"#:]+)"', html) + re.findall(r'url\("([^"]+)"\)', css)
+    pfade += re.findall(r'fetch\("([^"]+)"\)', js)
+    assert "../" in pfade and "data.json" in pfade and any(p.startswith("../fonts/") for p in pfade)
+    for p in pfade:
+        if p == "../":  # die Startseite, legt die Lesefassung ab
+            continue
+        assert (matrix / p).resolve().is_file(), p
+
+
+def test_ohne_javascript_fuehrt_das_dashboard_zu_den_seiten():
     html = (WEB / "index.html").read_text(encoding="utf-8")
     teil = re.search(r"<noscript>(.*?)</noscript>", html, re.S)
-    assert teil and 'href="daten/"' in teil[1]
+    assert teil and 'href="../"' in teil[1]
 
 
 def test_dashboard_verlinkt_die_lesefassung_fest_im_html():
-    """Ein Link, unauffällig unter «Über diese Daten», fest im HTML: Crawler ohne JavaScript sehen nur das, und Links
-    von außen zeigen aufs Dashboard, nicht auf die Seiten (docs/WEB.md, «Zwei Wege»)."""
+    """Ein Link, unauffällig unter «Über diese Daten», fest im HTML: Crawler ohne JavaScript sehen nur das. Er führt
+    zur Startseite, dem Verzeichnis aller Seiten (docs/WEB.md, «Zwei Wege»)."""
     html = (WEB / "index.html").read_text(encoding="utf-8")
     about = re.search(r'<section [^>]*id="about"[^>]*>(.*?)</section>', html, re.S)
-    assert about and '<a href="daten/">' in about.group(1)
+    assert about and '<a href="../">' in about.group(1)
     js = (WEB / "app.js").read_text(encoding="utf-8")
     assert 'getElementById("about").innerHTML' not in js, "app.js überschriebe den festen Link"
 
@@ -613,9 +644,11 @@ def test_seite_laedt_nichts_von_fremden_servern():
 
 
 def test_jede_schrift_der_css_liegt_in_web_fonts():
+    """style.css liegt auf der Seite unter matrix/, die Schriften an der Wurzel: daher «../fonts/»."""
     css = (WEB / "style.css").read_text(encoding="utf-8")
-    dateien = re.findall(r"url\(\"(fonts/[^\"]+)\"\)", css)
+    dateien = re.findall(r"url\(\"\.\./(fonts/[^\"]+)\"\)", css)
     assert dateien, "keine @font-face gefunden"
+    assert len(dateien) == css.count("@font-face")
     assert [d for d in dateien if not (WEB / d).is_file()] == []
     assert (WEB / "fonts" / "OFL.txt").is_file(), "Lizenz der Schriften fehlt"
 

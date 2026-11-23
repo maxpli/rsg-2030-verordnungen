@@ -9,10 +9,14 @@ Paket in einer festen Version einbindet (README, «Mitarbeiten»), liest vor dem
 
 **Webseite:**
 
+- **Die Startseite ist das Verzeichnis, das Dashboard liegt unter `/matrix/`** (docs/WEB.md, «Adressen»): Links von
+  außen zeigen auf die Domain, und dort steht jetzt die Seite mit Text, dem Datensatz-Eintrag und Links auf alle
+  Seiten statt des Dashboards, dessen Inhalt erst im Browser entsteht. `/daten/` leitet auf `/` weiter, alte Links
+  wie `/?region=61` führen in die Matrix. An den Daten ändert sich nichts.
 - **Icon, Name der Website und Vorschau beim Teilen** (docs/WEB.md, «Kopf für Suche und Vorschau»): Das Zeichen des
   Herausgebers als Icon auf allen Seiten, `WebSite` mit dem Namen «RSG-2030-Daten» auf der Startseite, Open Graph auf
-  Dashboard und Seiten. Ohne JavaScript verweist die Startseite jetzt auf `/daten/`. An den Daten ändert sich nichts.
-- **Titel:** Die Startseite nennt die interaktive Matrix. Die Seiten heißen einheitlich «Versorgungsdichte und
+  Dashboard und Seiten. Ohne JavaScript verweist das Dashboard auf das Verzeichnis. An den Daten ändert sich nichts.
+- **Titel:** Das Dashboard nennt die interaktive Matrix. Die Seiten heißen einheitlich «Versorgungsdichte und
   Planstellen …», beim Teilen kurz «RSG-2030-Daten:» mit Region oder Fach. Der Name allein klang nach dem amtlichen
   Plan. Überschrift und Beschreibungen sagen jetzt, dass die Versorgungsdichte gerechnet ist.
 - **Offene Fragen auch bei Wien:** Die Seiten zu Wien (Land, VR 91–93) zeigen jetzt den Verweis «Offene Fragen zu

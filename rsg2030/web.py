@@ -1,4 +1,7 @@
-"""Webseite zur Tabelle Versorgungsdichte bauen: `data.json` und die Dateien aus `web/` → `daten_ergebnis/web/`.
+"""Webseite zur Tabelle Versorgungsdichte bauen: `data.json` und die Dateien aus `web/` → `daten_ergebnis/web/matrix/`.
+
+Das Dashboard liegt unter `/matrix/`; die Startseite (`/`) ist das Verzeichnis der Lesefassung. Icon und Schriften
+liegen an der Wurzel, beide Darstellungen nutzen sie (docs/WEB.md, «Adressen»).
 
 Die Seite stellt die Tabelle mit Lesehilfen dar (docs/WEB.md); die Werte übernimmt sie unverändert aus
 `RSG_2030_Versorgungsdichte.csv`. Gelesen wird die Tabelle in `daten_ergebnis/` – lokal nach `python -m rsg2030 versorgungsdichte`, im Workflow
@@ -41,11 +44,22 @@ from rsg2030.schema import QUELLEN, massgeblicher_block, matrix_long
 log = logging.getLogger(__name__)
 
 ICONS = ("favicon.ico", "icon.svg", "apple-touch-icon.png")
-"""Das Icon der Website, neben `index.html`: Die Seiten laden nichts von fremden Servern. Kopien vom Herausgeber; ändert
-sich das Zeichen dort, hier von Hand ersetzen."""
+"""Das Icon der Website, an der Wurzel: Die Seiten laden nichts von fremden Servern, und Google sucht es dort. Kopien
+vom Herausgeber; ändert sich das Zeichen dort, hier von Hand ersetzen."""
 
-SEITE = ("index.html", "app.js", "style.css", "fonts", *ICONS)
-"""Dateien und Ordner aus `web/`, die zur Seite gehören (die CSV-Dateien dort sind Eingaben für `data.json`)."""
+MATRIX = "matrix/"
+"""Adresse des Dashboards unter der Wurzel. Bis November 2026 lag es auf der Wurzel selbst; alte Links mit
+`?region=…` leitet die Startseite hierher weiter (`lesefassung.WEITERLEITUNG_MATRIX`)."""
+
+DASHBOARD = ("index.html", "app.js", "style.css")
+"""Dateien aus `web/`, die nach `matrix/` gehen, dazu `data.json` (die CSV-Dateien in `web/` sind Eingaben dafür)."""
+
+GETEILT = ("fonts", *ICONS)
+"""Dateien und Ordner aus `web/` an der Wurzel: Dashboard und Lesefassung nutzen sie beide."""
+
+FRUEHER_AN_DER_WURZEL = ("app.js", "style.css", "data.json")
+"""Lagen bis November 2026 an der Wurzel; ein Bau in einen alten Ordner räumt sie weg. Nicht `index.html`: Die
+Wurzel gehört jetzt der Lesefassung."""
 
 SPALTEN = [
     "Land", "Ebene", "Region_ID", "Abschnitt", "Jahr", "Zeile_ID", "Fach", "AAVE", "Zuschnitt", "Bevoelkerung",
@@ -479,26 +493,34 @@ def baue_seite(tabelle_csv: Path, long_csv: Path, ziel: Path) -> Path:
         lade_regeln(),
         meta,
     )
-    # Nur die eigenen Dateien ersetzen, nicht das ganze Verzeichnis: Dort liegt auch die Lesefassung
-    # (`python -m rsg2030 lesefassung`), und die soll ein Lauf von «web» nicht mitnehmen.
-    ziel.mkdir(parents=True, exist_ok=True)
-    for name in (*SEITE, "data.json"):
-        vorhanden = ziel / name
-        if vorhanden.is_dir():
-            shutil.rmtree(vorhanden)
-        elif vorhanden.exists():
-            vorhanden.unlink()
-    for name in SEITE:
-        quelle = web_dir() / name
-        if quelle.is_dir():
-            shutil.copytree(quelle, ziel / name)
-        else:
-            shutil.copyfile(quelle, ziel / name)
-    pfad = ziel / "data.json"
+    pfad = lege_dateien_ab(ziel) / "data.json"
     pfad.write_text(
         json.dumps(daten, ensure_ascii=False, separators=(",", ":"), allow_nan=False) + "\n", encoding="utf-8"
     )
     return pfad
+
+
+def lege_dateien_ab(ziel: Path) -> Path:
+    """Die Dateien des Dashboards nach `ziel/matrix/`, Icon und Schriften an die Wurzel; gibt `ziel/matrix/` zurück.
+
+    Nur die eigenen Dateien ersetzen, nicht das ganze Verzeichnis: Dort liegt auch die Lesefassung
+    (`python -m rsg2030 lesefassung`), samt der Startseite, und die soll ein Lauf von «web» nicht mitnehmen – auch
+    nicht, wenn er nach ihr läuft."""
+    ziel.mkdir(parents=True, exist_ok=True)
+    matrix = ziel / MATRIX
+    for vorhanden in (matrix, *(ziel / n for n in (*GETEILT, *FRUEHER_AN_DER_WURZEL))):
+        if vorhanden.is_dir():
+            shutil.rmtree(vorhanden)
+        elif vorhanden.exists():
+            vorhanden.unlink()
+    matrix.mkdir()
+    for name, nach in [*((n, matrix) for n in DASHBOARD), *((n, ziel) for n in GETEILT)]:
+        quelle = web_dir() / name
+        if quelle.is_dir():
+            shutil.copytree(quelle, nach / name)
+        else:
+            shutil.copyfile(quelle, nach / name)
+    return matrix
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -520,7 +542,8 @@ def main(argv: list[str] | None = None) -> int:
     except (ValueError, KeyError, FileNotFoundError) as e:
         log.error(f"❌ Seite nicht gebaut: {e}")
         return 1
-    log.info(f"Seite gebaut: {daten.parent} (Ansehen: python -m http.server -d {daten.parent})")
+    # Ansehen von der Wurzel aus: Icon und Schriften liegen dort, nicht in matrix/
+    log.info(f"Seite gebaut: {daten.parent} (Ansehen: python -m http.server -d {ziel_dir()}, dann /{MATRIX})")
     schreibe_laufprotokoll(ausgabe_dir(), "web", [daten], {"Tabelle": tabelle.name, "Matrizen": long.name})
     return 0
 

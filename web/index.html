@@ -7,20 +7,20 @@
 <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
 <title>RSG-2030-Daten: Ambulante Versorgungsdichte als interaktive Matrix</title>
 <meta name="description" content="ÄAVE der Sachleistung aus den Planungsmatrizen der RSG-2030-Verordnungen je 100.000 Einwohner:innen, je Versorgungsregion und Fach, verglichen mit dem Versorgungsdichte-Soll-Intervall des ÖSG.">
-<!-- Eine Adresse für die Suche: Die Lesefassung verlinkt hierher mit ?region=…&fach=…, die alte Adresse auf
-     github.io leitet um – beides ist dieselbe Seite (docs/WEB.md, «Zwei Wege») -->
-<link rel="canonical" href="https://rsg.loesungswerk.at/">
-<!-- Icon, Name der Website und Vorschau beim Teilen: Google liest Icon und Namen nur von der Startseite
-     (docs/WEB.md, «Kopf für Suche und Vorschau»). Dieselben Angaben wie in darstellung.py; ein Test vergleicht sie. -->
-<link rel="icon" href="favicon.ico" sizes="48x48">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<!-- Eine Adresse für die Suche: Die Lesefassung verlinkt hierher mit ?region=…&fach=…, das ist dieselbe Seite
+     (docs/WEB.md, «Zwei Wege»). Das Dashboard liegt unter /matrix/, die Startseite ist das Verzeichnis -->
+<link rel="canonical" href="https://rsg.loesungswerk.at/matrix/">
+<!-- Icon, Name der Website und Vorschau beim Teilen, wie auf jeder Seite der Lesefassung; das Icon liegt an der
+     Wurzel (docs/WEB.md, «Kopf für Suche und Vorschau»). Dieselben Angaben wie in darstellung.py; ein Test vergleicht sie. -->
+<link rel="icon" href="../favicon.ico" sizes="48x48">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
 <meta property="og:locale" content="de_AT">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="RSG-2030-Daten">
 <meta property="og:title" content="RSG-2030-Daten: Ambulante Versorgungsdichte als interaktive Matrix">
 <meta property="og:description" content="ÄAVE der Sachleistung aus den Planungsmatrizen der RSG-2030-Verordnungen je 100.000 Einwohner:innen, je Versorgungsregion und Fach, verglichen mit dem Versorgungsdichte-Soll-Intervall des ÖSG.">
-<meta property="og:url" content="https://rsg.loesungswerk.at/">
+<meta property="og:url" content="https://rsg.loesungswerk.at/matrix/">
 <meta property="og:image" content="https://loesungswerk.at/assets/rsg-2030-og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -92,13 +92,13 @@
   <!-- Der Absatz steht fest im HTML, app.js setzt den übrigen Text davor: So finden auch Crawler ohne JavaScript die
        Lesefassung (docs/WEB.md, «Zwei Wege») -->
   <section class="panel about" id="about" aria-labelledby="h-about">
-    <p><b>Nachschlagen:</b> <a href="daten/">jede Region und jedes Fach als Tabelle</a>, mit den Sachleistungsstellen PLAN 2030.</p>
+    <p><b>Nachschlagen:</b> <a href="../">jede Region und jedes Fach als Tabelle</a>, mit den Sachleistungsstellen PLAN 2030.</p>
   </section>
 
   <footer id="footer"></footer>
 </div>
 <div class="tip" id="tip" hidden></div>
-<noscript><p style="padding:16px">Diese Seite braucht JavaScript. <a href="daten/">Regionen und Fächer zum Nachschlagen</a> gehen ohne, die Daten gibt es auch als CSV-Datei beim Release des Repositorys.</p></noscript>
+<noscript><p style="padding:16px">Diese Seite braucht JavaScript. <a href="../">Regionen und Fächer zum Nachschlagen</a> gehen ohne, die Daten gibt es auch als CSV-Datei beim Release des Repositorys.</p></noscript>
 <script src="app.js"></script>
 </body>
 </html>

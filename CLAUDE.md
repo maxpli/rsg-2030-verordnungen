@@ -101,7 +101,7 @@ rsg2030/              der Datensatz; __main__.py ruft die main() der Module auf
   web.py                «web»: Tabellen Versorgungsdichte und Planungsmatrizen (Herkunft je Wert) → data.json +
                           Seite aus web/ (nur bei passenden Prüfsummen)
   darstellung.py        gemeinsame Schicht für Dashboard und Lesefassung: Satz, Vorbehalte, Rundung (lesbar), Fußzeile
-  lesefassung.py        «lesefassung»: 59 statische Seiten, Sitemap, robots.txt, JSON-LD (Dataset nur auf /daten/)
+  lesefassung.py        «lesefassung»: 59 statische Seiten, Sitemap, robots.txt, JSON-LD (Dataset nur auf der Startseite /), Weiterleitung /daten/
   eingaben/2026/        von Hand gepflegte Eingaben: seiten, korrekturen, bekannte_abweichungen, manuell.xlsx, fussnoten.csv, zweitlesung/, freigabe.xlsx
 tests/                pytest; Fixture `pipeline` = baue_pipeline() einmal je Testlauf
 web/                  Webseite (kein Python): index.html, app.js, style.css, Icon-Dateien, kacheln.csv, faecher.csv, fonts/,

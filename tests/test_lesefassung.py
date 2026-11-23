@@ -18,20 +18,25 @@ import pytest
 from conftest import ROOT
 
 from rsg2030.config import VERSORGUNGSDICHTE_DATEI, ausgabe_dir
-from rsg2030.darstellung import VORBEHALTE, VORSCHAU_BILD, icon_links, lesbar, zahl
+from rsg2030.darstellung import SEITENNAME, VORBEHALTE, VORSCHAU_BILD, icon_links, lesbar, zahl
 from rsg2030.lesefassung import (
     LAND_SLUG,
+    START,
+    UMGEZOGEN,
     VERBOTEN,
+    WEITERLEITUNG_MATRIX,
     Aufbau,
     _anker,
     _dokument,
     _kennungen,
+    _weiterleitung,
     offene_fragen_ueberschrift,
     release_datum,
     seite_fach,
     seite_index,
     seite_region,
 )
+from rsg2030.web import MATRIX
 
 BASIS = "https://beispiel.invalid/rsg"
 
@@ -56,19 +61,59 @@ pytestmark = pytest.mark.slow
 
 
 def test_umfang(seiten):
-    """9 Bundesländer, 32 Versorgungsregionen, 17 Fächer, eine Indexseite – mehr nicht, weniger nicht."""
+    """9 Bundesländer, 32 Versorgungsregionen, 17 Fächer, eine Startseite – mehr nicht, weniger nicht."""
     assert sum(1 for p in seiten if p.startswith("bl/")) == 9
     assert sum(1 for p in seiten if p.startswith("vr/")) == 32
     assert sum(1 for p in seiten if p.startswith("fach/")) == 17
-    assert "daten/" in seiten
+    assert START == "" and START in seiten
     assert len(seiten) == 59
 
 
 def test_adressen_bleiben_nummern_und_kuerzel(seiten):
-    """Eine Adresse kann nicht umziehen (GitHub Pages kann nicht umleiten): keine Namen, keine Umlaute."""
+    """Eine Adresse soll nicht umziehen (GitHub Pages kann nicht per Server umleiten): keine Namen, keine Umlaute."""
     for pfad in seiten:
-        assert re.fullmatch(r"(daten|bl/[a-z]+|vr/\d{2}|fach/[A-Z/]+)/", pfad), pfad
+        assert pfad == START or re.fullmatch(r"(bl/[a-z]+|vr/\d{2}|fach/[A-Z/]+)/", pfad), pfad
     assert set(LAND_SLUG.values()) == {p.split("/")[1] for p in seiten if p.startswith("bl/")}
+
+
+def test_alte_adressen_leiten_weiter(seiten, aufbau):
+    """Umgezogene Seiten (`UMGEZOGEN`) bleiben als Weiterleitung stehen: sofort, ohne Skript, mit `canonical` auf die
+    neue Adresse. Keine Seite verlinkt mehr eine alte Adresse (docs/WEB.md, «Adressen»)."""
+    assert UMGEZOGEN == {"daten/": START}
+    for alt, neu in UMGEZOGEN.items():
+        assert alt not in seiten and neu in seiten
+        html = _weiterleitung(aufbau, alt, neu)
+        ziel = aufbau.link(alt, neu)
+        assert ziel == "../"
+        assert f'<meta http-equiv="refresh" content="0; url={ziel}">' in html
+        assert f'<link rel="canonical" href="{BASIS}/{neu}">' in html
+        assert f'<a href="{ziel}">' in html and "<script" not in html
+        for pfad, seite in seiten.items():
+            assert not re.search(rf'href="(?:\.\./)*{re.escape(alt)}', seite), (pfad, alt)
+            assert f"{BASIS}/{alt}" not in seite, (pfad, alt)
+
+
+def test_startseite_leitet_alte_links_aufs_dashboard_weiter(seiten):
+    """Bis November 2026 lag das Dashboard auf der Wurzel; Links mit ?region=… führen weiter in die Matrix. Das
+    einzige Skript der Lesefassung, nur auf der Startseite, und es kennt genau die Angaben, die app.js liest."""
+    assert seiten[START].count(WEITERLEITUNG_MATRIX) == 1
+    kopf = seiten[START][: seiten[START].index("</head>")]
+    assert WEITERLEITUNG_MATRIX in kopf
+    assert f'location.replace("{MATRIX}" + location.search)' in WEITERLEITUNG_MATRIX
+    js = (ROOT / "web" / "app.js").read_text(encoding="utf-8")
+    gelesen = set(re.findall(r'q\.get\("([a-z]+)"\)', js))
+    weitergeleitet = re.search(r"\[\?&\]\(([a-z|]+)\)=", WEITERLEITUNG_MATRIX)
+    assert gelesen and weitergeleitet and set(weitergeleitet[1].split("|")) == gelesen
+    for pfad, html in seiten.items():
+        if pfad != START:
+            assert WEITERLEITUNG_MATRIX not in html, pfad
+
+
+def test_startseite_traegt_den_namen_der_website(seiten):
+    """Google liest Name und Icon der Website nur von der Startseite (docs/WEB.md, «Kopf für Suche und Vorschau»)."""
+    site = next(k for k in _ld_bloecke(seiten[START]) if k["@type"] == "WebSite")
+    assert site["url"] == f"{BASIS}/" and site["name"] == SEITENNAME
+    assert icon_links("") in seiten[START]
 
 
 def test_jede_seite_hat_titel_h1_und_canonical(seiten):
@@ -82,10 +127,11 @@ def test_jede_seite_hat_titel_h1_und_canonical(seiten):
 
 
 def test_kein_javascript_und_nichts_von_fremden_servern(seiten):
-    """Der ganze Zweck ist reiner Text; und die Seiten geben nichts an Dritte weiter."""
+    """Der ganze Zweck ist reiner Text; und die Seiten geben nichts an Dritte weiter. Einzige Ausnahme: die
+    Weiterleitung alter Dashboard-Links auf der Startseite (eigener Test)."""
     for pfad, html in seiten.items():
         ohne_jsonld = re.sub(r'<script type="application/ld\+json">.*?</script>', "", html, flags=re.S)
-        assert "<script" not in ohne_jsonld, pfad
+        assert "<script" not in ohne_jsonld.replace(WEITERLEITUNG_MATRIX, ""), pfad
         assert "onclick" not in html and "javascript:" not in html, pfad
         fremde = [
             u
@@ -105,27 +151,34 @@ def test_kein_javascript_und_nichts_von_fremden_servern(seiten):
             assert "target=" not in rest, (pfad, url)
 
 
-def test_jede_seite_ist_von_der_indexseite_erreichbar(seiten):
-    """Ohne Verlinkung findet ein Crawler die Unterseiten nur über die Sitemap – beides soll stimmen."""
-    index = seiten["daten/"]
+def test_jede_seite_ist_von_der_startseite_erreichbar(seiten):
+    """Ohne Verlinkung findet ein Crawler die Unterseiten nur über die Sitemap – beides soll stimmen. Von der
+    Startseite, auf die die Links von außen zeigen, ist jede Seite einen Klick entfernt."""
+    start = seiten[START]
     for pfad in seiten:
-        if pfad == "daten/":
+        if pfad == START:
             continue
-        assert f'href="../{pfad}"' in index, pfad
+        assert f'href="{pfad}"' in start, pfad
 
 
 def test_brotkrumen_und_beide_wege(seiten, aufbau):
-    """Jede Seite zeigt, wo sie steht, und führt in beide Richtungen: nachschlagen und vergleichen."""
+    """Jede Seite zeigt, wo sie steht, und führt in beide Richtungen: nachschlagen (die Startseite) und vergleichen
+    (das Dashboard unter /matrix/, vorbelegt)."""
     for pfad, html in seiten.items():
         assert '<nav class="bereiche"' in html, pfad
         assert "Nachschlagen: Regionen und Fächer" in html and "Vergleichen: interaktive Matrix" in html, pfad
-        if pfad == "daten/":
+        hoch = aufbau.hoch(pfad)
+        assert f'<a href="{hoch or "./"}"' in html, pfad
+        assert f'<a href="{hoch}{MATRIX}' in html, pfad
+        if pfad == START:
             continue
         assert '<nav class="pfad"' in html and '"@type":"BreadcrumbList"' in html, pfad
+        glieder = next(k for k in _ld_bloecke(html) if k["@type"] == "BreadcrumbList")["itemListElement"]
+        assert glieder[0]["item"] == f"{BASIS}/" and glieder[-1]["item"] == f"{BASIS}/{pfad}", pfad
     for r in aufbau.regionen:
-        assert f'?region={r["slug"]}"' in seiten[aufbau.pfad(r)], r["id"]
+        assert f'{MATRIX}?region={r["slug"]}"' in seiten[aufbau.pfad(r)], r["id"]
     for f in aufbau.faecher:
-        assert f'?fach={f["id"]}"' in seiten[f"fach/{f['id']}/"], f["id"]
+        assert f'{MATRIX}?fach={f["id"]}"' in seiten[f"fach/{f['id']}/"], f["id"]
 
 
 def test_jeder_vorbehalt_steht_einmal_bei_der_tabelle(seiten, aufbau):
@@ -380,7 +433,7 @@ def test_jede_seite_sagt_dass_die_vd_gerechnet_ist(seiten):
     for pfad, html in seiten.items():
         assert html.count("Die VD steht nicht in der Verordnung. Sie ist gerechnet") >= 1, pfad
         assert "Statistik Austria und ÖROK" in html, pfad
-    assert "zu jeder Zahl" not in seiten["daten/"]
+    assert "zu jeder Zahl" not in seiten[START]
 
 
 def test_jede_seite_hat_icon_und_vorschau(seiten):
@@ -396,7 +449,7 @@ def test_jede_seite_hat_icon_und_vorschau(seiten):
         assert titel[1].count("2030") == 1 and "|" not in titel[1], pfad
         assert "<title>Versorgungsdichte und Planstellen " in html and " | RSG-2030-Daten</title>" in html, pfad
     for pfad, soll in {
-        "daten/": "RSG-2030-Daten: Versorgungsdichte und Planstellen je Region und Fach",
+        START: "RSG-2030-Daten: Versorgungsdichte und Planstellen je Region und Fach",
         "bl/burgenland/": "RSG-2030-Daten: Burgenland",
         "vr/12/": "RSG-2030-Daten: Burgenland-Süd (VR 12)",
         "fach/ZMK/": "RSG-2030-Daten: Zahn-, Mund- und Kieferheilkunde (inkl. KFO)",
@@ -407,7 +460,7 @@ def test_jede_seite_hat_icon_und_vorschau(seiten):
 def test_beschreibung_sagt_dass_die_vd_gerechnet_ist(seiten):
     """Google zeigt die Beschreibung ohne die Lesehilfe: Auch dort darf die VD nicht als Inhalt der Verordnung stehen."""
     for pfad, html in seiten.items():
-        if pfad.startswith(("bl/", "vr/", "daten/")):
+        if pfad == START or pfad.startswith(("bl/", "vr/")):
             assert re.search(r'<meta name="description" content="[^"]*daraus gerechnet', html), pfad
 
 
@@ -510,15 +563,17 @@ def _ld_bloecke(html: str) -> list[dict]:
 
 
 def test_genau_ein_dataset_eintrag(seiten):
-    """Ein Dataset für den ganzen Datensatz, auf /daten/ (docs/WEB.md, «Strukturierte Daten»). Die anderen Seiten
-    zeigen einen Ausschnitt daraus (`isBasedOn`), ihr Hauptthema ist nicht der Datensatz (kein `mainEntity`)."""
-    dataset_id = f"{BASIS}/daten/#dataset"
+    """Ein Dataset für den ganzen Datensatz, auf der Startseite (docs/WEB.md, «Strukturierte Daten»). Die anderen
+    Seiten zeigen einen Ausschnitt daraus (`isBasedOn`), ihr Hauptthema ist nicht der Datensatz (kein `mainEntity`)."""
+    dataset_id = f"{BASIS}/#dataset"
     mit = [p for p, h in seiten.items() if any(k["@type"] == "Dataset" for k in _ld_bloecke(h))]
-    assert mit == ["daten/"], mit
+    assert mit == [START], mit
+    ds = next(k for k in _ld_bloecke(seiten[START]) if k["@type"] == "Dataset")
+    assert ds["@id"] == dataset_id and ds["url"] == f"{BASIS}/"
     for pfad, html in seiten.items():
         seite = next(k for k in _ld_bloecke(html) if k["@type"] == "WebPage")
         assert seite["isPartOf"] == {"@id": f"{BASIS}/#website"}, pfad
-        if pfad == "daten/":
+        if pfad == START:
             assert seite["mainEntity"] == {"@id": dataset_id}
         else:
             assert seite["isBasedOn"] == {"@id": dataset_id} and "mainEntity" not in seite, pfad
@@ -537,7 +592,7 @@ def test_dataset_vollstaendig_und_downloads_im_release(seiten):
     """Was Google Dataset Search braucht, und jeder Download liegt wirklich im Release – release.yml hängt ihn an."""
     from rsg2030.lesefassung import PERSON, RELEASE_DATEIEN
 
-    ds = next(k for k in _ld_bloecke(seiten["daten/"]) if k["@type"] == "Dataset")
+    ds = next(k for k in _ld_bloecke(seiten[START]) if k["@type"] == "Dataset")
     for feld in ("name", "description", "license", "creator", "version", "variableMeasured", "distribution"):
         assert ds.get(feld), feld
     assert len(ds["description"]) >= 50
@@ -552,17 +607,37 @@ def test_dataset_vollstaendig_und_downloads_im_release(seiten):
 
 
 def test_sitemap_enthaelt_jede_seite():
-    """Gebaute Sitemap gegen die gebauten Seiten – der Bau schreibt beide."""
+    """Gebaute Sitemap gegen die gebauten Seiten – der Bau schreibt beide. Nicht hinein gehören das Dashboard (eigene
+    Adresse, Inhalt erst im Browser) und die Weiterleitungen alter Adressen."""
     ziel: Path = ausgabe_dir() / "web"
     if not (ziel / "sitemap.xml").is_file():
         pytest.skip("Lesefassung nicht gebaut (python -m rsg2030 lesefassung)")
     xml = (ziel / "sitemap.xml").read_text(encoding="utf-8")
-    seiten_auf_platte = sorted(
-        str(p.parent.relative_to(ziel)).replace("\\", "/") + "/" for p in ziel.rglob("index.html") if p.parent != ziel
-    )
+    nicht = {MATRIX, *UMGEZOGEN}
+    auf_platte = [p.parent.relative_to(ziel).as_posix() for p in ziel.rglob("index.html")]
+    seiten_auf_platte = sorted(f"{p}/" if p != "." else START for p in auf_platte)
+    seiten_auf_platte = [p for p in seiten_auf_platte if p not in nicht]
+    assert START in seiten_auf_platte
+    from rsg2030.lesefassung import BASIS_STANDARD  # so baut der Workflow
+
     for pfad in seiten_auf_platte:
-        assert f"/{pfad}</loc>" in xml, pfad
+        assert f"<loc>{BASIS_STANDARD}/{pfad}</loc>" in xml, pfad
     assert xml.count("<url>") == len(seiten_auf_platte)
+    for p in nicht:
+        assert not re.search(rf"/{re.escape(p)}</loc>", xml), p
+
+
+def test_gebaute_weiterleitungen_und_dashboard():
+    """Im gebauten Ordner: unter jeder alten Adresse die Weiterleitung, das Dashboard unter /matrix/ mit seinen
+    Daten, die Startseite von der Lesefassung (nicht das Dashboard von früher)."""
+    ziel: Path = ausgabe_dir() / "web"
+    if not (ziel / "sitemap.xml").is_file() or not (ziel / MATRIX / "data.json").is_file():
+        pytest.skip("Seite nicht gebaut (python -m rsg2030 web, dann python -m rsg2030 lesefassung)")
+    for alt in UMGEZOGEN:
+        assert 'http-equiv="refresh"' in (ziel / alt / "index.html").read_text(encoding="utf-8"), alt
+    assert 'id="mx"' in (ziel / MATRIX / "index.html").read_text(encoding="utf-8")
+    start = (ziel / "index.html").read_text(encoding="utf-8")
+    assert WEITERLEITUNG_MATRIX in start and 'id="mx"' not in start
 
 
 def test_robots_nennt_die_sitemap():

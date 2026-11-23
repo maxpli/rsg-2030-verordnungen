@@ -26,8 +26,9 @@ auch selbst ([Selbst erzeugen](#selbst-erzeugen)) und sieht am Ende, ob das Erge
 veröffentlichten Version entspricht.
 
 **Zum Nachsehen im Browser:** [Webseite zur Tabelle Versorgungsdichte](https://rsg.loesungswerk.at/)
-– je Versorgungsregion und Fach, ob die Sachleistung unter, im oder über dem Soll-Intervall liegt, mit den Daten des
-aktuellen Release ([docs/WEB.md](docs/WEB.md)).
+– je Versorgungsregion und Fach, ob die Sachleistung unter, im oder über dem Soll-Intervall liegt, als Tabellen und
+als [interaktive Matrix](https://rsg.loesungswerk.at/matrix/), mit den Daten des aktuellen Release
+([docs/WEB.md](docs/WEB.md)).
 
 [Was herauskommt](#was-herauskommt) · [Selbst erzeugen](#selbst-erzeugen) ·
 [Wie die Daten abgesichert sind](#wie-die-daten-abgesichert-sind) · [Fehler gefunden?](#fehler-gefunden-fragen) ·
@@ -38,9 +39,9 @@ aktuellen Release ([docs/WEB.md](docs/WEB.md)).
 ## Zahlen nachsehen
 
 Alle Werte stehen als Seiten zum Nachsehen und Verlinken bereit:
-[**alle 32 Versorgungsregionen und 17 Fächer auf einer Seite**](https://rsg.loesungswerk.at/daten/),
+[**alle 32 Versorgungsregionen und 17 Fächer auf einer Seite**](https://rsg.loesungswerk.at/),
 dazu eine eigene Seite je Fach und je Bundesland und Versorgungsregion, dort mit Herkunft und Korrekturen –
-und das [interaktive Dashboard](https://rsg.loesungswerk.at/) zum Vergleichen. Bitte vorher die
+und das [interaktive Dashboard](https://rsg.loesungswerk.at/matrix/) zum Vergleichen. Bitte vorher die
 [Fallstricke](docs/DATEN.md#fallstricke) lesen: Gezählt ist nur die Sachleistung, ohne Wahlärzt:innen.
 
 ## Was herauskommt

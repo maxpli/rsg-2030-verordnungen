@@ -5,13 +5,18 @@ Suchmaschinen und Abrufsysteme unerreichbar (oft Bildseiten, immer Querformat), 
 erst im Browser. Hier steht jede Zahl als Text im HTML. Was es nirgends sonst gibt, ist nicht die Abschrift, sondern
 der Vergleich: Versorgungsdichte, Lage zum Soll-Intervall des ÖSG, Position und ÄAVE-Abstand.
 
-Gebaut werden (Adressen sind endgültig, GitHub Pages kann nicht umleiten – deshalb Nummern und Kürzel, keine Namen):
+Gebaut werden (Adressen sind endgültig, GitHub Pages kann nicht per Server umleiten – deshalb Nummern und Kürzel,
+keine Namen):
 
-    /daten/        Einstieg: Verzeichnis der Regionen und Fächer, Downloads; alle Zeilen «insgesamt» zugeklappt
+    /              Startseite: Verzeichnis der Regionen und Fächer, Downloads, Datensatz; alle Zeilen «insgesamt»
+                   zugeklappt
     /bl/<kurz>/    9 Bundesländer
     /vr/<nr>/      32 Versorgungsregionen
     /fach/<id>/    17 Fächer (dieselbe Tabelle gekippt)
+    /daten/        bis November 2026 die Startseite; leitet auf / weiter (`UMGEZOGEN`)
     /sitemap.xml   alle Seiten
+
+Das Dashboard (`rsg2030.web`) liegt daneben unter /matrix/.
 
 Dieselben Darstellungsregeln wie das Dashboard, aus derselben Schicht: Satz in Worten und Vorbehalte kommen aus
 `rsg2030.darstellung`, die Werte und ihre Herkunft aus `rsg2030.web.baue_daten` – also aus genau dem, was auch
@@ -55,7 +60,7 @@ from rsg2030.fussnoten import MIT_VERWEIS
 from rsg2030.korrekturen import lade_regeln
 from rsg2030.protokoll import einrichten, schreibe_laufprotokoll
 from rsg2030.quellen import lade_quellen, ogd_pdf_url
-from rsg2030.web import ICONS, LAND_SLUG, baue_daten, repo_url, seiten_commit, web_dir
+from rsg2030.web import ICONS, LAND_SLUG, MATRIX, baue_daten, repo_url, seiten_commit, web_dir
 
 log = logging.getLogger(__name__)
 
@@ -63,6 +68,25 @@ BASIS_STANDARD = "https://rsg.loesungswerk.at"
 """Adresse, unter der die Seiten liegen – für `canonical`, Sitemap und `robots.txt`. GitHub Pages leitet
 `maxpli.github.io/rsg-2030-verordnungen/` auf diese Domain um. Bei einem Umzug nur hier und im Aufruf (`--basis`)
 ändern; die Pfade bleiben."""
+
+START = ""
+"""Pfad der Startseite: die Wurzel. Bis November 2026 lag das Verzeichnis unter `daten/` und auf der Wurzel das
+Dashboard. Umgezogen, damit Links auf die Domain auf der Seite landen, die alle anderen verlinkt und Text trägt
+(docs/WEB.md, «Adressen»)."""
+
+UMGEZOGEN = {"daten/": START}
+"""Alte Adresse → neue. Unter der alten bleibt eine Seite, die sofort weiterleitet (`_weiterleitung`): GitHub Pages
+kann nicht per Server umleiten, und eine Weiterleitung per `<meta http-equiv="refresh">` ohne Wartezeit wertet Google
+wie eine dauerhafte."""
+
+WEITERLEITUNG_MATRIX = (
+    "<script>"
+    f'if (/[?&](region|fach|abschnitt)=/.test(location.search)) location.replace("{MATRIX}" + location.search);'
+    "</script>"
+)
+"""Das einzige Skript der Lesefassung, nur auf der Startseite: Bis November 2026 lag dort das Dashboard, und die
+Seiten verlinkten es mit `?region=…`, `?fach=…`, `?abschnitt=…` (die Angaben, die `app.js` liest). Solche Links
+führen weiter in die Matrix; ohne diese Angaben bleibt die Startseite, wie sie ist."""
 
 OESG_TEXTBAND = "oesg/SPG_AT_OSG_G_20261009_8_2026.pdf"
 """Der ÖSG-Textband in `quellen.csv`; aus seiner Zeile kommt die Adresse beim RIS. Bei einem neuen ÖSG hier tauschen."""
@@ -122,8 +146,9 @@ class Seite:
     rumpf: str
     dashboard: str = ""
     """Abfrageteil für den Link auf das Dashboard, z. B. «?region=41» – vorbelegter Zustand statt Standardansicht."""
-    pfadleiste: tuple[tuple[str, str], ...] = ()
-    """Brotkrumen: (Name, Pfad ab der Wurzel); der letzte Eintrag ist die Seite selbst, mit leerem Pfad."""
+    pfadleiste: tuple[tuple[str, str | None], ...] = ()
+    """Brotkrumen: (Name, Pfad ab der Wurzel – die Startseite ist `START`, also leer); der letzte Eintrag ist die
+    Seite selbst, mit None."""
     thema: str = field(kw_only=True)
     """Worum es geht, für den Titel beim Teilen: «RSG 2030: <thema>» (docs/WEB.md, «Kopf für Suche und Vorschau»)."""
 
@@ -256,6 +281,11 @@ class Aufbau:
         """Weg von dieser Seite zur Wurzel («../../» für «vr/41/»); ohne absolute Pfade läuft die Seite auch
         lokal und unter einem Unterordner wie auf GitHub Pages."""
         return "../" * len([t for t in pfad.strip("/").split("/") if t])
+
+    def link(self, von: str, nach: str) -> str:
+        """Relativer Link von einer Seite auf eine andere (beide als Pfad ab der Wurzel). Von der Startseite auf sich
+        selbst «./»: Ein leeres `href` wäre zwar dieselbe Seite, sieht im HTML aber wie ein vergessener Link aus."""
+        return f"{self.hoch(von)}{nach}" or "./"
 
     def stil(self, pfad: str) -> str:
         return f"{self.hoch(pfad)}lesefassung.css"
@@ -602,10 +632,10 @@ def _website(a: Aufbau) -> dict[str, object]:
 
 
 def _webpage(a: Aufbau, s: Seite) -> str:
-    """Jede Seite ist Teil der Website. `/daten/` beschreibt den Datensatz (`mainEntity`); die anderen Seiten zeigen
-    einen Ausschnitt daraus (`isBasedOn`) – ihr Thema ist eine Region, ein Land oder ein Fach, nicht der ganze
+    """Jede Seite ist Teil der Website. Die Startseite beschreibt den Datensatz (`mainEntity`); die anderen Seiten
+    zeigen einen Ausschnitt daraus (`isBasedOn`) – ihr Thema ist eine Region, ein Land oder ein Fach, nicht der ganze
     Datensatz (docs/WEB.md, «Strukturierte Daten»)."""
-    dataset = {"@id": f"{a.basis}/daten/#dataset"}
+    dataset = {"@id": f"{a.basis}/{START}#dataset"}
     seite: dict[str, object] = {
         "@type": "WebPage",
         "@id": f"{a.basis}/{s.pfad}#webpage",
@@ -616,7 +646,7 @@ def _webpage(a: Aufbau, s: Seite) -> str:
         "isPartOf": {"@id": f"{a.basis}/#website"},
         "license": "https://creativecommons.org/licenses/by/4.0/",
     }
-    if s.pfad == "daten/":
+    if s.pfad == START:
         seite["mainEntity"] = dataset
     else:
         seite["isBasedOn"] = dataset
@@ -632,7 +662,7 @@ def _dataset(a: Aufbau) -> str:
     eintrag: dict[str, object] = {
         "@context": "https://schema.org",
         "@type": "Dataset",
-        "@id": f"{a.basis}/daten/#dataset",
+        "@id": f"{a.basis}/{START}#dataset",
         "name": DATENSATZ_NAME,
         "description": (
             "Die Planungsmatrizen der Regionalen Strukturpläne Gesundheit 2030 aller neun österreichischen "
@@ -641,7 +671,7 @@ def _dataset(a: Aufbau) -> str:
             "Versorgungsdichte-Soll-Intervall des ÖSG. Aus den Verordnungstexten im RIS erfasst, jede Zelle bis "
             "zur PDF-Seite nachvollziehbar."
         ),
-        "url": f"{a.basis}/daten/",
+        "url": f"{a.basis}/{START}",
         "sameAs": repo,
         "version": version,
         "license": "https://creativecommons.org/licenses/by/4.0/",
@@ -1012,13 +1042,13 @@ Der ÖSG misst je Versorgungsregion.</p>
         f"{name} ({fid}) in allen 32 Versorgungsregionen: Versorgungsdichte 2030 im Vergleich zum "
         f"Soll-Intervall des ÖSG ({num(f['min'])}–{num(f['max'])} ÄAVE je 100.000)."
     )
-    pfadleiste = (("RSG 2030", "daten/"), ("Fächer", "daten/#faecher"), (name, ""))
+    pfadleiste = (("RSG 2030", START), ("Fächer", f"{START}#faecher"), (name, None))
     return Seite(f"fach/{fid}/", titel, beschreibung, rumpf, f"?fach={fid}", pfadleiste, thema=name)
 
 
 def _urheber(a: Aufbau) -> str:
     """Fußzeile, dieselbe wie im Dashboard (`darstellung.fusszeile`). Die ORCID steht in den strukturierten Daten
-    (`creator`), nicht sichtbar auf jeder Seite; die Methode einmal auf /daten/."""
+    (`creator`), nicht sichtbar auf jeder Seite; die Methode einmal auf der Startseite."""
     meta = a.daten["meta"]
     return fusszeile(str(meta["repo"]), str(meta["version"]), str(meta["commit"]))  # type: ignore[index]
 
@@ -1052,7 +1082,11 @@ def seite_region(a: Aufbau, r: dict[str, object]) -> Seite:
             "(geplant wird je Versorgungsregion, nicht je Bezirk)",
             bevoelkerung,
         ]
-        pfadleiste: tuple[tuple[str, str], ...] = (("RSG 2030", "daten/"), (str(r["land_name"]), land_pfad), (name, ""))
+        pfadleiste: tuple[tuple[str, str | None], ...] = (
+            ("RSG 2030", START),
+            (str(r["land_name"]), land_pfad),
+            (name, None),
+        )
         weiter = [
             f'<a href="{hoch}vr/{v}/">{esc(a.region(v)["name"])}</a>'
             for v in a.vr_des_landes(str(r["land_name"]))
@@ -1066,7 +1100,7 @@ def seite_region(a: Aufbau, r: dict[str, object]) -> Seite:
         vr = a.vr_des_landes(str(r["land_name"]))
         liste = ", ".join(f'<a href="{hoch}vr/{v}/">{esc(a.region(v)["name"])}</a>' for v in vr)
         eck = [f"Bundesland mit {len(vr)} Versorgungsregionen: {liste}", bevoelkerung]
-        pfadleiste = (("RSG 2030", "daten/"), (name, ""))
+        pfadleiste = (("RSG 2030", START), (name, None))
         verweis = ""
     beschriftung = (
         f"{esc(name)}{esc(nummer)}: Versorgungsdichte der Sachleistung je Fach im IST und im PLAN 2030, Lage zum "
@@ -1098,14 +1132,14 @@ def _pfadleiste(a: Aufbau, s: Seite) -> tuple[str, str]:
     """Brotkrumen als Navigation und als `BreadcrumbList`: wo die Seite steht, und ein Klick zum Land."""
     if not s.pfadleiste:
         return "", ""
-    hoch = a.hoch(s.pfad)
     punkte, glieder = [], []
     for i, (name, ziel) in enumerate(s.pfadleiste, start=1):
-        if ziel:
-            punkte.append(f'<li><a href="{hoch}{esc(ziel)}">{esc(name)}</a></li>')
-        else:
+        if ziel is None:
             punkte.append(f'<li aria-current="page">{esc(name)}</li>')
-        glieder.append({"@type": "ListItem", "position": i, "name": name, "item": f"{a.basis}/{ziel or s.pfad}"})
+            ziel = s.pfad
+        else:
+            punkte.append(f'<li><a href="{esc(a.link(s.pfad, ziel))}">{esc(name)}</a></li>')
+        glieder.append({"@type": "ListItem", "position": i, "name": name, "item": f"{a.basis}/{ziel}"})
     nav = f'<nav class="pfad" aria-label="Pfad"><ol>{"".join(punkte)}</ol></nav>'
     ld = _ld({"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": glieder})
     return nav, ld
@@ -1120,11 +1154,14 @@ def _dokument(a: Aufbau, s: Seite) -> str:
     meta = a.daten["meta"]
     version = esc(meta["version"])  # type: ignore[index]
     hoch = esc(a.hoch(s.pfad))
+    start = esc(a.link(s.pfad, START))
     nav, ld_pfad = _pfadleiste(a, s)
+    # Vor allem anderen im Kopf: Ein alter Link aufs Dashboard soll nicht erst die Startseite zeichnen
+    weiter = f"\n{WEITERLEITUNG_MATRIX}" if s.pfad == START else ""
     return f"""<!doctype html>
 <html lang="de-AT">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8">{weiter}
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="format-detection" content="telephone=no,date=no,address=no">
 <title>{esc(s.titel)}</title>
@@ -1139,10 +1176,10 @@ def _dokument(a: Aufbau, s: Seite) -> str:
 <body>
 <a class="skip" href="#inhalt">Zum Inhalt</a>
 <header class="kopf">
-  <p class="eyebrow"><a href="{hoch}daten/">RSG 2030 – Planungsmatrizen der Verordnungen</a> · Release {version}</p>
+  <p class="eyebrow"><a href="{start}">RSG 2030 – Planungsmatrizen der Verordnungen</a> · Release {version}</p>
   <nav class="bereiche" aria-label="Bereiche">
-    <a href="{hoch}daten/"{' aria-current="page"' if s.pfad == "daten/" else ""}>Nachschlagen: Regionen und Fächer</a>
-    <a href="{hoch}{esc(s.dashboard)}">Vergleichen: interaktive Matrix</a>
+    <a href="{start}"{' aria-current="page"' if s.pfad == START else ""}>Nachschlagen: Regionen und Fächer</a>
+    <a href="{hoch}{MATRIX}{esc(s.dashboard)}">Vergleichen: interaktive Matrix</a>
   </nav>
 </header>
 <main id="inhalt">
@@ -1164,9 +1201,9 @@ def _verzeichnis_regionen(a: Aufbau) -> str:
         if r["ebene"] != "BL":
             continue
         vr = a.vr_des_landes(str(r["land_name"]))
-        punkte = "".join(f'<li><a href="../vr/{esc(v)}/">{esc(a.region(v)["name"])}</a></li>' for v in vr)
+        punkte = "".join(f'<li><a href="vr/{esc(v)}/">{esc(a.region(v)["name"])}</a></li>' for v in vr)
         bloecke.append(
-            f'<section><h3><a href="../bl/{LAND_SLUG[str(r["land"])]}/">{esc(r["land_name"])}</a></h3>'
+            f'<section><h3><a href="bl/{LAND_SLUG[str(r["land"])]}/">{esc(r["land_name"])}</a></h3>'
             f'<ul class="vr-liste">{punkte}</ul></section>'
         )
     return f'<div class="verzeichnis">{"".join(bloecke)}</div>'
@@ -1178,7 +1215,7 @@ def _verzeichnis_faecher(a: Aufbau) -> str:
     for f in a.faecher:
         teil = f" · Teil von {esc(f['teil_von'])}" if f["teil_von"] else ""
         punkte.append(
-            f'<li><a href="../fach/{esc(f["id"])}/">{esc(f["name"])}</a> '
+            f'<li><a href="fach/{esc(f["id"])}/">{esc(f["name"])}</a> '
             f'<span class="t2">{esc(f["id"])} · Soll-Intervall <span class="num">{num(f["min"])}–'
             f"{num(f['max'])}</span>{teil}</span></li>"
         )
@@ -1186,8 +1223,9 @@ def _verzeichnis_faecher(a: Aufbau) -> str:
 
 
 def seite_index(a: Aufbau) -> Seite:
-    """Der Einstieg: wofür der Datensatz da ist, das Verzeichnis der Regionen und Fächer, die Downloads – und am
-    Ende alle Zeilen «insgesamt» in einer Tabelle, zugeklappt.
+    """Die Startseite, an der Wurzel: wofür der Datensatz da ist, das Verzeichnis der Regionen und Fächer, die
+    Downloads – und am Ende alle Zeilen «insgesamt» in einer Tabelle, zugeklappt. Hierher zeigen die Links von außen;
+    von hier ist jede Seite einen Klick entfernt. Die Links gehen deshalb von der Wurzel aus, ohne «../».
 
     Bewusst kein 537-zeiliges Raster als Hauptinhalt: Wer vergleichen will, nimmt das Dashboard, wer rechnen will,
     die CSV. Die große Tabelle steht trotzdem im HTML, zugeklappt: Ein Abrufsystem (Chatbot, Agent) liest meist nur
@@ -1213,8 +1251,8 @@ def seite_index(a: Aufbau) -> Seite:
             if p is None:
                 continue
             zeilen.append(
-                f'<tr><th scope="row"><a href="../vr/{esc(rid)}/">{esc(rid)} {esc(r["name"])}</a></th>'
-                f'<td><a href="../fach/{esc(fid)}/">{esc(fid)}</a></td>'
+                f'<tr><th scope="row"><a href="vr/{esc(rid)}/">{esc(rid)} {esc(r["name"])}</a></th>'
+                f'<td><a href="fach/{esc(fid)}/">{esc(fid)}</a></td>'
                 f'<td class="num">{_vd(a, rid, "PLAN", f)}</td>'
                 f'<td class="num">{num(f["min"])}–{num(f["max"])}</td>'
                 f"{_lage_zelle(p)}"
@@ -1225,7 +1263,9 @@ def seite_index(a: Aufbau) -> Seite:
 <h1>Versorgungsdichte und Planstellen 2030 je Region und Fach</h1>
 <p>Was die Verordnungen zu den Regionalen Strukturplänen Gesundheit (RSG) 2030 für die ambulante ärztliche
 Versorgung festlegen, mit Verordnung und Seite als Beleg, und die daraus gerechnete Versorgungsdichte, je
-Versorgungsregion und Fach. Zum Vergleichen über alle Regionen auf einmal: <a href="../">interaktive Matrix</a>.</p>
+Versorgungsregion und Fach. Zum Vergleichen über alle Regionen auf einmal: <a href="{
+        MATRIX
+    }">interaktive Matrix</a>.</p>
 <p>Gezählt ist nur die Sachleistung, ohne Wahlärzt:innen; was das für den Vergleich mit dem ÖSG heißt, steht unter
 jeder Tabelle.</p>
 <h2 id="regionen">Nach Region</h2>
@@ -1277,7 +1317,7 @@ SVE, Umbuchungen, Fußnoten), stehen auf der Seite der jeweiligen Region.</p>
 {TEILMENGEN_HINWEIS}</div>
 </details>"""
     return Seite(
-        "daten/",
+        START,
         f"Versorgungsdichte und Planstellen 2030 je Region und Fach | {SEITENNAME}",
         "Daten aus den RSG-2030-Verordnungen: die daraus gerechnete Versorgungsdichte je Versorgungsregion und Fach "
         "im Vergleich zum Soll-Intervall des ÖSG, dazu Sachleistungsstellen – maschinenlesbar, mit Quelle je Wert.",
@@ -1297,7 +1337,7 @@ def _quellen_uebersicht(a: Aufbau) -> str:
             continue
         pdf, seite, datei, ris = q
         punkte.append(
-            f'<li><a href="../bl/{LAND_SLUG[str(r["land"])]}/">{esc(r["land_name"])}</a>: '
+            f'<li><a href="bl/{LAND_SLUG[str(r["land"])]}/">{esc(r["land_name"])}</a>: '
             f'<span class="nb">{esc(pdf)}</span>, Seite {seite} '
             f'(<a href="{esc(datei)}#page={seite}" target="_blank" rel="noopener noreferrer">öffnen</a>, '
             f'<a href="{esc(ris)}" target="_blank" rel="noopener noreferrer">RIS</a>)</li>'
@@ -1339,6 +1379,26 @@ def _robots(a: Aufbau) -> str:
     return f"User-agent: *\nAllow: /\n\nSitemap: {a.basis}/sitemap.xml\n"
 
 
+def _weiterleitung(a: Aufbau, alt: str, neu: str) -> str:
+    """Seite unter einer alten Adresse (`UMGEZOGEN`): leitet sofort weiter, ohne Skript. `canonical` nennt die neue
+    Adresse, damit Google beide als eine Seite zählt; der Link ist für alle, deren Browser nicht weiterleitet. Ein
+    Sprungziel (`#faecher`) geht dabei verloren – ohne Skript lässt es sich nicht mitnehmen."""
+    ziel = esc(a.link(alt, neu))
+    return f"""<!doctype html>
+<html lang="de-AT">
+<head>
+<meta charset="utf-8">
+<title>{esc(SEITENNAME)}</title>
+<link rel="canonical" href="{esc(a.basis)}/{esc(neu)}">
+<meta http-equiv="refresh" content="0; url={ziel}">
+</head>
+<body>
+<p>Diese Seite ist umgezogen: <a href="{ziel}">{esc(SEITENNAME)}</a></p>
+</body>
+</html>
+"""
+
+
 def baue_lesefassung(basis: str = BASIS_STANDARD) -> Path:
     """Alle Seiten erzeugen und nach `daten_ergebnis/web/` schreiben (neben das Dashboard)."""
     a = Aufbau(basis)
@@ -1354,6 +1414,9 @@ def baue_lesefassung(basis: str = BASIS_STANDARD) -> Path:
         ordner = ziel / s.pfad
         ordner.mkdir(parents=True, exist_ok=True)
         (ordner / "index.html").write_text(text, encoding="utf-8")
+    for alt, neu in UMGEZOGEN.items():
+        (ziel / alt).mkdir(parents=True, exist_ok=True)
+        (ziel / alt / "index.html").write_text(_weiterleitung(a, alt, neu), encoding="utf-8")
     (ziel / "sitemap.xml").write_text(_sitemap(a, seiten), encoding="utf-8")
     (ziel / "robots.txt").write_text(_robots(a), encoding="utf-8")
     shutil.copyfile(web_dir() / "lesefassung" / "lesefassung.css", ziel / "lesefassung.css")
@@ -1361,7 +1424,7 @@ def baue_lesefassung(basis: str = BASIS_STANDARD) -> Path:
     shutil.copytree(web_dir() / "fonts", ziel / "fonts", dirs_exist_ok=True)
     for icon in ICONS:
         shutil.copyfile(web_dir() / icon, ziel / icon)
-    log.info(f"{len(seiten)} Seiten: 1 Index, {sum(1 for s in seiten if s.pfad.startswith('bl/'))} Bundesländer, "
+    log.info(f"{len(seiten)} Seiten: 1 Startseite, {sum(1 for s in seiten if s.pfad.startswith('bl/'))} Bundesländer, "
              f"{sum(1 for s in seiten if s.pfad.startswith('vr/'))} Versorgungsregionen, "
              f"{sum(1 for s in seiten if s.pfad.startswith('fach/'))} Fächer")  # fmt: skip
     schreibe_laufprotokoll(ausgabe_dir(), "lesefassung", [ziel / "sitemap.xml"], {"Seiten": str(len(seiten))})
